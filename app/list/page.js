@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 export default function ListProperty() {
   const [form, setForm] = useState({
-    title:'', property_type:'Apartment', price:'', bedrooms:'1 bedroom',
+    title:'', property_type:'Apartment', price:'', currency:'USD', bedrooms:'1 bedroom',
     bathrooms:'1 bathroom', description:'', address:'', city:'', state:'DC',
     zip:'', neighborhood:'', contact_name:'', contact_email:'',
     contact_phone:'', contact_method:'Email', available_from:''
@@ -180,8 +180,15 @@ export default function ListProperty() {
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Monthly Rent (USD) *</label>
-              <input style={inputStyle} type="number" placeholder="e.g. 1800" {...f('price')} />
+              <label style={labelStyle}>Price *</label>
+              <div style={{display:'flex', gap:'8px'}}>
+                <select style={{...inputStyle, width:'120px', flexShrink:0}} {...f('currency')}>
+                  <option value="USD">$ USD</option>
+                  <option value="ETB">ETB ብር</option>
+                  <option value="Contact">Contact us</option>
+                </select>
+                <input style={inputStyle} type="number" placeholder="e.g. 1800" {...f('price')} disabled={form.currency === 'Contact'} />
+              </div>
             </div>
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
@@ -327,3 +334,5 @@ export default function ListProperty() {
     </div>
   )
 }
+
+

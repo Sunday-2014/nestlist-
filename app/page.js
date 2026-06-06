@@ -47,6 +47,12 @@ export default function Home() {
     if (e.key === 'Enter') handleSearch()
   }
 
+  const showPrice = (l) => {
+    if (l.currency === 'Contact') return <span style={{fontSize:'14px', color:'#ea580c', fontWeight:'700'}}>Contact for price</span>
+    if (l.currency === 'ETB') return <span>{l.price?.toLocaleString()} <span style={{fontSize:'13px', color:'#166534', fontWeight:'700'}}>ETB</span><span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></span>
+    return <span>${l.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></span>
+  }
+
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', margin:0, padding:0, overflowX:'hidden'}}>
 
@@ -183,7 +189,9 @@ export default function Home() {
                     <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 12px', fontWeight:'500'}}>📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}</p>
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
                       <div>
-                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>${l.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></p>
+                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>
+                          {showPrice(l)}
+                        </p>
                         <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>
                       </div>
                       <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', whiteSpace:'nowrap'}}>{t.viewDetails}</div>
@@ -216,4 +224,3 @@ export default function Home() {
     </div>
   )
 }
-
