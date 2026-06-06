@@ -84,13 +84,13 @@ export default function Home() {
         </div>
 
         {/* CONTACT US BAR */}
-        <div style={{background:'#1f2937', width:'100%', padding:'6px 16px', boxSizing:'border-box'}}>
+        <div style={{background:'linear-gradient(90deg, #0ea5e9, #38bdf8)', width:'100%', padding:'7px 16px', boxSizing:'border-box'}}>
           <div style={{maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center', gap:'16px'}}>
-            <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#fed7aa', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px', padding:'2px 0'}}>
+            <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px', padding:'2px 0'}}>
               📬 Contact Us
             </Link>
-            <span style={{color:'#374151', fontSize:'12px'}}>|</span>
-            <a href="mailto:info@enjerapresslist.com" style={{fontSize:'12px', color:'#9ca3af', textDecoration:'none', display:'flex', alignItems:'center', gap:'4px'}}>
+            <span style={{color:'rgba(255,255,255,0.4)', fontSize:'12px'}}>|</span>
+            <a href="mailto:info@enjerapresslist.com" style={{fontSize:'12px', color:'rgba(255,255,255,0.85)', textDecoration:'none', display:'flex', alignItems:'center', gap:'4px'}}>
               📧 info@enjerapresslist.com
             </a>
           </div>
@@ -220,5 +220,6 @@ export default function Home() {
     </div>
   )
 }
+
 
 
