@@ -90,7 +90,7 @@ export default function Login() {
 
           <p style={{textAlign:'center', fontSize:'14px', color:'#6b7280', marginTop:'20px'}}>
             No account yet?{' '}
-            <Link href="/register" style={{color:'#ea580c', fontWeight:'700', textDecoration:'none'}}>Register free</Link>
+            <Link href="/register" style={{color:'#ea580c', fontWeight:'700', textDecoration:'none'}}>Sign up free</Link>
           </p>
         </div>
       </div>
@@ -102,3 +102,4 @@ export default function Login() {
     </div>
   )
 }
+
