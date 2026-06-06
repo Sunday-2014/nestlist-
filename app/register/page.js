@@ -14,7 +14,7 @@ export default function Register() {
     setLoading(true)
     try {
       await register(form)
-      window.location.href = '/list'
+      window.location.href = '/dashboard'
     } catch (e) {
       setError(e.message)
     }
@@ -106,3 +106,4 @@ export default function Register() {
     </div>
   )
 }
+
