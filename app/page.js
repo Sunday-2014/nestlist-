@@ -122,10 +122,10 @@ export default function Home() {
             textTransform:'uppercase'
           }}>100% Free · No Hidden Fees</div>
           <h2 style={{fontSize:'clamp(24px, 6vw, 48px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>
-            Find Your Perfect<br/>Rental Home
+            Find or List Rentals<br/>&amp; Properties for Sale
           </h2>
           <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>
-            Browse trusted rental listings. Connect directly with landlords — no agents, no fees.
+            Browse rentals, list your property or post it for sale — connect directly with owners, no agents, no fees.
           </p>
 
           {/* SEARCH BOX */}
@@ -243,71 +243,73 @@ export default function Home() {
         ) : (
           <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap:'16px'}}>
             {filtered.map(l => (
-              <div key={l.id} style={{
-                background:'#ffffff', borderRadius:'16px',
-                border:'1px solid #e5e7eb', overflow:'hidden',
-                transition:'transform 0.2s, box-shadow 0.2s',
-                boxShadow:'0 1px 4px rgba(0,0,0,0.06)'
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
-                onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)' }}
-              >
-                {/* Card Image */}
+              <Link key={l.id} href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
                 <div style={{
-                  height:'180px',
-                  background:'linear-gradient(135deg, #fff7ed, #ffedd5)',
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  fontSize:'52px', position:'relative', overflow:'hidden'
-                }}>
-                  {l.listing_images && l.listing_images.length > 0 ? (
-                    <img
-                      src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url}
-                      alt={l.title}
-                      style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}}
-                    />
-                  ) : (
-                    <span style={{fontSize:'52px'}}>🏠</span>
-                  )}
+                  background:'#ffffff', borderRadius:'16px',
+                  border:'1px solid #e5e7eb', overflow:'hidden',
+                  transition:'transform 0.2s, box-shadow 0.2s',
+                  boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
+                  height:'100%'
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)' }}
+                >
+                  {/* Card Image */}
                   <div style={{
-                    position:'absolute', top:'12px', left:'12px',
-                    background:'#ea580c', color:'#ffffff',
-                    fontSize:'11px', fontWeight:'700',
-                    padding:'4px 10px', borderRadius:'6px',
-                    letterSpacing:'0.04em'
-                  }}>{l.property_type}</div>
-                  {l.listing_images && l.listing_images.length > 1 && (
+                    height:'180px',
+                    background:'linear-gradient(135deg, #fff7ed, #ffedd5)',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    fontSize:'52px', position:'relative', overflow:'hidden'
+                  }}>
+                    {l.listing_images && l.listing_images.length > 0 ? (
+                      <img
+                        src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url}
+                        alt={l.title}
+                        style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}}
+                      />
+                    ) : (
+                      <span style={{fontSize:'52px'}}>🏠</span>
+                    )}
                     <div style={{
-                      position:'absolute', bottom:'8px', right:'8px',
-                      background:'rgba(0,0,0,0.55)', color:'#ffffff',
+                      position:'absolute', top:'12px', left:'12px',
+                      background:'#ea580c', color:'#ffffff',
                       fontSize:'11px', fontWeight:'700',
-                      padding:'3px 8px', borderRadius:'6px'
-                    }}>+{l.listing_images.length - 1} photos</div>
-                  )}
-                </div>
+                      padding:'4px 10px', borderRadius:'6px',
+                      letterSpacing:'0.04em'
+                    }}>{l.property_type}</div>
+                    {l.listing_images && l.listing_images.length > 1 && (
+                      <div style={{
+                        position:'absolute', bottom:'8px', right:'8px',
+                        background:'rgba(0,0,0,0.55)', color:'#ffffff',
+                        fontSize:'11px', fontWeight:'700',
+                        padding:'3px 8px', borderRadius:'6px'
+                      }}>+{l.listing_images.length - 1} photos</div>
+                    )}
+                  </div>
 
-                {/* Card Body */}
-                <div style={{padding:'14px'}}>
-                  <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 6px', lineHeight:'1.4'}}>{l.title}</p>
-                  <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 12px', fontWeight:'500'}}>
-                    📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}
-                  </p>
-                  <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
-                    <div>
-                      <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>
-                        ${l.price?.toLocaleString()}
-                        <span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span>
-                      </p>
-                      <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>
+                  {/* Card Body */}
+                  <div style={{padding:'14px'}}>
+                    <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 6px', lineHeight:'1.4'}}>{l.title}</p>
+                    <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 12px', fontWeight:'500'}}>
+                      📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}
+                    </p>
+                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
+                      <div>
+                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>
+                          ${l.price?.toLocaleString()}
+                          <span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span>
+                        </p>
+                        <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>
+                      </div>
+                      <div style={{
+                        fontSize:'13px', fontWeight:'700', color:'#ffffff',
+                        padding:'8px 16px', borderRadius:'8px',
+                        background:'#ea580c', whiteSpace:'nowrap'
+                      }}>View Details</div>
                     </div>
-                    <a href={`mailto:${l.contact_email}`} style={{
-                      fontSize:'13px', fontWeight:'700', color:'#ffffff',
-                      padding:'8px 16px', borderRadius:'8px',
-                      background:'#ea580c', textDecoration:'none',
-                      display:'inline-block', whiteSpace:'nowrap'
-                    }}>Contact</a>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

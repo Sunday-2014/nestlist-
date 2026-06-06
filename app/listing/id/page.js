@@ -1,0 +1,227 @@
+'use client'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
+
+export default function ListingDetail({ params }) {
+  const [listing, setListing] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [activePhoto, setActivePhoto] = useState(0)
+  const [showContact, setShowContact] = useState(false)
+
+  useEffect(() => {
+    fetchListing()
+  }, [])
+
+  const fetchListing = async () => {
+    const { data, error } = await supabase
+      .from('listings')
+      .select('*, listing_images(public_url, position, storage_path)')
+      .eq('id', params.id)
+      .single()
+    if (!error) {
+      const sorted = data.listing_images?.sort((a,b) => a.position - b.position) || []
+      setListing({...data, listing_images: sorted})
+    }
+    setLoading(false)
+  }
+
+  const images = listing?.listing_images?.filter(i => !i.storage_path?.match(/\.(mp4|mov|avi)$/i)) || []
+  const videos = listing?.listing_images?.filter(i => i.storage_path?.match(/\.(mp4|mov|avi)$/i)) || []
+
+  const navStyle = {
+    background:'#ffffff', borderBottom:'2px solid #ea580c',
+    boxShadow:'0 2px 12px rgba(0,0,0,0.08)',
+    position:'sticky', top:0, zIndex:100, width:'100%', boxSizing:'border-box'
+  }
+
+  if (loading) return (
+    <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif'}}>
+      <nav style={navStyle}>
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+          <Link href="/" style={{fontSize:'18px', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>EnjeraPressList.Com</Link>
+          <Link href="/" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none'}}>← Back</Link>
+        </div>
+        <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
+          <div style={{height:'6px', background:'#078930'}}></div>
+          <div style={{height:'6px', background:'#FCDD09'}}></div>
+          <div style={{height:'6px', background:'#DA121A'}}></div>
+        </div>
+      </nav>
+      <div style={{textAlign:'center', padding:'80px 0'}}>
+        <p style={{color:'#6b7280', fontSize:'16px'}}>Loading listing...</p>
+      </div>
+    </div>
+  )
+
+  if (!listing) return (
+    <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', textAlign:'center', padding:'80px 24px'}}>
+      <p style={{fontSize:'18px', color:'#111827', fontWeight:'700', marginBottom:'12px'}}>Listing not found</p>
+      <Link href="/" style={{color:'#ea580c', fontWeight:'600', textDecoration:'none'}}>← Back to listings</Link>
+    </div>
+  )
+
+  return (
+    <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', overflowX:'hidden'}}>
+
+      {/* NAVBAR */}
+      <nav style={navStyle}>
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+            <div style={{position:'relative', width:'40px', height:'40px', flexShrink:0}}>
+              <img src="/logo.gif" alt="logo" style={{width:'40px', height:'40px', borderRadius:'50%', border:'2px solid #d97706'}} />
+              <span style={{position:'absolute', bottom:'-2px', right:'-4px', background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'900', width:'18px', height:'18px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff'}}>L</span>
+            </div>
+            <Link href="/" style={{fontSize:'clamp(14px, 4vw, 20px)', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite'}}>EnjeraPressList.Com</Link>
+          </div>
+          <Link href="/" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none', whiteSpace:'nowrap'}}>← Back</Link>
+        </div>
+        <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
+          <div style={{height:'6px', background:'#078930'}}></div>
+          <div style={{height:'6px', background:'#FCDD09'}}></div>
+          <div style={{height:'6px', background:'#DA121A'}}></div>
+        </div>
+      </nav>
+
+      <div style={{maxWidth:'900px', margin:'0 auto', padding:'24px 16px 64px', boxSizing:'border-box'}}>
+
+        {/* PHOTO GALLERY */}
+        {images.length > 0 && (
+          <div style={{marginBottom:'24px', borderRadius:'16px', overflow:'hidden', border:'1px solid #e5e7eb'}}>
+            <img
+              src={images[activePhoto]?.public_url}
+              alt={listing.title}
+              style={{width:'100%', height:'clamp(200px, 50vw, 420px)', objectFit:'cover', display:'block'}}
+            />
+            {images.length > 1 && (
+              <div style={{display:'flex', gap:'8px', padding:'10px', background:'#ffffff', overflowX:'auto'}}>
+                {images.map((img, i) => (
+                  <img
+                    key={i}
+                    src={img.public_url}
+                    alt=""
+                    onClick={() => setActivePhoto(i)}
+                    style={{
+                      width:'70px', height:'56px', objectFit:'cover',
+                      borderRadius:'8px', cursor:'pointer', flexShrink:0,
+                      border: i === activePhoto ? '3px solid #ea580c' : '3px solid transparent',
+                      opacity: i === activePhoto ? 1 : 0.7,
+                      transition:'all 0.15s'
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* NO IMAGE PLACEHOLDER */}
+        {images.length === 0 && (
+          <div style={{height:'200px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', borderRadius:'16px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px', marginBottom:'24px'}}>🏠</div>
+        )}
+
+        <div style={{display:'grid', gridTemplateColumns:'minmax(0,1fr) minmax(0,320px)', gap:'20px'}}>
+
+          {/* LEFT COLUMN */}
+          <div>
+
+            {/* TITLE + TYPE */}
+            <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+              <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', marginBottom:'10px'}}>{listing.property_type}</div>
+              <h1 style={{fontSize:'clamp(18px, 4vw, 26px)', fontWeight:'800', color:'#111827', margin:'0 0 8px', lineHeight:'1.3'}}>{listing.title}</h1>
+              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>📍 {listing.address && `${listing.address}, `}{listing.neighborhood && `${listing.neighborhood}, `}{listing.city}{listing.state && `, ${listing.state}`} {listing.zip}</p>
+
+              <div style={{display:'flex', flexWrap:'wrap', gap:'10px'}}>
+                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Price</p>
+                  <p style={{fontSize:'18px', fontWeight:'800', color:'#ea580c', margin:'0'}}>${listing.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></p>
+                </div>
+                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Beds</p>
+                  <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bedrooms}</p>
+                </div>
+                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Baths</p>
+                  <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bathrooms}</p>
+                </div>
+                {listing.available_from && (
+                  <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+                    <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Available</p>
+                    <p style={{fontSize:'14px', fontWeight:'700', color:'#111827', margin:'0'}}>{new Date(listing.available_from).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* DESCRIPTION */}
+            {listing.description && (
+              <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+                <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 12px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>About this property</h2>
+                <p style={{fontSize:'14px', color:'#4b5563', lineHeight:'1.8', margin:'0', whiteSpace:'pre-wrap'}}>{listing.description}</p>
+              </div>
+            )}
+
+            {/* VIDEO */}
+            {videos.length > 0 && (
+              <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+                <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 12px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>🎥 Property Video</h2>
+                <video src={videos[0].public_url} controls style={{width:'100%', borderRadius:'10px', maxHeight:'300px'}} />
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT COLUMN - CONTACT */}
+          <div style={{alignSelf:'start'}}>
+            <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', position:'sticky', top:'100px'}}>
+              <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
+
+              <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'16px'}}>
+                <div style={{width:'48px', height:'48px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0}}>👤</div>
+                <div>
+                  <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.contact_name || 'Landlord'}</p>
+                  <p style={{fontSize:'12px', color:'#6b7280', margin:'0', fontWeight:'500'}}>Prefers: {listing.contact_method}</p>
+                </div>
+              </div>
+
+              <a href={`mailto:${listing.contact_email}`} style={{
+                display:'block', width:'100%', padding:'13px',
+                background:'#ea580c', color:'#ffffff',
+                fontSize:'14px', fontWeight:'700', textAlign:'center',
+                borderRadius:'10px', textDecoration:'none',
+                marginBottom:'10px', boxSizing:'border-box'
+              }}>✉️ Send Email</a>
+
+              {listing.contact_phone && (
+                <a href={`tel:${listing.contact_phone}`} style={{
+                  display:'block', width:'100%', padding:'13px',
+                  background:'#166534', color:'#ffffff',
+                  fontSize:'14px', fontWeight:'700', textAlign:'center',
+                  borderRadius:'10px', textDecoration:'none',
+                  boxSizing:'border-box'
+                }}>📞 Call {listing.contact_phone}</a>
+              )}
+
+              <div style={{marginTop:'16px', padding:'12px', background:'#f9fafb', borderRadius:'10px', border:'1px solid #e5e7eb'}}>
+                <p style={{fontSize:'12px', color:'#6b7280', margin:'0', lineHeight:'1.6', textAlign:'center'}}>
+                  🔒 Contact landlord directly — no middlemen, no fees
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
+        <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 4px'}}>EnjeraPressList.Com</p>
+        <div style={{display:'flex', justifyContent:'center', gap:'4px', margin:'8px 0'}}>
+          <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
+          <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
+          <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
+        </div>
+        <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
+      </footer>
+
+    </div>
+  )
+}
