@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { supabase, getCurrentUser, deleteListing } from '@/lib/supabase'
+import { supabase, getCurrentUser, deleteListing, logout } from '@/lib/supabase'
 import Link from 'next/link'
 
 export default function Dashboard() {
@@ -8,6 +8,7 @@ export default function Dashboard() {
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(null)
+  const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
     checkUser()
@@ -42,18 +43,22 @@ export default function Dashboard() {
     setDeleting(null)
   }
 
-  const navStyle = {
-    background:'#ffffff', borderBottom:'2px solid #ea580c',
-    boxShadow:'0 2px 12px rgba(0,0,0,0.08)',
-    position:'sticky', top:0, zIndex:100,
-    width:'100%', boxSizing:'border-box'
+  const handleSignOut = async () => {
+    setSigningOut(true)
+    try {
+      await logout()
+      window.location.href = '/'
+    } catch (e) {
+      alert('Error signing out: ' + e.message)
+    }
+    setSigningOut(false)
   }
 
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', overflowX:'hidden'}}>
 
       {/* NAVBAR */}
-      <nav style={navStyle}>
+      <nav style={{background:'#ffffff', borderBottom:'2px solid #ea580c', boxShadow:'0 2px 12px rgba(0,0,0,0.08)', position:'sticky', top:0, zIndex:100, width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <div style={{position:'relative', width:'40px', height:'40px', flexShrink:0}}>
@@ -62,9 +67,14 @@ export default function Dashboard() {
             </div>
             <Link href="/" style={{fontSize:'clamp(14px, 4vw, 20px)', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite'}}>EnjeraPressList.Com</Link>
           </div>
-          <div style={{display:'flex', gap:'8px'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
             <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#ea580c', textDecoration:'none', whiteSpace:'nowrap'}}>+ New Listing</Link>
             <Link href="/" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', textDecoration:'none', whiteSpace:'nowrap'}}>← Home</Link>
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              style={{fontSize:'13px', fontWeight:'600', color:'#dc2626', padding:'7px 12px', borderRadius:'8px', border:'2px solid #fca5a5', background:'#fef2f2', cursor:'pointer', whiteSpace:'nowrap'}}
+            >{signingOut ? 'Signing out...' : '🚪 Sign out'}</button>
           </div>
         </div>
         <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
@@ -77,14 +87,35 @@ export default function Dashboard() {
       <div style={{maxWidth:'1000px', margin:'0 auto', padding:'28px 16px 64px', boxSizing:'border-box'}}>
 
         {/* HEADER */}
-        <div style={{marginBottom:'28px'}}>
-          <h1 style={{fontSize:'clamp(22px, 5vw, 32px)', fontWeight:'800', color:'#111827', margin:'0 0 6px'}}>My Dashboard</h1>
-          <p style={{fontSize:'14px', color:'#6b7280', margin:'0'}}>Manage your property listings</p>
-          {user && <p style={{fontSize:'13px', color:'#9ca3af', margin:'4px 0 0'}}>Signed in as {user.email}</p>}
+        <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px 24px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', marginBottom:'24px', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'12px'}}>
+          <div>
+            <h1 style={{fontSize:'clamp(20px, 5vw, 28px)', fontWeight:'800', color:'#111827', margin:'0 0 4px'}}>My Dashboard</h1>
+            <p style={{fontSize:'13px', color:'#6b7280', margin:'0'}}>Manage your property listings</p>
+            {user && (
+              <div style={{display:'flex', alignItems:'center', gap:'8px', marginTop:'8px'}}>
+                <div style={{width:'32px', height:'32px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'14px', border:'2px solid #fed7aa'}}>👤</div>
+                <div>
+                  <p style={{fontSize:'13px', fontWeight:'600', color:'#111827', margin:'0'}}>{user.user_metadata?.full_name || 'User'}</p>
+                  <p style={{fontSize:'11px', color:'#9ca3af', margin:'0'}}>{user.email}</p>
+                </div>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={handleSignOut}
+            disabled={signingOut}
+            style={{
+              fontSize:'14px', fontWeight:'700', color:'#ffffff',
+              padding:'10px 20px', borderRadius:'10px',
+              background: signingOut ? '#d1d5db' : '#dc2626',
+              border:'none', cursor: signingOut ? 'not-allowed' : 'pointer',
+              whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'6px'
+            }}
+          >🚪 {signingOut ? 'Signing out...' : 'Sign out'}</button>
         </div>
 
         {/* STATS */}
-        <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(140px, 1fr))', gap:'12px', marginBottom:'28px'}}>
+        <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(140px, 1fr))', gap:'12px', marginBottom:'24px'}}>
           <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
             <p style={{fontSize:'32px', fontWeight:'800', color:'#ea580c', margin:'0'}}>{listings.length}</p>
             <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Listings</p>
@@ -100,6 +131,11 @@ export default function Dashboard() {
         </div>
 
         {/* LISTINGS */}
+        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'16px', flexWrap:'wrap', gap:'10px'}}>
+          <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>Your Listings</h2>
+          <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', textDecoration:'none', whiteSpace:'nowrap'}}>+ Add New Listing</Link>
+        </div>
+
         {loading ? (
           <div style={{textAlign:'center', padding:'60px 0'}}>
             <p style={{color:'#6b7280', fontSize:'16px'}}>Loading your listings...</p>
@@ -140,6 +176,7 @@ export default function Dashboard() {
                           <span style={{fontSize:'13px', color:'#6b7280', fontWeight:'500'}}>{l.bedrooms}</span>
                           <span style={{fontSize:'13px', color:'#6b7280', fontWeight:'500'}}>{l.listing_images?.length || 0} photos</span>
                         </div>
+                        <p style={{fontSize:'11px', color:'#9ca3af', margin:'8px 0 0'}}>Listed {new Date(l.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</p>
                       </div>
 
                       {/* ACTIONS */}
@@ -175,4 +212,3 @@ export default function Dashboard() {
     </div>
   )
 }
-
