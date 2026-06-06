@@ -36,7 +36,7 @@ export default function Login() {
               <span style={{fontSize:'11px', color:'#6b7280', fontWeight:'500'}}>Free Rental Listings</span>
             </div>
           </div>
-          <Link href="/register" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'8px 18px', borderRadius:'8px', background:'#ea580c', textDecoration:'none'}}>Register Free</Link>
+          <Link href="/register" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'8px 18px', borderRadius:'8px', background:'#ea580c', textDecoration:'none'}}>Sign up free</Link>
         </div>
         <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
           <div style={{height:'8px', background:'#078930'}}></div>
