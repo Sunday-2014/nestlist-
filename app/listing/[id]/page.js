@@ -74,25 +74,31 @@ export default function ListingDetail({ params }) {
     return (
       <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
         <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>📤 Share this listing</p>
-        <div style={{display:'flex', gap:'8px', marginBottom:'8px', flexWrap:'wrap'}}>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginBottom:'8px'}}>
           
             href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{flex:'1', minWidth:'80px', padding:'10px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none'}}
+            style={{padding:'10px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
           >📱 WhatsApp</a>
           
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{flex:'1', minWidth:'80px', padding:'10px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none'}}
+            style={{padding:'10px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
           >👍 Facebook</a>
+          
+            href={`https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{padding:'10px 6px', borderRadius:'8px', background:'#0088cc', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
+          >✈️ Telegram</a>
           
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{flex:'1', minWidth:'80px', padding:'10px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none'}}
-          >𝕏 Twitter</a>
+            style={{padding:'10px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
+          >𝕏 Twitter (X)</a>
         </div>
         <button
           onClick={handleCopyLink}
@@ -216,11 +222,9 @@ export default function ListingDetail({ params }) {
           <div style={{height:'220px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', borderRadius:'16px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px', marginBottom:'24px', border:'1px solid #e5e7eb'}}>🏠</div>
         )}
 
-        {/* MOBILE: show share + contact ABOVE the description */}
-        <div style={{display:'block'}}>
-          <ShareButtons />
-          <ContactCard />
-        </div>
+        {/* SHARE + CONTACT — shows on all screens */}
+        <ShareButtons />
+        <ContactCard />
 
         {/* TITLE + STATS */}
         <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
@@ -276,5 +280,4 @@ export default function ListingDetail({ params }) {
     </div>
   )
 }
-
 
