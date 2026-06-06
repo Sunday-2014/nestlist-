@@ -54,6 +54,8 @@ export default function Dashboard() {
     setSigningOut(false)
   }
 
+  const totalViews = listings.reduce((sum, l) => sum + (l.views || 0), 0)
+
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', overflowX:'hidden'}}>
 
@@ -136,6 +138,10 @@ export default function Dashboard() {
             <p style={{fontSize:'32px', fontWeight:'800', color:'#d97706', margin:'0'}}>{listings.filter(l => l.listing_images?.length > 0).length}</p>
             <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>With Photos</p>
           </div>
+          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
+            <p style={{fontSize:'32px', fontWeight:'800', color:'#7c3aed', margin:'0'}}>{totalViews}</p>
+            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Views</p>
+          </div>
         </div>
 
         {/* LISTINGS */}
@@ -176,6 +182,7 @@ export default function Dashboard() {
                         <div style={{display:'flex', alignItems:'center', gap:'8px', marginBottom:'6px', flexWrap:'wrap'}}>
                           <span style={{background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>
                           <span style={{background: l.is_active ? '#f0fdf4' : '#fef2f2', color: l.is_active ? '#166534' : '#dc2626', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px', border: l.is_active ? '1px solid #bbf7d0' : '1px solid #fca5a5'}}>{l.is_active ? '✓ Active' : '✗ Inactive'}</span>
+                          <span style={{background:'#f5f3ff', color:'#7c3aed', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px', border:'1px solid #ddd6fe'}}>👁 {l.views || 0} views</span>
                         </div>
                         <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 4px', lineHeight:'1.3'}}>{l.title}</p>
                         <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 8px'}}>📍 {[l.neighborhood, l.city, l.state].filter(Boolean).join(', ')}</p>
@@ -220,3 +227,4 @@ export default function Dashboard() {
     </div>
   )
 }
+
