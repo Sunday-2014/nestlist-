@@ -103,7 +103,43 @@ export default function Home() {
       <div style={{background:'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)', borderBottom:'1px solid #fdba74', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
           <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'12px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
-          <h2 style={{fontSize:'clamp(24px, 6vw, 48px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>{t.heroTitle}</h2>
+          <div style={{display:'flex', alignItems:'center', gap:'12px', margin:'0 0 12px', justifyContent:'center'}}>
+            {/* LEFT AD FRAME */}
+            <div style={{
+              width:'120px', minHeight:'80px', flexShrink:0,
+              border:'2px solid #d97706',
+              borderRadius:'10px',
+              background:'linear-gradient(135deg, #fef3c7, #fde68a)',
+              display:'flex', flexDirection:'column',
+              alignItems:'center', justifyContent:'center',
+              padding:'8px', textAlign:'center',
+              boxShadow:'0 0 10px rgba(217,119,6,0.3)',
+              cursor:'pointer'
+            }}>
+              <span style={{fontSize:'18px', marginBottom:'4px'}}>⭐</span>
+              <p style={{fontSize:'10px', fontWeight:'700', color:'#92400e', margin:'0', lineHeight:'1.3'}}>Your Ad Here</p>
+              <p style={{fontSize:'9px', color:'#b45309', margin:'2px 0 0'}}>Contact us to advertise</p>
+            </div>
+
+            <h2 style={{fontSize:'clamp(20px, 4vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0', lineHeight:'1.2', flex:1}}>{t.heroTitle}</h2>
+
+            {/* RIGHT AD FRAME */}
+            <div style={{
+              width:'120px', minHeight:'80px', flexShrink:0,
+              border:'2px solid #d97706',
+              borderRadius:'10px',
+              background:'linear-gradient(135deg, #fef3c7, #fde68a)',
+              display:'flex', flexDirection:'column',
+              alignItems:'center', justifyContent:'center',
+              padding:'8px', textAlign:'center',
+              boxShadow:'0 0 10px rgba(217,119,6,0.3)',
+              cursor:'pointer'
+            }}>
+              <span style={{fontSize:'18px', marginBottom:'4px'}}>⭐</span>
+              <p style={{fontSize:'10px', fontWeight:'700', color:'#92400e', margin:'0', lineHeight:'1.3'}}>Your Ad Here</p>
+              <p style={{fontSize:'9px', color:'#b45309', margin:'2px 0 0'}}>Contact us to advertise</p>
+            </div>
+          </div>
           <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>{t.heroSubtitle}</p>
 
           {/* SEARCH BOX */}
@@ -226,4 +262,5 @@ export default function Home() {
     </div>
   )
 }
+
 
