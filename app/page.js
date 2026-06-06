@@ -36,7 +36,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif'}}>
+    <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', margin:0, padding:0, overflowX:'hidden'}}>
 
       {/* NAVBAR */}
       <nav style={{
@@ -45,23 +45,25 @@ export default function Home() {
         position:'sticky',
         top:0,
         zIndex:100,
-        boxShadow:'0 2px 12px rgba(0,0,0,0.08)'
+        boxShadow:'0 2px 12px rgba(0,0,0,0.08)',
+        width:'100%',
+        boxSizing:'border-box'
       }}>
-        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 24px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
 
           {/* LOGO + NAME */}
-          <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
-            <div style={{position:'relative', width:'52px', height:'52px', flexShrink:0}}>
+          <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+            <div style={{position:'relative', width:'44px', height:'44px', flexShrink:0}}>
               <img
                 src="/logo.gif"
                 alt="EnjeraPressList logo"
-                style={{width:'52px', height:'52px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}}
+                style={{width:'44px', height:'44px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}}
               />
               <span style={{
                 position:'absolute', bottom:'-2px', right:'-4px',
                 background:'#ea580c', color:'#ffffff',
-                fontSize:'13px', fontWeight:'900',
-                width:'22px', height:'22px', borderRadius:'50%',
+                fontSize:'11px', fontWeight:'900',
+                width:'20px', height:'20px', borderRadius:'50%',
                 display:'flex', alignItems:'center', justifyContent:'center',
                 border:'2px solid #ffffff',
                 boxShadow:'0 1px 4px rgba(0,0,0,0.25)'
@@ -69,7 +71,7 @@ export default function Home() {
             </div>
             <div>
               <span style={{
-                fontSize:'22px',
+                fontSize:'clamp(15px, 4vw, 22px)',
                 fontWeight:'800',
                 background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)',
                 backgroundSize:'200% auto',
@@ -79,114 +81,119 @@ export default function Home() {
                 letterSpacing:'-0.5px',
                 display:'block'
               }}>EnjeraPressList.Com</span>
-              <span style={{fontSize:'11px', color:'#6b7280', fontWeight:'500'}}>Free Rental Listings</span>
+              <span style={{fontSize:'10px', color:'#6b7280', fontWeight:'500'}}>Free Rental Listings</span>
             </div>
           </div>
 
           {/* NAV BUTTONS */}
-          <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
             <Link href="/login" style={{
-              fontSize:'14px', fontWeight:'600', color:'#374151',
-              padding:'8px 16px', borderRadius:'8px',
+              fontSize:'13px', fontWeight:'600', color:'#374151',
+              padding:'7px 12px', borderRadius:'8px',
               border:'2px solid #d1d5db', background:'#ffffff',
-              textDecoration:'none', display:'inline-block'
+              textDecoration:'none', display:'inline-block',
+              whiteSpace:'nowrap'
             }}>Sign in</Link>
             <Link href="/register" style={{
-              fontSize:'14px', fontWeight:'700', color:'#ffffff',
-              padding:'8px 18px', borderRadius:'8px',
+              fontSize:'13px', fontWeight:'700', color:'#ffffff',
+              padding:'7px 12px', borderRadius:'8px',
               background:'#ea580c', border:'2px solid #ea580c',
-              textDecoration:'none', display:'inline-block'
-            }}>Register Free</Link>
+              textDecoration:'none', display:'inline-block',
+              whiteSpace:'nowrap'
+            }}>Register</Link>
           </div>
         </div>
 
         {/* ETHIOPIAN FLAG STRIPES */}
         <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
-          <div style={{height:'8px', background:'#078930', width:'100%'}}></div>
-          <div style={{height:'8px', background:'#FCDD09', width:'100%'}}></div>
-          <div style={{height:'8px', background:'#DA121A', width:'100%'}}></div>
+          <div style={{height:'6px', background:'#078930', width:'100%'}}></div>
+          <div style={{height:'6px', background:'#FCDD09', width:'100%'}}></div>
+          <div style={{height:'6px', background:'#DA121A', width:'100%'}}></div>
         </div>
       </nav>
 
       {/* HERO */}
-      <div style={{background:'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)', borderBottom:'1px solid #fdba74'}}>
-        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'48px 24px 40px', textAlign:'center'}}>
+      <div style={{background:'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)', borderBottom:'1px solid #fdba74', width:'100%', boxSizing:'border-box'}}>
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
           <div style={{
             display:'inline-block', background:'#ea580c', color:'#ffffff',
             fontSize:'11px', fontWeight:'700', padding:'4px 14px',
-            borderRadius:'99px', marginBottom:'16px', letterSpacing:'0.08em',
+            borderRadius:'99px', marginBottom:'12px', letterSpacing:'0.08em',
             textTransform:'uppercase'
           }}>100% Free · No Hidden Fees</div>
-          <h2 style={{fontSize:'clamp(28px, 5vw, 48px)', fontWeight:'800', color:'#1f2937', margin:'0 0 14px', lineHeight:'1.2'}}>
+          <h2 style={{fontSize:'clamp(24px, 6vw, 48px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>
             Find Your Perfect<br/>Rental Home
           </h2>
-          <p style={{fontSize:'16px', color:'#4b5563', margin:'0 auto 32px', maxWidth:'480px', lineHeight:'1.6'}}>
+          <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>
             Browse trusted rental listings. Connect directly with landlords — no agents, no fees.
           </p>
 
           {/* SEARCH BOX */}
           <div style={{
-            background:'#ffffff', borderRadius:'16px', padding:'16px',
+            background:'#ffffff', borderRadius:'16px', padding:'12px',
             maxWidth:'780px', margin:'0 auto',
             boxShadow:'0 4px 24px rgba(0,0,0,0.10)',
-            border:'1px solid #e5e7eb'
+            border:'1px solid #e5e7eb',
+            boxSizing:'border-box'
           }}>
-            <div style={{display:'flex', flexWrap:'wrap', gap:'10px', alignItems:'center'}}>
+            <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
               <input
                 style={{
-                  flex:'1', minWidth:'200px', padding:'12px 16px',
+                  width:'100%', padding:'12px 16px',
                   borderRadius:'10px', border:'2px solid #e5e7eb',
                   fontSize:'14px', color:'#111827', outline:'none',
-                  background:'#f9fafb', fontWeight:'500'
+                  background:'#f9fafb', fontWeight:'500',
+                  boxSizing:'border-box'
                 }}
                 placeholder="Search city, neighborhood or title..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
-              <select
-                style={{
-                  padding:'12px 14px', borderRadius:'10px',
-                  border:'2px solid #e5e7eb', fontSize:'14px',
-                  color:'#111827', background:'#f9fafb',
-                  fontWeight:'500', outline:'none'
-                }}
-                value={type}
-                onChange={e => setType(e.target.value)}
-              >
-                <option value="">All types</option>
-                {['Apartment','House','Studio','Condo','Townhouse'].map(t => <option key={t}>{t}</option>)}
-              </select>
-              <select
-                style={{
-                  padding:'12px 14px', borderRadius:'10px',
-                  border:'2px solid #e5e7eb', fontSize:'14px',
-                  color:'#111827', background:'#f9fafb',
-                  fontWeight:'500', outline:'none'
-                }}
-                value={maxPrice}
-                onChange={e => setMaxPrice(e.target.value)}
-              >
-                <option value="">Any price</option>
-                <option value="1500">Under $1,500</option>
-                <option value="2500">Under $2,500</option>
-                <option value="3500">Under $3,500</option>
-                <option value="5000">Under $5,000</option>
-              </select>
-              <button
-                onClick={handleSearch}
-                style={{
-                  padding:'12px 28px', borderRadius:'10px',
-                  background:'#ea580c', color:'#ffffff',
-                  fontSize:'14px', fontWeight:'700',
-                  border:'none', cursor:'pointer',
-                  whiteSpace:'nowrap'
-                }}
-              >Search</button>
+              <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+                <select
+                  style={{
+                    flex:'1', minWidth:'120px', padding:'11px 10px',
+                    borderRadius:'10px', border:'2px solid #e5e7eb',
+                    fontSize:'13px', color:'#111827',
+                    background:'#f9fafb', fontWeight:'500', outline:'none'
+                  }}
+                  value={type}
+                  onChange={e => setType(e.target.value)}
+                >
+                  <option value="">All types</option>
+                  {['Apartment','House','Studio','Condo','Townhouse'].map(t => <option key={t}>{t}</option>)}
+                </select>
+                <select
+                  style={{
+                    flex:'1', minWidth:'120px', padding:'11px 10px',
+                    borderRadius:'10px', border:'2px solid #e5e7eb',
+                    fontSize:'13px', color:'#111827',
+                    background:'#f9fafb', fontWeight:'500', outline:'none'
+                  }}
+                  value={maxPrice}
+                  onChange={e => setMaxPrice(e.target.value)}
+                >
+                  <option value="">Any price</option>
+                  <option value="1500">Under $1,500</option>
+                  <option value="2500">Under $2,500</option>
+                  <option value="3500">Under $3,500</option>
+                  <option value="5000">Under $5,000</option>
+                </select>
+                <button
+                  onClick={handleSearch}
+                  style={{
+                    flex:'1', minWidth:'80px', padding:'11px 20px',
+                    borderRadius:'10px', background:'#ea580c',
+                    color:'#ffffff', fontSize:'14px', fontWeight:'700',
+                    border:'none', cursor:'pointer', whiteSpace:'nowrap'
+                  }}
+                >Search</button>
+              </div>
             </div>
           </div>
 
-          <div style={{marginTop:'20px'}}>
+          <div style={{marginTop:'16px'}}>
             <Link href="/list" style={{
               fontSize:'14px', fontWeight:'600', color:'#ea580c',
               textDecoration:'none', display:'inline-flex',
@@ -197,17 +204,18 @@ export default function Home() {
       </div>
 
       {/* LISTINGS */}
-      <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 24px 64px'}}>
-        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'24px', flexWrap:'wrap', gap:'12px'}}>
+      <div style={{maxWidth:'1100px', margin:'0 auto', padding:'24px 16px 64px', boxSizing:'border-box'}}>
+        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'20px', flexWrap:'wrap', gap:'10px'}}>
           <div>
-            <h3 style={{fontSize:'20px', fontWeight:'700', color:'#111827', margin:'0 0 2px'}}>Available Rentals</h3>
+            <h3 style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 2px'}}>Available Rentals</h3>
             <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'500'}}>{filtered.length} {filtered.length === 1 ? 'listing' : 'listings'} found</p>
           </div>
           <Link href="/list" style={{
-            fontSize:'14px', fontWeight:'700', color:'#ffffff',
-            padding:'10px 20px', borderRadius:'10px',
+            fontSize:'13px', fontWeight:'700', color:'#ffffff',
+            padding:'9px 16px', borderRadius:'10px',
             background:'#166534', textDecoration:'none',
-            display:'inline-block', border:'2px solid #166534'
+            display:'inline-block', border:'2px solid #166534',
+            whiteSpace:'nowrap'
           }}>+ Add Your Listing</Link>
         </div>
 
@@ -233,7 +241,7 @@ export default function Home() {
             }}>List Your Property Free</Link>
           </div>
         ) : (
-          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:'20px'}}>
+          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap:'16px'}}>
             {filtered.map(l => (
               <div key={l.id} style={{
                 background:'#ffffff', borderRadius:'16px',
@@ -278,24 +286,24 @@ export default function Home() {
                 </div>
 
                 {/* Card Body */}
-                <div style={{padding:'16px'}}>
+                <div style={{padding:'14px'}}>
                   <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 6px', lineHeight:'1.4'}}>{l.title}</p>
-                  <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 14px', fontWeight:'500'}}>
+                  <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 12px', fontWeight:'500'}}>
                     📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}
                   </p>
-                  <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'12px', borderTop:'1px solid #f3f4f6'}}>
+                  <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
                     <div>
-                      <p style={{fontSize:'20px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>
+                      <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>
                         ${l.price?.toLocaleString()}
-                        <span style={{fontSize:'13px', fontWeight:'500', color:'#9ca3af'}}>/mo</span>
+                        <span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span>
                       </p>
                       <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>
                     </div>
                     <a href={`mailto:${l.contact_email}`} style={{
                       fontSize:'13px', fontWeight:'700', color:'#ffffff',
-                      padding:'9px 18px', borderRadius:'8px',
+                      padding:'8px 16px', borderRadius:'8px',
                       background:'#ea580c', textDecoration:'none',
-                      display:'inline-block'
+                      display:'inline-block', whiteSpace:'nowrap'
                     }}>Contact</a>
                   </div>
                 </div>
@@ -306,28 +314,27 @@ export default function Home() {
       </div>
 
       {/* FOOTER */}
-      <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'28px 24px', textAlign:'center'}}>
-        <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'12px', marginBottom:'8px'}}>
-          <div style={{position:'relative', width:'36px', height:'36px'}}>
-            <img src="/logo.gif" alt="logo" style={{width:'36px', height:'36px', borderRadius:'50%', border:'2px solid #d97706'}} />
+      <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
+        <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'10px', marginBottom:'8px'}}>
+          <div style={{position:'relative', width:'32px', height:'32px'}}>
+            <img src="/logo.gif" alt="logo" style={{width:'32px', height:'32px', borderRadius:'50%', border:'2px solid #d97706'}} />
             <span style={{
               position:'absolute', bottom:'-1px', right:'-3px',
               background:'#ea580c', color:'#ffffff',
-              fontSize:'9px', fontWeight:'900',
-              width:'15px', height:'15px', borderRadius:'50%',
+              fontSize:'8px', fontWeight:'900',
+              width:'13px', height:'13px', borderRadius:'50%',
               display:'flex', alignItems:'center', justifyContent:'center',
               border:'1px solid #1f2937'
             }}>L</span>
           </div>
-          <p style={{fontSize:'15px', fontWeight:'700', color:'#ffffff', margin:'0'}}>EnjeraPressList.Com</p>
+          <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0'}}>EnjeraPressList.Com</p>
         </div>
-        {/* Ethiopian Flag Stripes in Footer */}
-        <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'12px'}}>
-          <div style={{height:'4px', width:'60px', background:'#078930', borderRadius:'2px'}}></div>
-          <div style={{height:'4px', width:'60px', background:'#FCDD09', borderRadius:'2px'}}></div>
-          <div style={{height:'4px', width:'60px', background:'#DA121A', borderRadius:'2px'}}></div>
+        <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px'}}>
+          <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
+          <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
+          <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
         </div>
-        <p style={{fontSize:'13px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
+        <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
       </footer>
 
     </div>
