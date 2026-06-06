@@ -85,14 +85,10 @@ export default function Home() {
 
         {/* CONTACT US BAR */}
         <div style={{background:'linear-gradient(90deg, #fef3c7, #fde68a, #fef3c7)', width:'100%', padding:'7px 16px', boxSizing:'border-box'}}>
-          <div style={{maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center', gap:'16px'}}>
+          <div style={{maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center'}}>
             <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#92400e', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px', padding:'2px 0'}}>
               📬 Contact Us
             </Link>
-            <span style={{color:'#d97706', fontSize:'12px'}}>|</span>
-            <a href="mailto:info@enjerapresslist.com" style={{fontSize:'12px', color:'#78350f', textDecoration:'none', display:'flex', alignItems:'center', gap:'4px'}}>
-              📧 info@enjerapresslist.com
-            </a>
           </div>
         </div>
       </nav>
@@ -220,3 +216,4 @@ export default function Home() {
     </div>
   )
 }
+
