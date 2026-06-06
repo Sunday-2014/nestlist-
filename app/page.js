@@ -99,6 +99,13 @@ export default function Home() {
             }}>Register Free</Link>
           </div>
         </div>
+
+        {/* ETHIOPIAN FLAG STRIPES */}
+        <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
+          <div style={{height:'8px', background:'#078930', width:'100%'}}></div>
+          <div style={{height:'8px', background:'#FCDD09', width:'100%'}}></div>
+          <div style={{height:'8px', background:'#DA121A', width:'100%'}}></div>
+        </div>
       </nav>
 
       {/* HERO */}
@@ -314,10 +321,15 @@ export default function Home() {
           </div>
           <p style={{fontSize:'15px', fontWeight:'700', color:'#ffffff', margin:'0'}}>EnjeraPressList.Com</p>
         </div>
+        {/* Ethiopian Flag Stripes in Footer */}
+        <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'12px'}}>
+          <div style={{height:'4px', width:'60px', background:'#078930', borderRadius:'2px'}}></div>
+          <div style={{height:'4px', width:'60px', background:'#FCDD09', borderRadius:'2px'}}></div>
+          <div style={{height:'4px', width:'60px', background:'#DA121A', borderRadius:'2px'}}></div>
+        </div>
         <p style={{fontSize:'13px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
       </footer>
 
     </div>
   )
 }
-
