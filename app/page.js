@@ -86,7 +86,14 @@ export default function Home() {
           </div>
 
           {/* NAV BUTTONS */}
-          <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap'}}>
+            <Link href="/dashboard" style={{
+              fontSize:'13px', fontWeight:'600', color:'#374151',
+              padding:'7px 12px', borderRadius:'8px',
+              border:'2px solid #d1d5db', background:'#ffffff',
+              textDecoration:'none', display:'inline-block',
+              whiteSpace:'nowrap'
+            }}>My Listings</Link>
             <Link href="/login" style={{
               fontSize:'13px', fontWeight:'600', color:'#374151',
               padding:'7px 12px', borderRadius:'8px',
@@ -342,3 +349,4 @@ export default function Home() {
     </div>
   )
 }
+
