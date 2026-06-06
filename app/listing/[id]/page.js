@@ -68,6 +68,87 @@ export default function ListingDetail({ params }) {
     </nav>
   )
 
+  const ShareButtons = () => {
+    const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
+    const shareText = `Check out this property: ${listing?.title} - $${listing?.price?.toLocaleString()}/mo in ${listing?.city}`
+    return (
+      <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+        <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>📤 Share this listing</p>
+        <div style={{display:'flex', gap:'8px', marginBottom:'8px', flexWrap:'wrap'}}>
+          
+            href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{flex:'1', minWidth:'80px', padding:'10px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none'}}
+          >📱 WhatsApp</a>
+          
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{flex:'1', minWidth:'80px', padding:'10px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none'}}
+          >👍 Facebook</a>
+          
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{flex:'1', minWidth:'80px', padding:'10px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none'}}
+          >𝕏 Twitter</a>
+        </div>
+        <button
+          onClick={handleCopyLink}
+          style={{width:'100%', padding:'10px', borderRadius:'8px', background: copied ? '#f0fdf4' : '#f9fafb', color: copied ? '#166534' : '#374151', fontSize:'12px', fontWeight:'700', border: copied ? '2px solid #bbf7d0' : '2px solid #e5e7eb', cursor:'pointer', transition:'all 0.2s'}}
+        >{copied ? '✅ Link Copied!' : '🔗 Copy Link'}</button>
+      </div>
+    )
+  }
+
+  const ContactCard = () => (
+    <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', marginBottom:'16px'}}>
+      <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
+      <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px', padding:'12px', background:'#f9fafb', borderRadius:'12px', border:'1px solid #e5e7eb'}}>
+        <div style={{width:'46px', height:'46px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0, border:'2px solid #fed7aa'}}>👤</div>
+        <div>
+          <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing?.contact_name || 'Landlord'}</p>
+          <p style={{fontSize:'12px', color:'#6b7280', margin:'0', fontWeight:'500'}}>Prefers: {listing?.contact_method}</p>
+        </div>
+      </div>
+      {!showContact ? (
+        <div>
+          <div style={{background:'#f9fafb', borderRadius:'10px', padding:'14px', marginBottom:'12px', border:'2px dashed #d1d5db', textAlign:'center'}}>
+            <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 4px', fontWeight:'600'}}>📧 ••••••@••••••.com</p>
+            {listing?.contact_phone && <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'600'}}>📞 ••• ••• ••••</p>}
+          </div>
+          <button
+            onClick={() => setShowContact(true)}
+            style={{display:'block', width:'100%', padding:'14px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', border:'none', cursor:'pointer', marginBottom:'10px', boxSizing:'border-box'}}
+          >👁 Reveal Contact Info</button>
+        </div>
+      ) : (
+        <div>
+          <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
+            <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Email</p>
+            <a href={`mailto:${listing?.contact_email}`} style={{fontSize:'14px', fontWeight:'600', color:'#ea580c', textDecoration:'none', wordBreak:'break-all'}}>{listing?.contact_email}</a>
+          </div>
+          {listing?.contact_phone && (
+            <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
+              <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Phone</p>
+              <a href={`tel:${listing?.contact_phone}`} style={{fontSize:'14px', fontWeight:'600', color:'#166534', textDecoration:'none'}}>{listing?.contact_phone}</a>
+            </div>
+          )}
+          <a href={`mailto:${listing?.contact_email}`} style={{display:'block', width:'100%', padding:'12px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', marginBottom:'8px', boxSizing:'border-box'}}>✉️ Send Email</a>
+          {listing?.contact_phone && (
+            <a href={`tel:${listing?.contact_phone}`} style={{display:'block', width:'100%', padding:'12px', background:'#166534', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', boxSizing:'border-box'}}>📞 Call Now</a>
+          )}
+        </div>
+      )}
+      <div style={{marginTop:'12px', padding:'10px', background:'#f0fdf4', borderRadius:'10px', border:'1px solid #bbf7d0'}}>
+        <p style={{fontSize:'12px', color:'#166534', margin:'0', lineHeight:'1.6', textAlign:'center', fontWeight:'500'}}>
+          🔒 Contact directly — no middlemen, no fees
+        </p>
+      </div>
+    </div>
+  )
+
   const Footer = () => (
     <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
       <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 8px'}}>EnjeraPressList.Com</p>
@@ -96,15 +177,12 @@ export default function ListingDetail({ params }) {
       <div style={{textAlign:'center', padding:'80px 24px'}}>
         <div style={{fontSize:'48px', marginBottom:'16px'}}>🏠</div>
         <p style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 8px'}}>Listing not found</p>
-        <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>This listing may have been removed or is no longer available.</p>
+        <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>This listing may have been removed.</p>
         <Link href="/" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'12px 28px', borderRadius:'10px', background:'#ea580c', textDecoration:'none', display:'inline-block'}}>← Back to listings</Link>
       </div>
       <Footer />
     </div>
   )
-
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
-  const shareText = `Check out this property: ${listing.title} - $${listing.price?.toLocaleString()}/mo in ${listing.city}`
 
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', overflowX:'hidden'}}>
@@ -128,13 +206,7 @@ export default function ListingDetail({ params }) {
                     src={img.public_url}
                     alt=""
                     onClick={() => setActivePhoto(i)}
-                    style={{
-                      width:'70px', height:'56px', objectFit:'cover',
-                      borderRadius:'8px', cursor:'pointer', flexShrink:0,
-                      border: i === activePhoto ? '3px solid #ea580c' : '3px solid transparent',
-                      opacity: i === activePhoto ? 1 : 0.7,
-                      transition:'all 0.15s'
-                    }}
+                    style={{width:'70px', height:'56px', objectFit:'cover', borderRadius:'8px', cursor:'pointer', flexShrink:0, border: i === activePhoto ? '3px solid #ea580c' : '3px solid transparent', opacity: i === activePhoto ? 1 : 0.7, transition:'all 0.15s'}}
                   />
                 ))}
               </div>
@@ -144,151 +216,65 @@ export default function ListingDetail({ params }) {
           <div style={{height:'220px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', borderRadius:'16px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px', marginBottom:'24px', border:'1px solid #e5e7eb'}}>🏠</div>
         )}
 
-        {/* MAIN GRID */}
-        <div style={{display:'grid', gridTemplateColumns:'minmax(0,1fr) minmax(0,300px)', gap:'20px'}}>
+        {/* MOBILE: show share + contact ABOVE the description */}
+        <div style={{display:'block'}}>
+          <ShareButtons />
+          <ContactCard />
+        </div>
 
-          {/* LEFT COLUMN */}
-          <div style={{minWidth:0}}>
-
-            {/* TITLE + STATS */}
-            <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-              <div style={{display:'flex', alignItems:'center', gap:'8px', marginBottom:'10px', flexWrap:'wrap'}}>
-                <div style={{background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', letterSpacing:'0.04em'}}>{listing.property_type}</div>
-                <div style={{background:'#f9fafb', color:'#6b7280', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', border:'1px solid #e5e7eb'}}>👁 {listing.views || 0} views</div>
-              </div>
-              <h1 style={{fontSize:'clamp(18px, 4vw, 26px)', fontWeight:'800', color:'#111827', margin:'0 0 8px', lineHeight:'1.3'}}>{listing.title}</h1>
-              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>
-                📍 {[listing.address, listing.neighborhood, listing.city, listing.state, listing.zip].filter(Boolean).join(', ')}
-              </p>
-
-              <div style={{display:'flex', flexWrap:'wrap', gap:'10px'}}>
-                <div style={{background:'#fff7ed', borderRadius:'10px', padding:'10px 16px', border:'1px solid #fed7aa', textAlign:'center'}}>
-                  <p style={{fontSize:'11px', color:'#9a3412', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Price</p>
-                  <p style={{fontSize:'20px', fontWeight:'800', color:'#ea580c', margin:'0'}}>${listing.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></p>
-                </div>
-                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
-                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Bedrooms</p>
-                  <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bedrooms}</p>
-                </div>
-                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
-                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Bathrooms</p>
-                  <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bathrooms}</p>
-                </div>
-                {listing.available_from && (
-                  <div style={{background:'#f0fdf4', borderRadius:'10px', padding:'10px 16px', border:'1px solid #bbf7d0', textAlign:'center'}}>
-                    <p style={{fontSize:'11px', color:'#166534', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Available</p>
-                    <p style={{fontSize:'14px', fontWeight:'700', color:'#166534', margin:'0'}}>{new Date(listing.available_from).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* DESCRIPTION */}
-            {listing.description && (
-              <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-                <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 12px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>About this property</h2>
-                <p style={{fontSize:'14px', color:'#4b5563', lineHeight:'1.8', margin:'0', whiteSpace:'pre-wrap'}}>{listing.description}</p>
-              </div>
-            )}
-
-            {/* VIDEO */}
-            {videos.length > 0 && (
-              <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-                <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 12px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>🎥 Property Video</h2>
-                <video src={videos[0].public_url} controls style={{width:'100%', borderRadius:'10px', maxHeight:'320px'}} />
-              </div>
-            )}
+        {/* TITLE + STATS */}
+        <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+          <div style={{display:'flex', alignItems:'center', gap:'8px', marginBottom:'10px', flexWrap:'wrap'}}>
+            <div style={{background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', letterSpacing:'0.04em'}}>{listing.property_type}</div>
+            <div style={{background:'#f9fafb', color:'#6b7280', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', border:'1px solid #e5e7eb'}}>👁 {listing.views || 0} views</div>
           </div>
-
-          {/* RIGHT COLUMN */}
-          <div style={{alignSelf:'start'}}>
-            <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', position:'sticky', top:'100px'}}>
-
-              {/* SHARE BUTTONS */}
-              <div style={{marginBottom:'20px', paddingBottom:'20px', borderBottom:'2px solid #f3f4f6'}}>
-                <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>Share this listing</p>
-                <div style={{display:'flex', gap:'8px', marginBottom:'8px'}}>
-                  
-                    href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{flex:'1', padding:'9px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'11px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'3px'}}
-                  >📱 WhatsApp</a>
-                  
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{flex:'1', padding:'9px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'11px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'3px'}}
-                  >👍 Facebook</a>
-                  
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{flex:'1', padding:'9px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'11px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'3px'}}
-                  >𝕏 Twitter</a>
-                </div>
-                <button
-                  onClick={handleCopyLink}
-                  style={{width:'100%', padding:'9px', borderRadius:'8px', background: copied ? '#f0fdf4' : '#f9fafb', color: copied ? '#166534' : '#374151', fontSize:'12px', fontWeight:'700', border: copied ? '2px solid #bbf7d0' : '2px solid #e5e7eb', cursor:'pointer', transition:'all 0.2s'}}
-                >{copied ? '✅ Link Copied!' : '🔗 Copy Link'}</button>
-              </div>
-
-              {/* CONTACT SECTION */}
-              <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
-
-              {/* LANDLORD INFO */}
-              <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px', padding:'12px', background:'#f9fafb', borderRadius:'12px', border:'1px solid #e5e7eb'}}>
-                <div style={{width:'46px', height:'46px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0, border:'2px solid #fed7aa'}}>👤</div>
-                <div>
-                  <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.contact_name || 'Landlord'}</p>
-                  <p style={{fontSize:'12px', color:'#6b7280', margin:'0', fontWeight:'500'}}>Prefers: {listing.contact_method}</p>
-                </div>
-              </div>
-
-              {/* HIDDEN CONTACT - REVEAL BUTTON */}
-              {!showContact ? (
-                <div>
-                  <div style={{background:'#f9fafb', borderRadius:'10px', padding:'14px', marginBottom:'12px', border:'2px dashed #d1d5db', textAlign:'center'}}>
-                    <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 4px', fontWeight:'600'}}>📧 ••••••@••••••.com</p>
-                    {listing.contact_phone && <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'600'}}>📞 ••• ••• ••••</p>}
-                  </div>
-                  <button
-                    onClick={() => setShowContact(true)}
-                    style={{display:'block', width:'100%', padding:'14px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', border:'none', cursor:'pointer', marginBottom:'10px', boxSizing:'border-box', transition:'background 0.2s'}}
-                    onMouseEnter={e => e.currentTarget.style.background='#c2410c'}
-                    onMouseLeave={e => e.currentTarget.style.background='#ea580c'}
-                  >👁 Reveal Contact Info</button>
-                </div>
-              ) : (
-                <div>
-                  <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
-                    <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Email</p>
-                    <a href={`mailto:${listing.contact_email}`} style={{fontSize:'14px', fontWeight:'600', color:'#ea580c', textDecoration:'none', wordBreak:'break-all'}}>{listing.contact_email}</a>
-                  </div>
-                  {listing.contact_phone && (
-                    <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
-                      <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Phone</p>
-                      <a href={`tel:${listing.contact_phone}`} style={{fontSize:'14px', fontWeight:'600', color:'#166534', textDecoration:'none'}}>{listing.contact_phone}</a>
-                    </div>
-                  )}
-                  <a href={`mailto:${listing.contact_email}`} style={{display:'block', width:'100%', padding:'12px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', marginBottom:'8px', boxSizing:'border-box'}}>✉️ Send Email</a>
-                  {listing.contact_phone && (
-                    <a href={`tel:${listing.contact_phone}`} style={{display:'block', width:'100%', padding:'12px', background:'#166534', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', boxSizing:'border-box'}}>📞 Call Now</a>
-                  )}
-                </div>
-              )}
-
-              <div style={{marginTop:'12px', padding:'10px', background:'#f0fdf4', borderRadius:'10px', border:'1px solid #bbf7d0'}}>
-                <p style={{fontSize:'12px', color:'#166534', margin:'0', lineHeight:'1.6', textAlign:'center', fontWeight:'500'}}>
-                  🔒 Contact directly — no middlemen, no fees
-                </p>
-              </div>
+          <h1 style={{fontSize:'clamp(18px, 4vw, 26px)', fontWeight:'800', color:'#111827', margin:'0 0 8px', lineHeight:'1.3'}}>{listing.title}</h1>
+          <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>
+            📍 {[listing.address, listing.neighborhood, listing.city, listing.state, listing.zip].filter(Boolean).join(', ')}
+          </p>
+          <div style={{display:'flex', flexWrap:'wrap', gap:'10px'}}>
+            <div style={{background:'#fff7ed', borderRadius:'10px', padding:'10px 16px', border:'1px solid #fed7aa', textAlign:'center'}}>
+              <p style={{fontSize:'11px', color:'#9a3412', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Price</p>
+              <p style={{fontSize:'20px', fontWeight:'800', color:'#ea580c', margin:'0'}}>${listing.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></p>
             </div>
+            <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+              <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Bedrooms</p>
+              <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bedrooms}</p>
+            </div>
+            <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+              <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Bathrooms</p>
+              <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bathrooms}</p>
+            </div>
+            {listing.available_from && (
+              <div style={{background:'#f0fdf4', borderRadius:'10px', padding:'10px 16px', border:'1px solid #bbf7d0', textAlign:'center'}}>
+                <p style={{fontSize:'11px', color:'#166534', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Available</p>
+                <p style={{fontSize:'14px', fontWeight:'700', color:'#166534', margin:'0'}}>{new Date(listing.available_from).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</p>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* DESCRIPTION */}
+        {listing.description && (
+          <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+            <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 12px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>About this property</h2>
+            <p style={{fontSize:'14px', color:'#4b5563', lineHeight:'1.8', margin:'0', whiteSpace:'pre-wrap'}}>{listing.description}</p>
+          </div>
+        )}
+
+        {/* VIDEO */}
+        {videos.length > 0 && (
+          <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+            <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 12px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>🎥 Property Video</h2>
+            <video src={videos[0].public_url} controls style={{width:'100%', borderRadius:'10px', maxHeight:'320px'}} />
+          </div>
+        )}
+
       </div>
 
       <Footer />
     </div>
   )
 }
+
+
