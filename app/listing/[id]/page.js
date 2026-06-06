@@ -11,7 +11,7 @@ export default function ListingDetail({ params }) {
   const [activePhoto, setActivePhoto] = useState(0)
   const [showContact, setShowContact] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [pageUrl, setPageUrl] = useState('')
+  const [pageUrl, setPageUrl] = useState('https://enjerapresslist.com/listing/' + id)
 
   useEffect(() => {
     setPageUrl(window.location.href)
@@ -50,18 +50,6 @@ export default function ListingDetail({ params }) {
     position:'sticky', top:0, zIndex:100, width:'100%', boxSizing:'border-box'
   }
 
-  const Footer = () => (
-    <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
-      <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 8px'}}>EnjeraPressList.Com</p>
-      <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px'}}>
-        <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
-        <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
-        <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
-      </div>
-      <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
-    </footer>
-  )
-
   const Navbar = () => (
     <nav style={navStyle}>
       <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
@@ -80,6 +68,18 @@ export default function ListingDetail({ params }) {
         <div style={{height:'6px', background:'#DA121A'}}></div>
       </div>
     </nav>
+  )
+
+  const Footer = () => (
+    <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
+      <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 8px'}}>EnjeraPressList.Com</p>
+      <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px'}}>
+        <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
+        <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
+        <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
+      </div>
+      <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
+    </footer>
   )
 
   if (loading) return (
@@ -140,41 +140,39 @@ export default function ListingDetail({ params }) {
         )}
 
         {/* SHARE BUTTONS */}
-        {pageUrl && (
-          <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-            <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>📤 Share this listing</p>
-            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginBottom:'8px'}}>
-              
-                href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{padding:'11px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
-              >📱 WhatsApp</a>
-              
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{padding:'11px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
-              >👍 Facebook</a>
-              
-                href={`https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{padding:'11px 6px', borderRadius:'8px', background:'#0088cc', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
-              >✈️ Telegram</a>
-              
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{padding:'11px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
-              >𝕏 Twitter (X)</a>
-            </div>
-            <button
-              onClick={handleCopyLink}
-              style={{width:'100%', padding:'10px', borderRadius:'8px', background: copied ? '#f0fdf4' : '#f9fafb', color: copied ? '#166534' : '#374151', fontSize:'13px', fontWeight:'700', border: copied ? '2px solid #bbf7d0' : '2px solid #e5e7eb', cursor:'pointer', transition:'all 0.2s', boxSizing:'border-box'}}
-            >{copied ? '✅ Link Copied!' : '🔗 Copy Link'}</button>
+        <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+          <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>📤 Share this listing</p>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginBottom:'8px'}}>
+            
+              href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{padding:'11px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+            >📱 WhatsApp</a>
+            
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{padding:'11px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+            >👍 Facebook</a>
+            
+              href={`https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{padding:'11px 6px', borderRadius:'8px', background:'#0088cc', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+            >✈️ Telegram</a>
+            
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{padding:'11px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+            >𝕏 Twitter (X)</a>
           </div>
-        )}
+          <button
+            onClick={handleCopyLink}
+            style={{width:'100%', padding:'10px', borderRadius:'8px', background: copied ? '#f0fdf4' : '#f9fafb', color: copied ? '#166534' : '#374151', fontSize:'13px', fontWeight:'700', border: copied ? '2px solid #bbf7d0' : '2px solid #e5e7eb', cursor:'pointer', transition:'all 0.2s', boxSizing:'border-box'}}
+          >{copied ? '✅ Link Copied!' : '🔗 Copy Link'}</button>
+        </div>
 
         {/* CONTACT CARD */}
         <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', marginBottom:'16px'}}>
@@ -276,3 +274,4 @@ export default function ListingDetail({ params }) {
     </div>
   )
 }
+
