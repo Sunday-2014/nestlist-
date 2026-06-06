@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { use } from 'react'
 
 export default function ListingDetail({ params }) {
+  const { id } = use(params)
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activePhoto, setActivePhoto] = useState(0)
-  const [showContact, setShowContact] = useState(false)
 
   useEffect(() => {
     fetchListing()
@@ -17,9 +18,9 @@ export default function ListingDetail({ params }) {
     const { data, error } = await supabase
       .from('listings')
       .select('*, listing_images(public_url, position, storage_path)')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
-    if (!error) {
+    if (!error && data) {
       const sorted = data.listing_images?.sort((a,b) => a.position - b.position) || []
       setListing({...data, listing_images: sorted})
     }
@@ -35,59 +36,70 @@ export default function ListingDetail({ params }) {
     position:'sticky', top:0, zIndex:100, width:'100%', boxSizing:'border-box'
   }
 
+  const Navbar = () => (
+    <nav style={navStyle}>
+      <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+        <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+          <div style={{position:'relative', width:'40px', height:'40px', flexShrink:0}}>
+            <img src="/logo.gif" alt="logo" style={{width:'40px', height:'40px', borderRadius:'50%', border:'2px solid #d97706'}} />
+            <span style={{position:'absolute', bottom:'-2px', right:'-4px', background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'900', width:'18px', height:'18px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff'}}>L</span>
+          </div>
+          <Link href="/" style={{fontSize:'clamp(14px, 4vw, 20px)', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite'}}>EnjeraPressList.Com</Link>
+        </div>
+        <Link href="/" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none', whiteSpace:'nowrap'}}>← Back</Link>
+      </div>
+      <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
+        <div style={{height:'6px', background:'#078930'}}></div>
+        <div style={{height:'6px', background:'#FCDD09'}}></div>
+        <div style={{height:'6px', background:'#DA121A'}}></div>
+      </div>
+    </nav>
+  )
+
+  const Footer = () => (
+    <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
+      <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 8px'}}>EnjeraPressList.Com</p>
+      <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px'}}>
+        <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
+        <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
+        <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
+      </div>
+      <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
+    </footer>
+  )
+
   if (loading) return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif'}}>
-      <nav style={navStyle}>
-        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-          <Link href="/" style={{fontSize:'18px', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>EnjeraPressList.Com</Link>
-          <Link href="/" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none'}}>← Back</Link>
-        </div>
-        <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
-          <div style={{height:'6px', background:'#078930'}}></div>
-          <div style={{height:'6px', background:'#FCDD09'}}></div>
-          <div style={{height:'6px', background:'#DA121A'}}></div>
-        </div>
-      </nav>
-      <div style={{textAlign:'center', padding:'80px 0'}}>
+      <Navbar />
+      <div style={{textAlign:'center', padding:'80px 24px'}}>
         <p style={{color:'#6b7280', fontSize:'16px'}}>Loading listing...</p>
       </div>
+      <Footer />
     </div>
   )
 
   if (!listing) return (
-    <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', textAlign:'center', padding:'80px 24px'}}>
-      <p style={{fontSize:'18px', color:'#111827', fontWeight:'700', marginBottom:'12px'}}>Listing not found</p>
-      <Link href="/" style={{color:'#ea580c', fontWeight:'600', textDecoration:'none'}}>← Back to listings</Link>
+    <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif'}}>
+      <Navbar />
+      <div style={{textAlign:'center', padding:'80px 24px'}}>
+        <div style={{fontSize:'48px', marginBottom:'16px'}}>🏠</div>
+        <p style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 8px'}}>Listing not found</p>
+        <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>This listing may have been removed or is no longer available.</p>
+        <Link href="/" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'12px 28px', borderRadius:'10px', background:'#ea580c', textDecoration:'none', display:'inline-block'}}>← Back to listings</Link>
+      </div>
+      <Footer />
     </div>
   )
 
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', overflowX:'hidden'}}>
-
-      {/* NAVBAR */}
-      <nav style={navStyle}>
-        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-          <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-            <div style={{position:'relative', width:'40px', height:'40px', flexShrink:0}}>
-              <img src="/logo.gif" alt="logo" style={{width:'40px', height:'40px', borderRadius:'50%', border:'2px solid #d97706'}} />
-              <span style={{position:'absolute', bottom:'-2px', right:'-4px', background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'900', width:'18px', height:'18px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff'}}>L</span>
-            </div>
-            <Link href="/" style={{fontSize:'clamp(14px, 4vw, 20px)', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite'}}>EnjeraPressList.Com</Link>
-          </div>
-          <Link href="/" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none', whiteSpace:'nowrap'}}>← Back</Link>
-        </div>
-        <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
-          <div style={{height:'6px', background:'#078930'}}></div>
-          <div style={{height:'6px', background:'#FCDD09'}}></div>
-          <div style={{height:'6px', background:'#DA121A'}}></div>
-        </div>
-      </nav>
+      <Navbar />
 
       <div style={{maxWidth:'900px', margin:'0 auto', padding:'24px 16px 64px', boxSizing:'border-box'}}>
 
         {/* PHOTO GALLERY */}
-        {images.length > 0 && (
-          <div style={{marginBottom:'24px', borderRadius:'16px', overflow:'hidden', border:'1px solid #e5e7eb'}}>
+        {images.length > 0 ? (
+          <div style={{marginBottom:'24px', borderRadius:'16px', overflow:'hidden', border:'1px solid #e5e7eb', background:'#ffffff', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
             <img
               src={images[activePhoto]?.public_url}
               alt={listing.title}
@@ -113,41 +125,41 @@ export default function ListingDetail({ params }) {
               </div>
             )}
           </div>
+        ) : (
+          <div style={{height:'220px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', borderRadius:'16px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px', marginBottom:'24px', border:'1px solid #e5e7eb'}}>🏠</div>
         )}
 
-        {/* NO IMAGE PLACEHOLDER */}
-        {images.length === 0 && (
-          <div style={{height:'200px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', borderRadius:'16px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px', marginBottom:'24px'}}>🏠</div>
-        )}
-
-        <div style={{display:'grid', gridTemplateColumns:'minmax(0,1fr) minmax(0,320px)', gap:'20px'}}>
+        {/* MAIN GRID */}
+        <div style={{display:'grid', gridTemplateColumns:'minmax(0,1fr) minmax(0,300px)', gap:'20px'}}>
 
           {/* LEFT COLUMN */}
-          <div>
+          <div style={{minWidth:0}}>
 
-            {/* TITLE + TYPE */}
+            {/* TITLE + STATS */}
             <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-              <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', marginBottom:'10px'}}>{listing.property_type}</div>
+              <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', marginBottom:'10px', letterSpacing:'0.04em'}}>{listing.property_type}</div>
               <h1 style={{fontSize:'clamp(18px, 4vw, 26px)', fontWeight:'800', color:'#111827', margin:'0 0 8px', lineHeight:'1.3'}}>{listing.title}</h1>
-              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>📍 {listing.address && `${listing.address}, `}{listing.neighborhood && `${listing.neighborhood}, `}{listing.city}{listing.state && `, ${listing.state}`} {listing.zip}</p>
+              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>
+                📍 {[listing.address, listing.neighborhood, listing.city, listing.state, listing.zip].filter(Boolean).join(', ')}
+              </p>
 
               <div style={{display:'flex', flexWrap:'wrap', gap:'10px'}}>
-                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
-                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Price</p>
-                  <p style={{fontSize:'18px', fontWeight:'800', color:'#ea580c', margin:'0'}}>${listing.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></p>
+                <div style={{background:'#fff7ed', borderRadius:'10px', padding:'10px 16px', border:'1px solid #fed7aa', textAlign:'center'}}>
+                  <p style={{fontSize:'11px', color:'#9a3412', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Price</p>
+                  <p style={{fontSize:'20px', fontWeight:'800', color:'#ea580c', margin:'0'}}>${listing.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></p>
                 </div>
-                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
-                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Beds</p>
+                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Bedrooms</p>
                   <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bedrooms}</p>
                 </div>
-                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
-                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Baths</p>
+                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Bathrooms</p>
                   <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bathrooms}</p>
                 </div>
                 {listing.available_from && (
-                  <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 14px', border:'1px solid #e5e7eb', textAlign:'center'}}>
-                    <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Available</p>
-                    <p style={{fontSize:'14px', fontWeight:'700', color:'#111827', margin:'0'}}>{new Date(listing.available_from).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</p>
+                  <div style={{background:'#f0fdf4', borderRadius:'10px', padding:'10px 16px', border:'1px solid #bbf7d0', textAlign:'center'}}>
+                    <p style={{fontSize:'11px', color:'#166534', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Available</p>
+                    <p style={{fontSize:'14px', fontWeight:'700', color:'#166534', margin:'0'}}>{new Date(listing.available_from).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</p>
                   </div>
                 )}
               </div>
@@ -165,7 +177,7 @@ export default function ListingDetail({ params }) {
             {videos.length > 0 && (
               <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
                 <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 12px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>🎥 Property Video</h2>
-                <video src={videos[0].public_url} controls style={{width:'100%', borderRadius:'10px', maxHeight:'300px'}} />
+                <video src={videos[0].public_url} controls style={{width:'100%', borderRadius:'10px', maxHeight:'320px'}} />
               </div>
             )}
           </div>
@@ -175,8 +187,8 @@ export default function ListingDetail({ params }) {
             <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', position:'sticky', top:'100px'}}>
               <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
 
-              <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'16px'}}>
-                <div style={{width:'48px', height:'48px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0}}>👤</div>
+              <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px', padding:'12px', background:'#f9fafb', borderRadius:'12px', border:'1px solid #e5e7eb'}}>
+                <div style={{width:'46px', height:'46px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0, border:'2px solid #fed7aa'}}>👤</div>
                 <div>
                   <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.contact_name || 'Landlord'}</p>
                   <p style={{fontSize:'12px', color:'#6b7280', margin:'0', fontWeight:'500'}}>Prefers: {listing.contact_method}</p>
@@ -197,13 +209,13 @@ export default function ListingDetail({ params }) {
                   background:'#166534', color:'#ffffff',
                   fontSize:'14px', fontWeight:'700', textAlign:'center',
                   borderRadius:'10px', textDecoration:'none',
-                  boxSizing:'border-box'
+                  marginBottom:'16px', boxSizing:'border-box'
                 }}>📞 Call {listing.contact_phone}</a>
               )}
 
-              <div style={{marginTop:'16px', padding:'12px', background:'#f9fafb', borderRadius:'10px', border:'1px solid #e5e7eb'}}>
-                <p style={{fontSize:'12px', color:'#6b7280', margin:'0', lineHeight:'1.6', textAlign:'center'}}>
-                  🔒 Contact landlord directly — no middlemen, no fees
+              <div style={{padding:'12px', background:'#f0fdf4', borderRadius:'10px', border:'1px solid #bbf7d0'}}>
+                <p style={{fontSize:'12px', color:'#166534', margin:'0', lineHeight:'1.6', textAlign:'center', fontWeight:'500'}}>
+                  🔒 Contact directly — no middlemen, no fees
                 </p>
               </div>
             </div>
@@ -211,17 +223,8 @@ export default function ListingDetail({ params }) {
         </div>
       </div>
 
-      {/* FOOTER */}
-      <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
-        <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 4px'}}>EnjeraPressList.Com</p>
-        <div style={{display:'flex', justifyContent:'center', gap:'4px', margin:'8px 0'}}>
-          <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
-          <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
-          <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
-        </div>
-        <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
-      </footer>
-
+      <Footer />
     </div>
   )
 }
+
