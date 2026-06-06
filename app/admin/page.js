@@ -32,15 +32,19 @@ export default function AdminPanel() {
   }
 
   const fetchData = async () => {
-    const { data: listingsData } = await supabase
+    const { data: listingsData, error: listingsError } = await supabase
       .from('listings')
-      .select('*, listing_images(public_url, position), profiles(full_name)')
+      .select('*, listing_images(public_url, position)')
       .order('created_at', { ascending: false })
 
-    const { data: usersData } = await supabase
+    if (listingsError) console.error('Listings error:', listingsError)
+
+    const { data: usersData, error: usersError } = await supabase
       .from('profiles')
       .select('*')
       .order('created_at', { ascending: false })
+
+    if (usersError) console.error('Users error:', usersError)
 
     if (listingsData) {
       setListings(listingsData)
@@ -75,19 +79,6 @@ export default function AdminPanel() {
     setUsers(prev => prev.map(u => u.id === userId ? {...u, is_admin: !currentStatus} : u))
   }
 
-  const navStyle = {
-    background:'#1f2937', borderBottom:'2px solid #ea580c',
-    boxShadow:'0 2px 12px rgba(0,0,0,0.2)',
-    position:'sticky', top:0, zIndex:100, width:'100%', boxSizing:'border-box'
-  }
-
-  const statCard = (value, label, color) => (
-    <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
-      <p style={{fontSize:'36px', fontWeight:'800', color, margin:'0'}}>{value}</p>
-      <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>{label}</p>
-    </div>
-  )
-
   if (loading) return (
     <div style={{minHeight:'100vh', background:'#f1f5f9', fontFamily:'system-ui, -apple-system, sans-serif', display:'flex', alignItems:'center', justifyContent:'center'}}>
       <p style={{color:'#6b7280', fontSize:'16px'}}>Loading admin panel...</p>
@@ -100,7 +91,7 @@ export default function AdminPanel() {
     <div style={{minHeight:'100vh', background:'#f1f5f9', fontFamily:'system-ui, -apple-system, sans-serif'}}>
 
       {/* NAVBAR */}
-      <nav style={navStyle}>
+      <nav style={{background:'#1f2937', borderBottom:'2px solid #ea580c', boxShadow:'0 2px 12px rgba(0,0,0,0.2)', position:'sticky', top:0, zIndex:100, width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1200px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
           <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
             <div style={{position:'relative', width:'36px', height:'36px', flexShrink:0}}>
@@ -129,19 +120,32 @@ export default function AdminPanel() {
 
         {/* STATS */}
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:'12px', marginBottom:'28px'}}>
-          {statCard(stats.totalListings, 'Total Listings', '#ea580c')}
-          {statCard(stats.activeListings, 'Active Listings', '#166534')}
-          {statCard(stats.totalUsers, 'Total Users', '#1877F2')}
-          {statCard(stats.totalViews, 'Total Views', '#7c3aed')}
+          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
+            <p style={{fontSize:'36px', fontWeight:'800', color:'#ea580c', margin:'0'}}>{stats.totalListings}</p>
+            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Listings</p>
+          </div>
+          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
+            <p style={{fontSize:'36px', fontWeight:'800', color:'#166534', margin:'0'}}>{stats.activeListings}</p>
+            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Active Listings</p>
+          </div>
+          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
+            <p style={{fontSize:'36px', fontWeight:'800', color:'#1877F2', margin:'0'}}>{stats.totalUsers}</p>
+            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Users</p>
+          </div>
+          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
+            <p style={{fontSize:'36px', fontWeight:'800', color:'#7c3aed', margin:'0'}}>{stats.totalViews}</p>
+            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Views</p>
+          </div>
         </div>
 
         {/* TABS */}
         <div style={{display:'flex', gap:'4px', marginBottom:'20px', background:'#ffffff', padding:'4px', borderRadius:'12px', border:'1px solid #e5e7eb', width:'fit-content'}}>
-          {['listings', 'users'].map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{fontSize:'13px', fontWeight:'700', padding:'8px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: tab === t ? '#ea580c' : 'transparent', color: tab === t ? '#ffffff' : '#6b7280', textTransform:'capitalize', transition:'all 0.15s'}}>
-              {t === 'listings' ? `🏠 Listings (${listings.length})` : `👥 Users (${users.length})`}
-            </button>
-          ))}
+          <button onClick={() => setTab('listings')} style={{fontSize:'13px', fontWeight:'700', padding:'8px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: tab === 'listings' ? '#ea580c' : 'transparent', color: tab === 'listings' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            🏠 Listings ({listings.length})
+          </button>
+          <button onClick={() => setTab('users')} style={{fontSize:'13px', fontWeight:'700', padding:'8px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: tab === 'users' ? '#ea580c' : 'transparent', color: tab === 'users' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            👥 Users ({users.length})
+          </button>
         </div>
 
         {/* LISTINGS TAB */}
@@ -149,7 +153,7 @@ export default function AdminPanel() {
           <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
             {listings.length === 0 ? (
               <div style={{textAlign:'center', padding:'60px', background:'#ffffff', borderRadius:'16px', border:'1px solid #e5e7eb'}}>
-                <p style={{color:'#6b7280'}}>No listings yet</p>
+                <p style={{color:'#6b7280'}}>No listings found</p>
               </div>
             ) : listings.map(l => {
               const firstImage = l.listing_images?.sort((a,b) => a.position - b.position)[0]
@@ -168,9 +172,8 @@ export default function AdminPanel() {
                         </div>
                         <p style={{fontSize:'14px', fontWeight:'700', color:'#111827', margin:'0 0 3px'}}>{l.title}</p>
                         <p style={{fontSize:'12px', color:'#6b7280', margin:'0 0 3px'}}>📍 {[l.neighborhood, l.city, l.state].filter(Boolean).join(', ')}</p>
-                        <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>
-                          💰 ${l.price?.toLocaleString()}/mo · {l.bedrooms} · Listed {new Date(l.created_at).toLocaleDateString()}
-                        </p>
+                        <p style={{fontSize:'12px', color:'#9ca3af', margin:'0 0 3px'}}>💰 ${l.price?.toLocaleString()}/mo · {l.bedrooms}</p>
+                        <p style={{fontSize:'11px', color:'#9ca3af', margin:'0'}}>📧 {l.contact_email} · Listed {new Date(l.created_at).toLocaleDateString()}</p>
                       </div>
                       <div style={{display:'flex', flexDirection:'column', gap:'6px', flexShrink:0}}>
                         <Link href={`/listing/${l.id}`} style={{fontSize:'12px', fontWeight:'600', color:'#374151', padding:'6px 12px', borderRadius:'7px', border:'1.5px solid #d1d5db', textDecoration:'none', textAlign:'center', whiteSpace:'nowrap'}}>👁 View</Link>
@@ -212,14 +215,13 @@ export default function AdminPanel() {
                   </div>
                 </div>
                 <div style={{display:'flex', gap:'8px'}}>
-                  {u.id !== user?.id && (
+                  {u.id !== user?.id ? (
                     <button
                       onClick={() => handleToggleAdmin(u.id, u.is_admin)}
                       style={{fontSize:'12px', fontWeight:'600', color:'#ffffff', padding:'7px 14px', borderRadius:'8px', background: u.is_admin ? '#dc2626' : '#ea580c', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}
                     >{u.is_admin ? 'Remove Admin' : '👑 Make Admin'}</button>
-                  )}
-                  {u.id === user?.id && (
-                    <span style={{fontSize:'12px', color:'#9ca3af', padding:'7px 14px'}}>You</span>
+                  ) : (
+                    <span style={{fontSize:'12px', color:'#9ca3af', padding:'7px 14px'}}>You (Owner)</span>
                   )}
                 </div>
               </div>
