@@ -94,6 +94,13 @@ export default function Home() {
               textDecoration:'none', display:'inline-block',
               whiteSpace:'nowrap'
             }}>My Listings</Link>
+            <Link href="/list" style={{
+              fontSize:'13px', fontWeight:'700', color:'#ffffff',
+              padding:'7px 12px', borderRadius:'8px',
+              background:'#166534', border:'2px solid #166534',
+              textDecoration:'none', display:'inline-block',
+              whiteSpace:'nowrap'
+            }}>+ Add Listing</Link>
             <Link href="/login" style={{
               fontSize:'13px', fontWeight:'600', color:'#374151',
               padding:'7px 12px', borderRadius:'8px',
@@ -217,13 +224,6 @@ export default function Home() {
             <h3 style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 2px'}}>Available Rentals</h3>
             <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'500'}}>{filtered.length} {filtered.length === 1 ? 'listing' : 'listings'} found</p>
           </div>
-          <Link href="/list" style={{
-            fontSize:'13px', fontWeight:'700', color:'#ffffff',
-            padding:'9px 16px', borderRadius:'10px',
-            background:'#166534', textDecoration:'none',
-            display:'inline-block', border:'2px solid #166534',
-            whiteSpace:'nowrap'
-          }}>+ Add Your Listing</Link>
         </div>
 
         {loading ? (
