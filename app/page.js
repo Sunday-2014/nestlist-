@@ -173,17 +173,19 @@ export default function Home() {
                   onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
                   onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)' }}
                 >
-                  <div style={{height:'180px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'52px', position:'relative', overflow:'hidden'}}>
-                    {l.listing_images && l.listing_images.length > 0 ? (
+                  {l.listing_images && l.listing_images.length > 0 ? (
+                    <div style={{height:'180px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'52px', position:'relative', overflow:'hidden'}}>
                       <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
-                    ) : (
-                      <span style={{fontSize:'52px'}}>🏠</span>
-                    )}
-                    <div style={{position:'absolute', top:'12px', left:'12px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', letterSpacing:'0.04em'}}>{l.property_type}</div>
-                    {l.listing_images && l.listing_images.length > 1 && (
-                      <div style={{position:'absolute', bottom:'8px', right:'8px', background:'rgba(0,0,0,0.55)', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'6px'}}>+{l.listing_images.length - 1} photos</div>
-                    )}
-                  </div>
+                      <div style={{position:'absolute', top:'12px', left:'12px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', letterSpacing:'0.04em'}}>{l.property_type}</div>
+                      {l.listing_images.length > 1 && (
+                        <div style={{position:'absolute', bottom:'8px', right:'8px', background:'rgba(0,0,0,0.55)', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'6px'}}>+{l.listing_images.length - 1} photos</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{padding:'14px 14px 0'}}>
+                      <span style={{background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>
+                    </div>
+                  )}
                   <div style={{padding:'14px'}}>
                     <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 6px', lineHeight:'1.4'}}>{l.title}</p>
                     <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 12px', fontWeight:'500'}}>📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}</p>
@@ -224,3 +226,4 @@ export default function Home() {
     </div>
   )
 }
+
