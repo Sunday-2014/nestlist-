@@ -47,20 +47,43 @@ export default function Home() {
         zIndex:100,
         boxShadow:'0 2px 12px rgba(0,0,0,0.08)'
       }}>
-        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'14px 24px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-          <div>
-            <span style={{
-              fontSize:'22px',
-              fontWeight:'800',
-              background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)',
-              backgroundSize:'200% auto',
-              WebkitBackgroundClip:'text',
-              WebkitTextFillColor:'transparent',
-              animation:'shine 3s linear infinite',
-              letterSpacing:'-0.5px'
-            }}>EnjeraPressList.Com</span>
-            <div style={{fontSize:'11px', color:'#6b7280', fontWeight:'500', marginTop:'1px'}}>Free Rental Listings</div>
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 24px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+
+          {/* LOGO + NAME */}
+          <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+            <div style={{position:'relative', width:'52px', height:'52px', flexShrink:0}}>
+              <img
+                src="/logo.gif"
+                alt="EnjeraPressList logo"
+                style={{width:'52px', height:'52px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}}
+              />
+              <span style={{
+                position:'absolute', bottom:'-2px', right:'-4px',
+                background:'#ea580c', color:'#ffffff',
+                fontSize:'13px', fontWeight:'900',
+                width:'22px', height:'22px', borderRadius:'50%',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                border:'2px solid #ffffff',
+                boxShadow:'0 1px 4px rgba(0,0,0,0.25)'
+              }}>L</span>
+            </div>
+            <div>
+              <span style={{
+                fontSize:'22px',
+                fontWeight:'800',
+                background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)',
+                backgroundSize:'200% auto',
+                WebkitBackgroundClip:'text',
+                WebkitTextFillColor:'transparent',
+                animation:'shine 3s linear infinite',
+                letterSpacing:'-0.5px',
+                display:'block'
+              }}>EnjeraPressList.Com</span>
+              <span style={{fontSize:'11px', color:'#6b7280', fontWeight:'500'}}>Free Rental Listings</span>
+            </div>
           </div>
+
+          {/* NAV BUTTONS */}
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <Link href="/login" style={{
               fontSize:'14px', fontWeight:'600', color:'#374151',
@@ -90,7 +113,7 @@ export default function Home() {
           <h2 style={{fontSize:'clamp(28px, 5vw, 48px)', fontWeight:'800', color:'#1f2937', margin:'0 0 14px', lineHeight:'1.2'}}>
             Find Your Perfect<br/>Rental Home
           </h2>
-          <p style={{fontSize:'16px', color:'#4b5563', margin:'0 auto 32px', maxWidth:'480px', lineHeight:'1.6', fontWeight:'400'}}>
+          <p style={{fontSize:'16px', color:'#4b5563', margin:'0 auto 32px', maxWidth:'480px', lineHeight:'1.6'}}>
             Browse trusted rental listings. Connect directly with landlords — no agents, no fees.
           </p>
 
@@ -277,7 +300,20 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'28px 24px', textAlign:'center'}}>
-        <p style={{fontSize:'15px', fontWeight:'700', color:'#ffffff', margin:'0 0 4px'}}>EnjeraPressList.Com</p>
+        <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'12px', marginBottom:'8px'}}>
+          <div style={{position:'relative', width:'36px', height:'36px'}}>
+            <img src="/logo.gif" alt="logo" style={{width:'36px', height:'36px', borderRadius:'50%', border:'2px solid #d97706'}} />
+            <span style={{
+              position:'absolute', bottom:'-1px', right:'-3px',
+              background:'#ea580c', color:'#ffffff',
+              fontSize:'9px', fontWeight:'900',
+              width:'15px', height:'15px', borderRadius:'50%',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              border:'1px solid #1f2937'
+            }}>L</span>
+          </div>
+          <p style={{fontSize:'15px', fontWeight:'700', color:'#ffffff', margin:'0'}}>EnjeraPressList.Com</p>
+        </div>
         <p style={{fontSize:'13px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
       </footer>
 
