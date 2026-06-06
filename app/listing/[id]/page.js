@@ -24,6 +24,10 @@ export default function ListingDetail({ params }) {
     if (!error && data) {
       const sorted = data.listing_images?.sort((a,b) => a.position - b.position) || []
       setListing({...data, listing_images: sorted})
+      await supabase
+        .from('listings')
+        .update({ views: (data.views || 0) + 1 })
+        .eq('id', id)
     }
     setLoading(false)
   }
@@ -138,7 +142,10 @@ export default function ListingDetail({ params }) {
 
             {/* TITLE + STATS */}
             <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-              <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', marginBottom:'10px', letterSpacing:'0.04em'}}>{listing.property_type}</div>
+              <div style={{display:'flex', alignItems:'center', gap:'8px', marginBottom:'10px', flexWrap:'wrap'}}>
+                <div style={{background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', letterSpacing:'0.04em'}}>{listing.property_type}</div>
+                <div style={{background:'#f9fafb', color:'#6b7280', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', border:'1px solid #e5e7eb'}}>👁 {listing.views || 0} views</div>
+              </div>
               <h1 style={{fontSize:'clamp(18px, 4vw, 26px)', fontWeight:'800', color:'#111827', margin:'0 0 8px', lineHeight:'1.3'}}>{listing.title}</h1>
               <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>
                 📍 {[listing.address, listing.neighborhood, listing.city, listing.state, listing.zip].filter(Boolean).join(', ')}
