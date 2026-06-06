@@ -87,31 +87,39 @@ export default function Dashboard() {
       <div style={{maxWidth:'1000px', margin:'0 auto', padding:'28px 16px 64px', boxSizing:'border-box'}}>
 
         {/* HEADER */}
-        <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px 24px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', marginBottom:'24px', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'12px'}}>
-          <div>
-            <h1 style={{fontSize:'clamp(20px, 5vw, 28px)', fontWeight:'800', color:'#111827', margin:'0 0 4px'}}>My Dashboard</h1>
-            <p style={{fontSize:'13px', color:'#6b7280', margin:'0'}}>Manage your property listings</p>
-            {user && (
-              <div style={{display:'flex', alignItems:'center', gap:'8px', marginTop:'8px'}}>
-                <div style={{width:'32px', height:'32px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'14px', border:'2px solid #fed7aa'}}>👤</div>
-                <div>
-                  <p style={{fontSize:'13px', fontWeight:'600', color:'#111827', margin:'0'}}>{user.user_metadata?.full_name || 'User'}</p>
-                  <p style={{fontSize:'11px', color:'#9ca3af', margin:'0'}}>{user.email}</p>
-                </div>
+        <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px 24px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', marginBottom:'24px'}}>
+          <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'12px'}}>
+            <div style={{display:'flex', alignItems:'center', gap:'14px'}}>
+              <div style={{width:'52px', height:'52px', background:'#ea580c', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0, color:'#ffffff', fontWeight:'800'}}>
+                {user?.user_metadata?.full_name ? user.user_metadata.full_name.charAt(0).toUpperCase() : '👤'}
               </div>
-            )}
+              <div>
+                <h1 style={{fontSize:'clamp(18px, 4vw, 24px)', fontWeight:'800', color:'#111827', margin:'0 0 2px'}}>My Dashboard</h1>
+                <p style={{fontSize:'13px', color:'#6b7280', margin:'0'}}>{user?.user_metadata?.full_name || 'Welcome back'}</p>
+                <p style={{fontSize:'11px', color:'#9ca3af', margin:'2px 0 0'}}>{user?.email}</p>
+              </div>
+            </div>
+            <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+              <Link href="/account" style={{
+                fontSize:'13px', fontWeight:'700', color:'#374151',
+                padding:'9px 16px', borderRadius:'10px',
+                background:'#ffffff', border:'2px solid #d1d5db',
+                textDecoration:'none', whiteSpace:'nowrap',
+                display:'inline-block'
+              }}>⚙️ Account Settings</Link>
+              <button
+                onClick={handleSignOut}
+                disabled={signingOut}
+                style={{
+                  fontSize:'13px', fontWeight:'700', color:'#ffffff',
+                  padding:'9px 16px', borderRadius:'10px',
+                  background: signingOut ? '#d1d5db' : '#dc2626',
+                  border:'none', cursor: signingOut ? 'not-allowed' : 'pointer',
+                  whiteSpace:'nowrap'
+                }}
+              >🚪 {signingOut ? 'Signing out...' : 'Sign out'}</button>
+            </div>
           </div>
-          <button
-            onClick={handleSignOut}
-            disabled={signingOut}
-            style={{
-              fontSize:'14px', fontWeight:'700', color:'#ffffff',
-              padding:'10px 20px', borderRadius:'10px',
-              background: signingOut ? '#d1d5db' : '#dc2626',
-              border:'none', cursor: signingOut ? 'not-allowed' : 'pointer',
-              whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'6px'
-            }}
-          >🚪 {signingOut ? 'Signing out...' : 'Sign out'}</button>
         </div>
 
         {/* STATS */}
