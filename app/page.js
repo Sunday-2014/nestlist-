@@ -64,12 +64,12 @@ export default function Home() {
             </div>
           </div>
 
+          {/* NAV BUTTONS */}
           <div style={{display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap'}}>
-            {/* LANGUAGE TOGGLE */}
-            <button
-              onClick={toggleLang}
-              style={{fontSize:'12px', fontWeight:'700', color:'#374151', padding:'6px 10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'4px'}}
-            >🌍 {lang === 'en' ? 'አማርኛ' : 'English'}</button>
+            <button onClick={toggleLang} style={{fontSize:'12px', fontWeight:'700', color:'#374151', padding:'6px 10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'4px'}}>
+              🌍 {lang === 'en' ? 'አማርኛ' : 'English'}
+            </button>
+            <Link href="/contact" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>Contact</Link>
             <Link href="/dashboard" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.myListings}</Link>
             <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#166534', border:'2px solid #166534', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.addListing}</Link>
             <Link href="/login" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.signIn}</Link>
@@ -208,4 +208,5 @@ export default function Home() {
     </div>
   )
 }
+
 
