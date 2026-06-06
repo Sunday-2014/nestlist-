@@ -11,8 +11,10 @@ export default function ListingDetail({ params }) {
   const [activePhoto, setActivePhoto] = useState(0)
   const [showContact, setShowContact] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [pageUrl, setPageUrl] = useState('')
 
   useEffect(() => {
+    setPageUrl(window.location.href)
     fetchListing()
   }, [])
 
@@ -34,7 +36,7 @@ export default function ListingDetail({ params }) {
   }
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
+    navigator.clipboard.writeText(pageUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -47,6 +49,18 @@ export default function ListingDetail({ params }) {
     boxShadow:'0 2px 12px rgba(0,0,0,0.08)',
     position:'sticky', top:0, zIndex:100, width:'100%', boxSizing:'border-box'
   }
+
+  const Footer = () => (
+    <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
+      <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 8px'}}>EnjeraPressList.Com</p>
+      <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px'}}>
+        <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
+        <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
+        <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
+      </div>
+      <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
+    </footer>
+  )
 
   const Navbar = () => (
     <nav style={navStyle}>
@@ -66,105 +80,6 @@ export default function ListingDetail({ params }) {
         <div style={{height:'6px', background:'#DA121A'}}></div>
       </div>
     </nav>
-  )
-
-  const ShareButtons = () => {
-    const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
-    const shareText = `Check out this property: ${listing?.title} - $${listing?.price?.toLocaleString()}/mo in ${listing?.city}`
-    return (
-      <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-        <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>📤 Share this listing</p>
-        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginBottom:'8px'}}>
-          
-            href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{padding:'10px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
-          >📱 WhatsApp</a>
-          
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{padding:'10px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
-          >👍 Facebook</a>
-          
-            href={`https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{padding:'10px 6px', borderRadius:'8px', background:'#0088cc', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
-          >✈️ Telegram</a>
-          
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{padding:'10px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'12px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'4px'}}
-          >𝕏 Twitter (X)</a>
-        </div>
-        <button
-          onClick={handleCopyLink}
-          style={{width:'100%', padding:'10px', borderRadius:'8px', background: copied ? '#f0fdf4' : '#f9fafb', color: copied ? '#166534' : '#374151', fontSize:'12px', fontWeight:'700', border: copied ? '2px solid #bbf7d0' : '2px solid #e5e7eb', cursor:'pointer', transition:'all 0.2s'}}
-        >{copied ? '✅ Link Copied!' : '🔗 Copy Link'}</button>
-      </div>
-    )
-  }
-
-  const ContactCard = () => (
-    <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', marginBottom:'16px'}}>
-      <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
-      <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px', padding:'12px', background:'#f9fafb', borderRadius:'12px', border:'1px solid #e5e7eb'}}>
-        <div style={{width:'46px', height:'46px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0, border:'2px solid #fed7aa'}}>👤</div>
-        <div>
-          <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing?.contact_name || 'Landlord'}</p>
-          <p style={{fontSize:'12px', color:'#6b7280', margin:'0', fontWeight:'500'}}>Prefers: {listing?.contact_method}</p>
-        </div>
-      </div>
-      {!showContact ? (
-        <div>
-          <div style={{background:'#f9fafb', borderRadius:'10px', padding:'14px', marginBottom:'12px', border:'2px dashed #d1d5db', textAlign:'center'}}>
-            <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 4px', fontWeight:'600'}}>📧 ••••••@••••••.com</p>
-            {listing?.contact_phone && <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'600'}}>📞 ••• ••• ••••</p>}
-          </div>
-          <button
-            onClick={() => setShowContact(true)}
-            style={{display:'block', width:'100%', padding:'14px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', border:'none', cursor:'pointer', marginBottom:'10px', boxSizing:'border-box'}}
-          >👁 Reveal Contact Info</button>
-        </div>
-      ) : (
-        <div>
-          <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
-            <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Email</p>
-            <a href={`mailto:${listing?.contact_email}`} style={{fontSize:'14px', fontWeight:'600', color:'#ea580c', textDecoration:'none', wordBreak:'break-all'}}>{listing?.contact_email}</a>
-          </div>
-          {listing?.contact_phone && (
-            <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
-              <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Phone</p>
-              <a href={`tel:${listing?.contact_phone}`} style={{fontSize:'14px', fontWeight:'600', color:'#166534', textDecoration:'none'}}>{listing?.contact_phone}</a>
-            </div>
-          )}
-          <a href={`mailto:${listing?.contact_email}`} style={{display:'block', width:'100%', padding:'12px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', marginBottom:'8px', boxSizing:'border-box'}}>✉️ Send Email</a>
-          {listing?.contact_phone && (
-            <a href={`tel:${listing?.contact_phone}`} style={{display:'block', width:'100%', padding:'12px', background:'#166534', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', boxSizing:'border-box'}}>📞 Call Now</a>
-          )}
-        </div>
-      )}
-      <div style={{marginTop:'12px', padding:'10px', background:'#f0fdf4', borderRadius:'10px', border:'1px solid #bbf7d0'}}>
-        <p style={{fontSize:'12px', color:'#166534', margin:'0', lineHeight:'1.6', textAlign:'center', fontWeight:'500'}}>
-          🔒 Contact directly — no middlemen, no fees
-        </p>
-      </div>
-    </div>
-  )
-
-  const Footer = () => (
-    <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
-      <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 8px'}}>EnjeraPressList.Com</p>
-      <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px'}}>
-        <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
-        <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
-        <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
-      </div>
-      <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>Free rental listings · No fees · Connect directly with landlords</p>
-    </footer>
   )
 
   if (loading) return (
@@ -189,6 +104,8 @@ export default function ListingDetail({ params }) {
       <Footer />
     </div>
   )
+
+  const shareText = `Check out this property: ${listing.title} - $${listing.price?.toLocaleString()}/mo in ${listing.city}`
 
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', overflowX:'hidden'}}>
@@ -222,9 +139,88 @@ export default function ListingDetail({ params }) {
           <div style={{height:'220px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', borderRadius:'16px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'64px', marginBottom:'24px', border:'1px solid #e5e7eb'}}>🏠</div>
         )}
 
-        {/* SHARE + CONTACT — shows on all screens */}
-        <ShareButtons />
-        <ContactCard />
+        {/* SHARE BUTTONS */}
+        {pageUrl && (
+          <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+            <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>📤 Share this listing</p>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginBottom:'8px'}}>
+              
+                href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{padding:'11px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+              >📱 WhatsApp</a>
+              
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{padding:'11px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+              >👍 Facebook</a>
+              
+                href={`https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{padding:'11px 6px', borderRadius:'8px', background:'#0088cc', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+              >✈️ Telegram</a>
+              
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{padding:'11px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'13px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'block'}}
+              >𝕏 Twitter (X)</a>
+            </div>
+            <button
+              onClick={handleCopyLink}
+              style={{width:'100%', padding:'10px', borderRadius:'8px', background: copied ? '#f0fdf4' : '#f9fafb', color: copied ? '#166534' : '#374151', fontSize:'13px', fontWeight:'700', border: copied ? '2px solid #bbf7d0' : '2px solid #e5e7eb', cursor:'pointer', transition:'all 0.2s', boxSizing:'border-box'}}
+            >{copied ? '✅ Link Copied!' : '🔗 Copy Link'}</button>
+          </div>
+        )}
+
+        {/* CONTACT CARD */}
+        <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', marginBottom:'16px'}}>
+          <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
+          <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px', padding:'12px', background:'#f9fafb', borderRadius:'12px', border:'1px solid #e5e7eb'}}>
+            <div style={{width:'46px', height:'46px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0, border:'2px solid #fed7aa'}}>👤</div>
+            <div>
+              <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.contact_name || 'Landlord'}</p>
+              <p style={{fontSize:'12px', color:'#6b7280', margin:'0', fontWeight:'500'}}>Prefers: {listing.contact_method}</p>
+            </div>
+          </div>
+          {!showContact ? (
+            <div>
+              <div style={{background:'#f9fafb', borderRadius:'10px', padding:'14px', marginBottom:'12px', border:'2px dashed #d1d5db', textAlign:'center'}}>
+                <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 4px', fontWeight:'600'}}>📧 ••••••@••••••.com</p>
+                {listing.contact_phone && <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'600'}}>📞 ••• ••• ••••</p>}
+              </div>
+              <button
+                onClick={() => setShowContact(true)}
+                style={{display:'block', width:'100%', padding:'14px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', border:'none', cursor:'pointer', marginBottom:'10px', boxSizing:'border-box'}}
+              >👁 Reveal Contact Info</button>
+            </div>
+          ) : (
+            <div>
+              <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
+                <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Email</p>
+                <a href={`mailto:${listing.contact_email}`} style={{fontSize:'14px', fontWeight:'600', color:'#ea580c', textDecoration:'none', wordBreak:'break-all'}}>{listing.contact_email}</a>
+              </div>
+              {listing.contact_phone && (
+                <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Phone</p>
+                  <a href={`tel:${listing.contact_phone}`} style={{fontSize:'14px', fontWeight:'600', color:'#166534', textDecoration:'none'}}>{listing.contact_phone}</a>
+                </div>
+              )}
+              <a href={`mailto:${listing.contact_email}`} style={{display:'block', width:'100%', padding:'12px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', marginBottom:'8px', boxSizing:'border-box'}}>✉️ Send Email</a>
+              {listing.contact_phone && (
+                <a href={`tel:${listing.contact_phone}`} style={{display:'block', width:'100%', padding:'12px', background:'#166534', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', boxSizing:'border-box'}}>📞 Call Now</a>
+              )}
+            </div>
+          )}
+          <div style={{marginTop:'12px', padding:'10px', background:'#f0fdf4', borderRadius:'10px', border:'1px solid #bbf7d0'}}>
+            <p style={{fontSize:'12px', color:'#166534', margin:'0', lineHeight:'1.6', textAlign:'center', fontWeight:'500'}}>
+              🔒 Contact directly — no middlemen, no fees
+            </p>
+          </div>
+        </div>
 
         {/* TITLE + STATS */}
         <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
@@ -280,4 +276,3 @@ export default function ListingDetail({ params }) {
     </div>
   )
 }
-
