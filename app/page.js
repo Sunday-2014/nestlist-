@@ -84,7 +84,7 @@ export default function Home() {
         </div>
 
         {/* CONTACT US BAR */}
-        <div style={{background:'linear-gradient(90deg, #0ea5e9, #38bdf8)', width:'100%', padding:'7px 16px', boxSizing:'border-box'}}>
+        <div style={{background:'linear-gradient(90deg, #b45309, #d97706, #f59e0b)', width:'100%', padding:'7px 16px', boxSizing:'border-box'}}>
           <div style={{maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center', gap:'16px'}}>
             <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px', padding:'2px 0'}}>
               📬 Contact Us
@@ -220,6 +220,7 @@ export default function Home() {
     </div>
   )
 }
+
 
 
 
