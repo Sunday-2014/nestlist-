@@ -53,6 +53,22 @@ export default function Home() {
     return <span>${l.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></span>
   }
 
+  const adFrame = (
+    <div style={{
+      width:'160px', minHeight:'110px', flexShrink:0,
+      border:'3px solid #d97706', borderRadius:'12px',
+      background:'linear-gradient(135deg, #fef3c7, #fde68a)',
+      display:'flex', flexDirection:'column',
+      alignItems:'center', justifyContent:'center',
+      padding:'12px', textAlign:'center',
+      boxShadow:'0 0 14px rgba(217,119,6,0.35)',
+      cursor:'pointer'
+    }}>
+      <p style={{fontSize:'12px', fontWeight:'800', color:'#92400e', margin:'0 0 4px', lineHeight:'1.4'}}>This place is open for Ad</p>
+      <p style={{fontSize:'10px', color:'#b45309', margin:'0', lineHeight:'1.4'}}>Contact us to advertise</p>
+    </div>
+  )
+
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', margin:0, padding:0, overflowX:'hidden'}}>
 
@@ -103,43 +119,14 @@ export default function Home() {
       <div style={{background:'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)', borderBottom:'1px solid #fdba74', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
           <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'12px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
+
+          {/* HERO TITLE WITH AD FRAMES */}
           <div style={{display:'flex', alignItems:'center', gap:'12px', margin:'0 0 12px', justifyContent:'center'}}>
-            {/* LEFT AD FRAME */}
-            <div style={{
-              width:'120px', minHeight:'80px', flexShrink:0,
-              border:'2px solid #d97706',
-              borderRadius:'10px',
-              background:'linear-gradient(135deg, #fef3c7, #fde68a)',
-              display:'flex', flexDirection:'column',
-              alignItems:'center', justifyContent:'center',
-              padding:'8px', textAlign:'center',
-              boxShadow:'0 0 10px rgba(217,119,6,0.3)',
-              cursor:'pointer'
-            }}>
-              <span style={{fontSize:'18px', marginBottom:'4px'}}>⭐</span>
-              <p style={{fontSize:'10px', fontWeight:'700', color:'#92400e', margin:'0', lineHeight:'1.3'}}>Your Ad Here</p>
-              <p style={{fontSize:'9px', color:'#b45309', margin:'2px 0 0'}}>Contact us to advertise</p>
-            </div>
-
-            <h2 style={{fontSize:'clamp(20px, 4vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0', lineHeight:'1.2', flex:1}}>{t.heroTitle}</h2>
-
-            {/* RIGHT AD FRAME */}
-            <div style={{
-              width:'120px', minHeight:'80px', flexShrink:0,
-              border:'2px solid #d97706',
-              borderRadius:'10px',
-              background:'linear-gradient(135deg, #fef3c7, #fde68a)',
-              display:'flex', flexDirection:'column',
-              alignItems:'center', justifyContent:'center',
-              padding:'8px', textAlign:'center',
-              boxShadow:'0 0 10px rgba(217,119,6,0.3)',
-              cursor:'pointer'
-            }}>
-              <span style={{fontSize:'18px', marginBottom:'4px'}}>⭐</span>
-              <p style={{fontSize:'10px', fontWeight:'700', color:'#92400e', margin:'0', lineHeight:'1.3'}}>Your Ad Here</p>
-              <p style={{fontSize:'9px', color:'#b45309', margin:'2px 0 0'}}>Contact us to advertise</p>
-            </div>
+            {adFrame}
+            <h2 style={{fontSize:'clamp(18px, 4vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0', lineHeight:'1.2', flex:1}}>{t.heroTitle}</h2>
+            {adFrame}
           </div>
+
           <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>{t.heroSubtitle}</p>
 
           {/* SEARCH BOX */}
@@ -210,7 +197,7 @@ export default function Home() {
                   onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)' }}
                 >
                   {l.listing_images && l.listing_images.length > 0 ? (
-                    <div style={{height:'180px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'52px', position:'relative', overflow:'hidden'}}>
+                    <div style={{height:'180px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden'}}>
                       <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
                       <div style={{position:'absolute', top:'12px', left:'12px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', letterSpacing:'0.04em'}}>{l.property_type}</div>
                       {l.listing_images.length > 1 && (
@@ -218,13 +205,16 @@ export default function Home() {
                       )}
                     </div>
                   ) : (
-                    <div style={{padding:'14px 14px 0'}}>
+                    <div style={{padding:'12px 14px 0'}}>
                       <span style={{background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>
                     </div>
                   )}
                   <div style={{padding:'14px'}}>
                     <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 6px', lineHeight:'1.4'}}>{l.title}</p>
-                    <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 12px', fontWeight:'500'}}>📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}</p>
+                    <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 6px', fontWeight:'500'}}>📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}</p>
+                    {l.description && !l.listing_images?.length && (
+                      <p style={{fontSize:'12px', color:'#9ca3af', margin:'0 0 10px', lineHeight:'1.5', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden'}}>{l.description}</p>
+                    )}
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
                       <div>
                         <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>
@@ -262,5 +252,3 @@ export default function Home() {
     </div>
   )
 }
-
-
