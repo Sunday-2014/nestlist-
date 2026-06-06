@@ -72,7 +72,7 @@ export default function Home() {
             <Link href="/dashboard" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.myListings}</Link>
             <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#166534', border:'2px solid #166534', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.addListing}</Link>
             <Link href="/login" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.signIn}</Link>
-            <Link href="/register" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#ea580c', border:'2px solid #ea580c', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.register}</Link>
+            <Link href="/register" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#ea580c', border:'2px solid #ea580c', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>Sign up free</Link>
           </div>
         </div>
 
@@ -220,4 +220,5 @@ export default function Home() {
     </div>
   )
 }
+
 
