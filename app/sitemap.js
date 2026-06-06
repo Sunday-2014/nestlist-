@@ -1,37 +1,39 @@
 export default function sitemap() {
+  const baseUrl = 'https://www.enjerapresslist.com'
+  
   return [
     {
-      url: 'https://www.enjerapresslist.com',
+      url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 1,
+      priority: 1.0,
     },
     {
-      url: 'https://www.enjerapresslist.com/register',
+      url: `${baseUrl}/register`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://www.enjerapresslist.com/login',
+      url: `${baseUrl}/login`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://www.enjerapresslist.com/list',
+      url: `${baseUrl}/list`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
-      url: 'https://www.enjerapresslist.com/contact',
+      url: `${baseUrl}/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: 'https://www.enjerapresslist.com/browse',
+      url: `${baseUrl}/browse`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
