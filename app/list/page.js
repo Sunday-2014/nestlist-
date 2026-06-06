@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createListing, getCurrentUser, uploadListingImage } from '@/lib/supabase'
 import Link from 'next/link'
 
@@ -17,19 +17,30 @@ export default function ListProperty() {
   const [uploadProgress, setUploadProgress] = useState('')
   const fileInputRef = useRef(null)
 
+  useEffect(() => {
+    loadUser()
+  }, [])
+
+  const loadUser = async () => {
+    const user = await getCurrentUser()
+    if (!user) { window.location.href = '/login'; return }
+    setForm(prev => ({
+      ...prev,
+      contact_email: user.email,
+      contact_name: user.user_metadata?.full_name || ''
+    }))
+  }
+
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files)
     const existingImages = files.filter(f => f.type.startsWith('image/'))
     const existingVideos = files.filter(f => f.type.startsWith('video/'))
     const newImages = selected.filter(f => f.type.startsWith('image/'))
     const newVideos = selected.filter(f => f.type.startsWith('video/'))
-
     if (existingImages.length + newImages.length > 4) { setError('Maximum 4 photos allowed'); return }
     if (existingVideos.length + newVideos.length > 1) { setError('Maximum 1 video allowed'); return }
-
     const validFiles = []
     const validPreviews = []
-
     for (const file of selected) {
       if (file.type.startsWith('image/')) {
         validFiles.push(file)
@@ -63,7 +74,10 @@ export default function ListProperty() {
     if (!form.title) { setError('Please add a title'); return }
     if (!form.price) { setError('Please add a price'); return }
     if (!form.city) { setError('Please add a city'); return }
-    if (!form.contact_email) { setError('Please add a contact email'); return }
+    if (!form.contact_name) { setError('Please add your name'); return }
+    if (!form.contact_phone) { setError('Please add a contact phone number'); return }
+    const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
+    if (!phoneRegex.test(form.contact_phone.replace(/\s/g, ''))) { setError('Please enter a valid phone number (e.g. +1 555 000 0000)'); return }
     setLoading(true)
     try {
       const user = await getCurrentUser()
@@ -93,6 +107,11 @@ export default function ListProperty() {
     boxSizing:'border-box'
   }
 
+  const lockedInputStyle = {
+    ...inputStyle,
+    background:'#f3f4f6', color:'#6b7280', cursor:'not-allowed'
+  }
+
   const labelStyle = {
     fontSize:'12px', fontWeight:'700', color:'#374151',
     display:'block', marginBottom:'6px', textTransform:'uppercase',
@@ -115,7 +134,7 @@ export default function ListProperty() {
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif'}}>
 
-      {/* Navbar */}
+      {/* NAVBAR */}
       <nav style={{background:'#ffffff', borderBottom:'2px solid #ea580c', boxShadow:'0 2px 12px rgba(0,0,0,0.08)', position:'sticky', top:0, zIndex:100}}>
         <div style={{maxWidth:'800px', margin:'0 auto', padding:'12px 24px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
@@ -126,6 +145,11 @@ export default function ListProperty() {
             <Link href="/" style={{fontSize:'18px', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>EnjeraPressList.Com</Link>
           </div>
           <Link href="/" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none'}}>← Back to listings</Link>
+        </div>
+        <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
+          <div style={{height:'6px', background:'#078930'}}></div>
+          <div style={{height:'6px', background:'#FCDD09'}}></div>
+          <div style={{height:'6px', background:'#DA121A'}}></div>
         </div>
       </nav>
 
@@ -217,31 +241,17 @@ export default function ListProperty() {
           <p style={{fontSize:'13px', color:'#6b7280', marginBottom:'16px', fontWeight:'500', lineHeight:'1.6'}}>
             Upload up to <strong style={{color:'#111827'}}>4 photos</strong> and <strong style={{color:'#111827'}}>1 video (max 30 seconds)</strong>. Listings with photos get 3x more inquiries.
           </p>
-
           <div
             onClick={() => fileInputRef.current.click()}
-            style={{
-              border:'2px dashed #d1d5db', borderRadius:'12px',
-              padding:'36px 24px', textAlign:'center', cursor:'pointer',
-              background:'#f9fafb', marginBottom:'16px',
-              transition:'all 0.2s'
-            }}
+            style={{border:'2px dashed #d1d5db', borderRadius:'12px', padding:'36px 24px', textAlign:'center', cursor:'pointer', background:'#f9fafb', marginBottom:'16px', transition:'all 0.2s'}}
             onMouseEnter={e => { e.currentTarget.style.borderColor='#ea580c'; e.currentTarget.style.background='#fff7ed' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor='#d1d5db'; e.currentTarget.style.background='#f9fafb' }}
           >
             <div style={{fontSize:'40px', marginBottom:'10px'}}>📁</div>
             <p style={{fontSize:'15px', fontWeight:'700', color:'#374151', margin:'0 0 6px'}}>Click to upload photos or video</p>
             <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>JPG, PNG, WEBP · MP4 (max 30 sec) · Up to 4 photos + 1 video</p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime"
-              onChange={handleFileChange}
-              style={{display:'none'}}
-            />
+            <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" onChange={handleFileChange} style={{display:'none'}} />
           </div>
-
           {previews.length > 0 && (
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(150px, 1fr))', gap:'10px'}}>
               {previews.map((p, i) => (
@@ -252,21 +262,9 @@ export default function ListProperty() {
                     <video src={p.url} style={{width:'100%', height:'120px', objectFit:'cover', display:'block'}} controls />
                   )}
                   <div style={{padding:'6px 8px', background:'#ffffff'}}>
-                    <p style={{fontSize:'11px', color:'#6b7280', margin:'0', fontWeight:'600'}}>
-                      {p.type === 'video' ? '🎥 Video' : `📷 Photo ${i+1}`}
-                    </p>
+                    <p style={{fontSize:'11px', color:'#6b7280', margin:'0', fontWeight:'600'}}>{p.type === 'video' ? '🎥 Video' : `📷 Photo ${i+1}`}</p>
                   </div>
-                  <button
-                    onClick={() => removeFile(i)}
-                    style={{
-                      position:'absolute', top:'6px', right:'6px',
-                      background:'#ef4444', color:'#ffffff',
-                      border:'none', borderRadius:'50%',
-                      width:'24px', height:'24px', cursor:'pointer',
-                      fontSize:'12px', fontWeight:'700',
-                      display:'flex', alignItems:'center', justifyContent:'center'
-                    }}
-                  >✕</button>
+                  <button onClick={() => removeFile(i)} style={{position:'absolute', top:'6px', right:'6px', background:'#ef4444', color:'#ffffff', border:'none', borderRadius:'50%', width:'24px', height:'24px', cursor:'pointer', fontSize:'12px', fontWeight:'700', display:'flex', alignItems:'center', justifyContent:'center'}}>✕</button>
                 </div>
               ))}
             </div>
@@ -276,9 +274,12 @@ export default function ListProperty() {
         {/* Contact */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>📞 Contact Information</div>
+          <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'12px 14px', marginBottom:'16px'}}>
+            <p style={{fontSize:'13px', color:'#166534', margin:'0', fontWeight:'600'}}>🔒 Your registered email is automatically used as your contact email — this ensures renters always reach the verified account owner.</p>
+          </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
-              <label style={labelStyle}>Your Name</label>
+              <label style={labelStyle}>Your Name *</label>
               <input style={inputStyle} placeholder="Jane Smith" {...f('contact_name')} />
             </div>
             <div>
@@ -290,11 +291,16 @@ export default function ListProperty() {
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
-              <label style={labelStyle}>Contact Email *</label>
-              <input style={inputStyle} type="email" placeholder="jane@example.com" {...f('contact_email')} />
+              <label style={labelStyle}>Contact Email 🔒 Verified</label>
+              <input
+                style={lockedInputStyle}
+                value={form.contact_email}
+                readOnly
+                title="This is your verified account email and cannot be changed"
+              />
             </div>
             <div>
-              <label style={labelStyle}>Contact Phone</label>
+              <label style={labelStyle}>Contact Phone *</label>
               <input style={inputStyle} type="tel" placeholder="+1 (555) 000-0000" {...f('contact_phone')} />
             </div>
           </div>
@@ -313,12 +319,7 @@ export default function ListProperty() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          style={{
-            width:'100%', padding:'16px', borderRadius:'12px',
-            background: loading ? '#d1d5db' : '#ea580c',
-            color:'#ffffff', fontSize:'16px', fontWeight:'800',
-            border:'none', cursor: loading ? 'not-allowed' : 'pointer'
-          }}
+          style={{width:'100%', padding:'16px', borderRadius:'12px', background: loading ? '#d1d5db' : '#ea580c', color:'#ffffff', fontSize:'16px', fontWeight:'800', border:'none', cursor: loading ? 'not-allowed' : 'pointer'}}
         >
           {loading ? '⏳ Publishing...' : '🚀 Publish Listing — Free'}
         </button>
@@ -326,4 +327,3 @@ export default function ListProperty() {
     </div>
   )
 }
-

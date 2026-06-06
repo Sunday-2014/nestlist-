@@ -9,6 +9,7 @@ export default function ListingDetail({ params }) {
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activePhoto, setActivePhoto] = useState(0)
+  const [showContact, setShowContact] = useState(false)
 
   useEffect(() => {
     fetchListing()
@@ -187,6 +188,7 @@ export default function ListingDetail({ params }) {
             <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', position:'sticky', top:'100px'}}>
               <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
 
+              {/* LANDLORD INFO */}
               <div style={{display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px', padding:'12px', background:'#f9fafb', borderRadius:'12px', border:'1px solid #e5e7eb'}}>
                 <div style={{width:'46px', height:'46px', background:'#fff7ed', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px', flexShrink:0, border:'2px solid #fed7aa'}}>👤</div>
                 <div>
@@ -195,25 +197,47 @@ export default function ListingDetail({ params }) {
                 </div>
               </div>
 
-              <a href={`mailto:${listing.contact_email}`} style={{
-                display:'block', width:'100%', padding:'13px',
-                background:'#ea580c', color:'#ffffff',
-                fontSize:'14px', fontWeight:'700', textAlign:'center',
-                borderRadius:'10px', textDecoration:'none',
-                marginBottom:'10px', boxSizing:'border-box'
-              }}>✉️ Send Email</a>
-
-              {listing.contact_phone && (
-                <a href={`tel:${listing.contact_phone}`} style={{
-                  display:'block', width:'100%', padding:'13px',
-                  background:'#166534', color:'#ffffff',
-                  fontSize:'14px', fontWeight:'700', textAlign:'center',
-                  borderRadius:'10px', textDecoration:'none',
-                  marginBottom:'16px', boxSizing:'border-box'
-                }}>📞 Call {listing.contact_phone}</a>
+              {/* HIDDEN CONTACT - REVEAL BUTTON */}
+              {!showContact ? (
+                <div>
+                  <div style={{background:'#f9fafb', borderRadius:'10px', padding:'14px', marginBottom:'12px', border:'2px dashed #d1d5db', textAlign:'center'}}>
+                    <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 4px', fontWeight:'600'}}>📧 ••••••@••••••.com</p>
+                    {listing.contact_phone && <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'600'}}>📞 ••• ••• ••••</p>}
+                  </div>
+                  <button
+                    onClick={() => setShowContact(true)}
+                    style={{
+                      display:'block', width:'100%', padding:'14px',
+                      background:'#ea580c', color:'#ffffff',
+                      fontSize:'14px', fontWeight:'700', textAlign:'center',
+                      borderRadius:'10px', border:'none', cursor:'pointer',
+                      marginBottom:'10px', boxSizing:'border-box',
+                      transition:'background 0.2s'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background='#c2410c'}
+                    onMouseLeave={e => e.currentTarget.style.background='#ea580c'}
+                  >👁 Reveal Contact Info</button>
+                </div>
+              ) : (
+                <div>
+                  <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
+                    <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Email</p>
+                    <a href={`mailto:${listing.contact_email}`} style={{fontSize:'14px', fontWeight:'600', color:'#ea580c', textDecoration:'none', wordBreak:'break-all'}}>{listing.contact_email}</a>
+                  </div>
+                  {listing.contact_phone && (
+                    <div style={{background:'#f9fafb', borderRadius:'10px', padding:'12px', marginBottom:'10px', border:'1px solid #e5e7eb'}}>
+                      <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 4px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Phone</p>
+                      <a href={`tel:${listing.contact_phone}`} style={{fontSize:'14px', fontWeight:'600', color:'#166534', textDecoration:'none'}}>{listing.contact_phone}</a>
+                    </div>
+                  )}
+                  <a href={`mailto:${listing.contact_email}`} style={{display:'block', width:'100%', padding:'12px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', marginBottom:'8px', boxSizing:'border-box'}}>✉️ Send Email</a>
+                  {listing.contact_phone && (
+                    <a href={`tel:${listing.contact_phone}`} style={{display:'block', width:'100%', padding:'12px', background:'#166534', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', textDecoration:'none', boxSizing:'border-box'}}>📞 Call Now</a>
+                  )}
+                </div>
               )}
 
-              <div style={{padding:'12px', background:'#f0fdf4', borderRadius:'10px', border:'1px solid #bbf7d0'}}>
+              <div style={{marginTop:'12px', padding:'10px', background:'#f0fdf4', borderRadius:'10px', border:'1px solid #bbf7d0'}}>
                 <p style={{fontSize:'12px', color:'#166534', margin:'0', lineHeight:'1.6', textAlign:'center', fontWeight:'500'}}>
                   🔒 Contact directly — no middlemen, no fees
                 </p>
@@ -227,4 +251,3 @@ export default function ListingDetail({ params }) {
     </div>
   )
 }
-
