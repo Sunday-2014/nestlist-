@@ -12,6 +12,8 @@ export default function Home() {
   const [type, setType] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [lang, setLang] = useState('en')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   const t = translations[lang]
 
@@ -23,6 +25,10 @@ export default function Home() {
       setFiltered(data)
       setLoading(false)
     }).catch(() => setLoading(false))
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   const toggleLang = () => {
@@ -53,50 +59,59 @@ export default function Home() {
     return <span>${l.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></span>
   }
 
-  const adFrame = (
-    <div style={{
-      width:'160px', minHeight:'110px', flexShrink:0,
-      border:'3px solid #d97706', borderRadius:'12px',
-      background:'linear-gradient(135deg, #fef3c7, #fde68a)',
-      display:'flex', flexDirection:'column',
-      alignItems:'center', justifyContent:'center',
-      padding:'12px', textAlign:'center',
-      boxShadow:'0 0 14px rgba(217,119,6,0.35)',
-      cursor:'pointer'
-    }}>
-      <p style={{fontSize:'12px', fontWeight:'800', color:'#92400e', margin:'0 0 4px', lineHeight:'1.4'}}>This place is open for Ad</p>
-      <p style={{fontSize:'10px', color:'#b45309', margin:'0', lineHeight:'1.4'}}>Contact us to advertise</p>
-    </div>
-  )
-
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', margin:0, padding:0, overflowX:'hidden'}}>
 
       {/* NAVBAR */}
       <nav style={{background:'#ffffff', position:'sticky', top:0, zIndex:100, boxShadow:'0 2px 12px rgba(0,0,0,0.08)', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+
+          {/* LOGO */}
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <div style={{position:'relative', width:'44px', height:'44px', flexShrink:0}}>
               <img src="/logo.gif" alt="logo" style={{width:'44px', height:'44px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}} />
-              <span style={{position:'absolute', bottom:'-2px', right:'-4px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'900', width:'20px', height:'20px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff', boxShadow:'0 1px 4px rgba(0,0,0,0.25)'}}>L</span>
+              <span style={{position:'absolute', bottom:'-2px', right:'-4px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'900', width:'20px', height:'20px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff'}}>L</span>
             </div>
             <div>
-              <span style={{fontSize:'clamp(15px, 4vw, 22px)', fontWeight:'800', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite', letterSpacing:'-0.5px', display:'block'}}>{t.siteName}</span>
+              <span style={{fontSize:'clamp(14px, 3.5vw, 22px)', fontWeight:'800', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite', display:'block'}}>{t.siteName}</span>
               <span style={{fontSize:'10px', color:'#6b7280', fontWeight:'500'}}>{t.tagline}</span>
             </div>
           </div>
 
-          {/* NAV BUTTONS */}
-          <div style={{display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap'}}>
-            <button onClick={toggleLang} style={{fontSize:'12px', fontWeight:'700', color:'#374151', padding:'6px 10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'4px'}}>
-              🌍 {lang === 'en' ? 'አማርኛ' : 'English'}
-            </button>
-            <Link href="/dashboard" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.myListings}</Link>
-            <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#166534', border:'2px solid #166534', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.addListing}</Link>
-            <Link href="/login" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.signIn}</Link>
-            <Link href="/register" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#ea580c', border:'2px solid #ea580c', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>Sign up free</Link>
-          </div>
+          {/* DESKTOP NAV */}
+          {!isMobile && (
+            <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
+              <button onClick={toggleLang} style={{fontSize:'12px', fontWeight:'700', color:'#374151', padding:'6px 10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', whiteSpace:'nowrap'}}>
+                🌍 {lang === 'en' ? 'አማርኛ' : 'English'}
+              </button>
+              <Link href="/dashboard" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', whiteSpace:'nowrap'}}>{t.myListings}</Link>
+              <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#166534', textDecoration:'none', whiteSpace:'nowrap'}}>{t.addListing}</Link>
+              <Link href="/login" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', whiteSpace:'nowrap'}}>{t.signIn}</Link>
+              <Link href="/register" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#ea580c', textDecoration:'none', whiteSpace:'nowrap'}}>Sign up free</Link>
+            </div>
+          )}
+
+          {/* MOBILE HAMBURGER */}
+          {isMobile && (
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              style={{background:'none', border:'2px solid #d1d5db', borderRadius:'8px', padding:'6px 10px', cursor:'pointer', fontSize:'20px', color:'#374151'}}
+            >☰</button>
+          )}
         </div>
+
+        {/* MOBILE MENU */}
+        {isMobile && menuOpen && (
+          <div style={{background:'#ffffff', borderTop:'1px solid #e5e7eb', padding:'12px 16px', display:'flex', flexDirection:'column', gap:'8px'}}>
+            <button onClick={() => { toggleLang(); setMenuOpen(false) }} style={{fontSize:'13px', fontWeight:'700', color:'#374151', padding:'10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', textAlign:'left'}}>
+              🌍 {lang === 'en' ? 'Switch to አማርኛ' : 'Switch to English'}
+            </button>
+            <Link href="/dashboard" onClick={() => setMenuOpen(false)} style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'10px', borderRadius:'8px', border:'2px solid #d1d5db', textDecoration:'none', display:'block'}}>{t.myListings}</Link>
+            <Link href="/list" onClick={() => setMenuOpen(false)} style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px', borderRadius:'8px', background:'#166534', textDecoration:'none', display:'block', textAlign:'center'}}>{t.addListing}</Link>
+            <Link href="/login" onClick={() => setMenuOpen(false)} style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'10px', borderRadius:'8px', border:'2px solid #d1d5db', textDecoration:'none', display:'block', textAlign:'center'}}>{t.signIn}</Link>
+            <Link href="/register" onClick={() => setMenuOpen(false)} style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px', borderRadius:'8px', background:'#ea580c', textDecoration:'none', display:'block', textAlign:'center'}}>Sign up free</Link>
+          </div>
+        )}
 
         {/* ETHIOPIAN FLAG STRIPES */}
         <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
@@ -108,7 +123,7 @@ export default function Home() {
         {/* CONTACT US BAR */}
         <div style={{background:'linear-gradient(90deg, #fef3c7, #fde68a, #fef3c7)', width:'100%', padding:'7px 16px', boxSizing:'border-box'}}>
           <div style={{maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center'}}>
-            <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#92400e', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px', padding:'2px 0'}}>
+            <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#92400e', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px'}}>
               📬 Contact Us
             </Link>
           </div>
@@ -120,12 +135,22 @@ export default function Home() {
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
           <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'12px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
 
-          {/* HERO TITLE WITH AD FRAMES */}
-          <div style={{display:'flex', alignItems:'center', gap:'12px', margin:'0 0 12px', justifyContent:'center'}}>
-            {adFrame}
-            <h2 style={{fontSize:'clamp(18px, 4vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0', lineHeight:'1.2', flex:1}}>{t.heroTitle}</h2>
-            {adFrame}
-          </div>
+          {/* HERO TITLE — AD FRAMES ONLY ON DESKTOP */}
+          {!isMobile ? (
+            <div style={{display:'flex', alignItems:'center', gap:'16px', margin:'0 0 12px', justifyContent:'center'}}>
+              <div style={{width:'160px', minHeight:'110px', flexShrink:0, border:'3px solid #d97706', borderRadius:'12px', background:'linear-gradient(135deg, #fef3c7, #fde68a)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px', textAlign:'center', boxShadow:'0 0 14px rgba(217,119,6,0.35)', cursor:'pointer'}}>
+                <p style={{fontSize:'12px', fontWeight:'800', color:'#92400e', margin:'0 0 4px', lineHeight:'1.4'}}>This place is open for Ad</p>
+                <p style={{fontSize:'10px', color:'#b45309', margin:'0', lineHeight:'1.4'}}>Contact us to advertise</p>
+              </div>
+              <h2 style={{fontSize:'clamp(20px, 3vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0', lineHeight:'1.2', flex:1}}>{t.heroTitle}</h2>
+              <div style={{width:'160px', minHeight:'110px', flexShrink:0, border:'3px solid #d97706', borderRadius:'12px', background:'linear-gradient(135deg, #fef3c7, #fde68a)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px', textAlign:'center', boxShadow:'0 0 14px rgba(217,119,6,0.35)', cursor:'pointer'}}>
+                <p style={{fontSize:'12px', fontWeight:'800', color:'#92400e', margin:'0 0 4px', lineHeight:'1.4'}}>This place is open for Ad</p>
+                <p style={{fontSize:'10px', color:'#b45309', margin:'0', lineHeight:'1.4'}}>Contact us to advertise</p>
+              </div>
+            </div>
+          ) : (
+            <h2 style={{fontSize:'clamp(22px, 6vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>{t.heroTitle}</h2>
+          )}
 
           <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>{t.heroSubtitle}</p>
 
@@ -197,9 +222,9 @@ export default function Home() {
                   onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)' }}
                 >
                   {l.listing_images && l.listing_images.length > 0 ? (
-                    <div style={{height:'180px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden'}}>
+                    <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
                       <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
-                      <div style={{position:'absolute', top:'12px', left:'12px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px', letterSpacing:'0.04em'}}>{l.property_type}</div>
+                      <div style={{position:'absolute', top:'12px', left:'12px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px'}}>{l.property_type}</div>
                       {l.listing_images.length > 1 && (
                         <div style={{position:'absolute', bottom:'8px', right:'8px', background:'rgba(0,0,0,0.55)', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'6px'}}>+{l.listing_images.length - 1} photos</div>
                       )}
@@ -217,9 +242,7 @@ export default function Home() {
                     )}
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
                       <div>
-                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>
-                          {showPrice(l)}
-                        </p>
+                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>{showPrice(l)}</p>
                         <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>
                       </div>
                       <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', whiteSpace:'nowrap'}}>{t.viewDetails}</div>
