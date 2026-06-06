@@ -5,14 +5,35 @@ import Link from 'next/link'
 
 export default function Home() {
   const [listings, setListings] = useState([])
+  const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [type, setType] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
 
   useEffect(() => {
     getListings().then(data => {
       setListings(data)
+      setFiltered(data)
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
+
+  const handleSearch = () => {
+    let results = listings
+    if (search) results = results.filter(l =>
+      l.title?.toLowerCase().includes(search.toLowerCase()) ||
+      l.city?.toLowerCase().includes(search.toLowerCase()) ||
+      l.neighborhood?.toLowerCase().includes(search.toLowerCase())
+    )
+    if (type) results = results.filter(l => l.property_type === type)
+    if (maxPrice) results = results.filter(l => l.price <= parseInt(maxPrice))
+    setFiltered(results)
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleSearch()
+  }
 
   return (
     <main className="min-h-screen p-8 max-w-5xl mx-auto">
@@ -25,21 +46,43 @@ export default function Home() {
       </div>
       <p className="text-gray-500 mb-6">Find and list rental properties</p>
 
+      <div className="flex gap-3 mb-4 flex-wrap">
+        <input
+          className="border rounded p-2 flex-1 min-w-40"
+          placeholder="Search city, neighborhood or title..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <select className="border rounded p-2" value={type} onChange={e => setType(e.target.value)}>
+          <option value="">All types</option>
+          {['Apartment','House','Studio','Condo','Townhouse'].map(t => <option key={t}>{t}</option>)}
+        </select>
+        <select className="border rounded p-2" value={maxPrice} onChange={e => setMaxPrice(e.target.value)}>
+          <option value="">Any price</option>
+          <option value="1500">Under $1,500</option>
+          <option value="2500">Under $2,500</option>
+          <option value="3500">Under $3,500</option>
+          <option value="5000">Under $5,000</option>
+        </select>
+        <button onClick={handleSearch} className="bg-green-800 text-white px-4 py-2 rounded text-sm">Search</button>
+      </div>
+
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-gray-800">Latest listings</h2>
+        <p className="text-sm text-gray-500">{filtered.length} {filtered.length === 1 ? 'listing' : 'listings'} found</p>
         <Link href="/list" className="bg-green-800 text-white px-4 py-2 rounded text-sm">+ Add listing</Link>
       </div>
 
       {loading ? (
         <p className="text-gray-500">Loading listings...</p>
-      ) : listings.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-500 mb-4">No listings yet</p>
+          <p className="text-gray-500 mb-4">No listings found</p>
           <Link href="/list" className="bg-green-800 text-white px-4 py-2 rounded">Be the first to list</Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {listings.map(l => (
+          {filtered.map(l => (
             <div key={l.id} className="border rounded-lg overflow-hidden hover:border-green-600 transition">
               <div className="h-40 bg-green-50 flex items-center justify-center text-4xl">🏠</div>
               <div className="p-4">
