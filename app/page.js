@@ -38,7 +38,13 @@ export default function Home() {
   return (
     <main className="min-h-screen p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-bold text-green-800">Nest.list</h1>
+        <h1 className="text-4xl font-bold mb-1" style={{
+  background: 'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)',
+  backgroundSize: '200% auto',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  animation: 'shine 3s linear infinite'
+}}>EnjeraPressList.Com</h1>
         <div className="flex gap-3">
           <Link href="/login" className="border border-green-800 text-green-800 px-4 py-2 rounded text-sm">Sign in</Link>
           <Link href="/register" className="bg-green-800 text-white px-4 py-2 rounded text-sm">Register</Link>
@@ -104,3 +110,4 @@ export default function Home() {
     </main>
   )
 }
+
