@@ -51,7 +51,7 @@ export default function Home() {
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', margin:0, padding:0, overflowX:'hidden'}}>
 
       {/* NAVBAR */}
-      <nav style={{background:'#ffffff', borderBottom:'2px solid #ea580c', position:'sticky', top:0, zIndex:100, boxShadow:'0 2px 12px rgba(0,0,0,0.08)', width:'100%', boxSizing:'border-box'}}>
+      <nav style={{background:'#ffffff', position:'sticky', top:0, zIndex:100, boxShadow:'0 2px 12px rgba(0,0,0,0.08)', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <div style={{position:'relative', width:'44px', height:'44px', flexShrink:0}}>
