@@ -69,7 +69,6 @@ export default function Home() {
             <button onClick={toggleLang} style={{fontSize:'12px', fontWeight:'700', color:'#374151', padding:'6px 10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'4px'}}>
               🌍 {lang === 'en' ? 'አማርኛ' : 'English'}
             </button>
-            <Link href="/contact" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>Contact</Link>
             <Link href="/dashboard" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.myListings}</Link>
             <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'7px 12px', borderRadius:'8px', background:'#166534', border:'2px solid #166534', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.addListing}</Link>
             <Link href="/login" style={{fontSize:'13px', fontWeight:'600', color:'#374151', padding:'7px 12px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', textDecoration:'none', display:'inline-block', whiteSpace:'nowrap'}}>{t.signIn}</Link>
@@ -82,6 +81,19 @@ export default function Home() {
           <div style={{height:'6px', background:'#078930', width:'100%'}}></div>
           <div style={{height:'6px', background:'#FCDD09', width:'100%'}}></div>
           <div style={{height:'6px', background:'#DA121A', width:'100%'}}></div>
+        </div>
+
+        {/* CONTACT US BAR */}
+        <div style={{background:'#1f2937', width:'100%', padding:'6px 16px', boxSizing:'border-box'}}>
+          <div style={{maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center', gap:'16px'}}>
+            <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#fed7aa', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px', padding:'2px 0'}}>
+              📬 Contact Us
+            </Link>
+            <span style={{color:'#374151', fontSize:'12px'}}>|</span>
+            <a href="mailto:info@enjerapresslist.com" style={{fontSize:'12px', color:'#9ca3af', textDecoration:'none', display:'flex', alignItems:'center', gap:'4px'}}>
+              📧 info@enjerapresslist.com
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -208,5 +220,4 @@ export default function Home() {
     </div>
   )
 }
-
 
