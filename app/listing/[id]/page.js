@@ -10,6 +10,7 @@ export default function ListingDetail({ params }) {
   const [loading, setLoading] = useState(true)
   const [activePhoto, setActivePhoto] = useState(0)
   const [showContact, setShowContact] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     fetchListing()
@@ -30,6 +31,12 @@ export default function ListingDetail({ params }) {
         .eq('id', id)
     }
     setLoading(false)
+  }
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   const images = listing?.listing_images?.filter(i => !i.storage_path?.match(/\.(mp4|mov|avi)$/i)) || []
@@ -95,6 +102,9 @@ export default function ListingDetail({ params }) {
       <Footer />
     </div>
   )
+
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
+  const shareText = `Check out this property: ${listing.title} - $${listing.price?.toLocaleString()}/mo in ${listing.city}`
 
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', overflowX:'hidden'}}>
@@ -190,9 +200,40 @@ export default function ListingDetail({ params }) {
             )}
           </div>
 
-          {/* RIGHT COLUMN - CONTACT */}
+          {/* RIGHT COLUMN */}
           <div style={{alignSelf:'start'}}>
             <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', position:'sticky', top:'100px'}}>
+
+              {/* SHARE BUTTONS */}
+              <div style={{marginBottom:'20px', paddingBottom:'20px', borderBottom:'2px solid #f3f4f6'}}>
+                <p style={{fontSize:'12px', fontWeight:'700', color:'#374151', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'0.06em'}}>Share this listing</p>
+                <div style={{display:'flex', gap:'8px', marginBottom:'8px'}}>
+                  
+                    href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{flex:'1', padding:'9px 6px', borderRadius:'8px', background:'#25D366', color:'#ffffff', fontSize:'11px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'3px'}}
+                  >📱 WhatsApp</a>
+                  
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{flex:'1', padding:'9px 6px', borderRadius:'8px', background:'#1877F2', color:'#ffffff', fontSize:'11px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'3px'}}
+                  >👍 Facebook</a>
+                  
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{flex:'1', padding:'9px 6px', borderRadius:'8px', background:'#000000', color:'#ffffff', fontSize:'11px', fontWeight:'700', textAlign:'center', textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', gap:'3px'}}
+                  >𝕏 Twitter</a>
+                </div>
+                <button
+                  onClick={handleCopyLink}
+                  style={{width:'100%', padding:'9px', borderRadius:'8px', background: copied ? '#f0fdf4' : '#f9fafb', color: copied ? '#166534' : '#374151', fontSize:'12px', fontWeight:'700', border: copied ? '2px solid #bbf7d0' : '2px solid #e5e7eb', cursor:'pointer', transition:'all 0.2s'}}
+                >{copied ? '✅ Link Copied!' : '🔗 Copy Link'}</button>
+              </div>
+
+              {/* CONTACT SECTION */}
               <h2 style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0 0 16px', paddingBottom:'10px', borderBottom:'2px solid #fed7aa'}}>Contact Landlord</h2>
 
               {/* LANDLORD INFO */}
@@ -213,14 +254,7 @@ export default function ListingDetail({ params }) {
                   </div>
                   <button
                     onClick={() => setShowContact(true)}
-                    style={{
-                      display:'block', width:'100%', padding:'14px',
-                      background:'#ea580c', color:'#ffffff',
-                      fontSize:'14px', fontWeight:'700', textAlign:'center',
-                      borderRadius:'10px', border:'none', cursor:'pointer',
-                      marginBottom:'10px', boxSizing:'border-box',
-                      transition:'background 0.2s'
-                    }}
+                    style={{display:'block', width:'100%', padding:'14px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', border:'none', cursor:'pointer', marginBottom:'10px', boxSizing:'border-box', transition:'background 0.2s'}}
                     onMouseEnter={e => e.currentTarget.style.background='#c2410c'}
                     onMouseLeave={e => e.currentTarget.style.background='#ea580c'}
                   >👁 Reveal Contact Info</button>
