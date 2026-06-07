@@ -93,10 +93,11 @@
 }
 export function showPrice(listing) {
   if (!listing) return ''
-  if (listing.currency === 'Contact') return 'Contact for price'
-  if (listing.currency === 'ETB') return `${listing.price?.toLocaleString()} ETB/mo`
-  if (listing.currency === 'USD') return `$${listing.price?.toLocaleString()}/mo`
-  return `${listing.price?.toLocaleString()} ${listing.currency || 'USD'}/mo`
+  const currency = listing.currency || 'USD'
+  if (currency === 'Contact') return 'Contact for price'
+  if (currency === 'ETB') return `${listing.price?.toLocaleString()} ETB/mo`
+  return `$${listing.price?.toLocaleString()}/mo`
 }
+
 
 
