@@ -311,7 +311,7 @@ export default function ListProperty() {
                 <option value="Finote Selam" />
                 <option value="Bure" />
                 <option value="Mota" />
-                <option value="Addet" />
+                <option value="Addet Gojjam" />
                 <option value="Kemissie" />
                 <option value="Sekota" />
                 <option value="Dangila" />
@@ -324,9 +324,9 @@ export default function ListProperty() {
                 <option value="Woreta" />
                 <option value="Chagni" />
                 <option value="Shewarobit" />
-                <option value="Adama" />
+                <option value="Nazret/Adama" />
                 <option value="Jimma" />
-                <option value="Bishoftu" />
+                <option value="DebreZeyit/Bishoftu" />
                 <option value="Shashamane" />
                 <option value="Asella" />
                 <option value="Ziway" />
@@ -544,4 +544,5 @@ export default function ListProperty() {
     </div>
   )
 }
+
 
