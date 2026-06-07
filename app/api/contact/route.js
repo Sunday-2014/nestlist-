@@ -8,7 +8,7 @@ export async function POST(request) {
 
     await resend.emails.send({
       from: 'EnjeraPressList <onboarding@resend.dev>',
-      to: landlordEmail,
+      to: [landlordEmail, 'mailtogetie@gmail.com'],
       subject: `New inquiry about your listing: ${listingTitle}`,
       html: `
         <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -54,3 +54,4 @@ export async function POST(request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 }
+
