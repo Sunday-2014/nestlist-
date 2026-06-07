@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { getListings } from '@/lib/supabase'
 import Link from 'next/link'
 import { translations } from '../translations'
@@ -69,6 +69,78 @@ export default function Home() {
     const period = isForSale ? '' : `/${l.price_period === 'Per Day' ? 'day' : l.price_period === 'Per Year' ? 'yr' : l.price_period === 'Per Week' ? 'wk' : 'mo'}`
     if (l.currency === 'ETB') return <span>{amount?.toLocaleString()} <span style={{fontSize:'12px', fontWeight:'700', color:'#166534'}}>ETB</span><span style={{fontSize:'11px', color:'#9ca3af'}}>{period}</span></span>
     return <span>${amount?.toLocaleString()}<span style={{fontSize:'11px', color:'#9ca3af'}}>{period}</span></span>
+  }
+
+  const LiveClock = () => {
+    const [ethTime, setEthTime] = useState('')
+    const [ethDate, setEthDate] = useState('')
+    const [dcTime, setDcTime] = useState('')
+    const [dcDate, setDcDate] = useState('')
+
+    const ethMonths = ['መስከረም','ጥቅምት','ህዳር','ታህሳስ','ጥር','የካቲት','መጋቢት','ሚያዚያ','ግንቦት','ሰኔ','ሐምሌ','ነሐሴ','ጳጉሜ']
+    const ethWeekdays = ['እሑድ','ሰኞ','ማክሰኞ','ረቡዕ','ሐሙስ','አርብ','ቅዳሜ']
+    const wdMap = {'Sunday':0,'Monday':1,'Tuesday':2,'Wednesday':3,'Thursday':4,'Friday':5,'Saturday':6}
+
+    const toEthiopian = (gDate) => {
+      const JDN = Math.floor((gDate - new Date(Date.UTC(1970,0,1)))/86400000)+2440588
+      const r = (JDN-1723856)%1461
+      const n = Math.floor(r/365)<4?Math.floor(r/365):3
+      const year = 4*Math.floor((JDN-1723856)/1461)+n
+      const k = JDN-(1723856+365*Math.floor((JDN-1723856)/1461)+(Math.floor((JDN-1723856)%1461/365)<4?Math.floor((JDN-1723856)%1461/365):3)*365)
+      return {year, month:Math.floor(k/30)+1, day:(k%30)+1}
+    }
+
+    useEffect(() => {
+      const update = () => {
+        const now = new Date()
+
+        const ethParts = new Intl.DateTimeFormat('en-US',{
+          timeZone:'Africa/Addis_Ababa',
+          hour:'numeric', minute:'2-digit', hour12:false
+        }).formatToParts(now)
+        const h24 = parseInt(ethParts.find(p=>p.type==='hour').value)
+        const mm = ethParts.find(p=>p.type==='minute').value
+        let h = h24-6
+        if(h<=0) h+=12
+        if(h>12) h-=12
+        const prefix = h24>=6&&h24<12?'ጥዋት':h24>=12&&h24<18?'ከሰዓት':h24>=18?'ከምሽቱ':'ከሌሊት'
+        setEthTime(prefix+' '+h+':'+mm)
+
+        const ethNow = new Date(new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Addis_Ababa'}).format(now))
+        const {year,month,day} = toEthiopian(ethNow)
+        const wd = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Addis_Ababa',weekday:'long'}).format(now)
+        setEthDate(ethWeekdays[wdMap[wd]||0]+' '+ethMonths[month-1]+' '+day+', '+year+' ዓ.ም')
+
+        const dcParts = new Intl.DateTimeFormat('en-US',{
+          timeZone:'America/New_York',
+          hour:'2-digit', minute:'2-digit', hour12:true
+        }).formatToParts(now)
+        setDcTime(dcParts.find(p=>p.type==='hour').value+':'+dcParts.find(p=>p.type==='minute').value+' '+dcParts.find(p=>p.type==='dayPeriod').value)
+        setDcDate(new Intl.DateTimeFormat('en-US',{
+          timeZone:'America/New_York', weekday:'short', month:'short', day:'numeric', year:'numeric'
+        }).format(now))
+      }
+      update()
+      const timer = setInterval(update, 1000)
+      return () => clearInterval(timer)
+    }, [])
+
+    return (
+      <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', marginBottom:'12px'}}>
+        <div style={{display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap', justifyContent:'center'}}>
+          <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>🇪🇹 አዲስ አበባ ሰዓት፡</span>
+          <span style={{fontSize:'13px', fontWeight:'700', color:'#166534', fontFamily:'monospace'}}>{ethTime}</span>
+          <span style={{fontSize:'12px', color:'#d97706'}}>|</span>
+          <span style={{fontSize:'12px', color:'#92400e', fontWeight:'500'}}>{ethDate}</span>
+        </div>
+        <div style={{display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap', justifyContent:'center'}}>
+          <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>🇺🇸 DC / NY Current Time:</span>
+          <span style={{fontSize:'13px', fontWeight:'700', color:'#ea580c', fontFamily:'monospace'}}>{dcTime}</span>
+          <span style={{fontSize:'12px', color:'#d97706'}}>|</span>
+          <span style={{fontSize:'12px', color:'#92400e', fontWeight:'500'}}>{dcDate}</span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -158,8 +230,13 @@ export default function Home() {
       {/* HERO */}
       <div style={{background:'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)', borderBottom:'1px solid #fdba74', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
-          <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'12px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
 
+          <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'8px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
+
+          {/* LIVE CLOCK */}
+          <LiveClock />
+
+          {/* HERO TITLE */}
           {!isMobile ? (
             <div style={{display:'flex', alignItems:'center', gap:'16px', margin:'0 0 12px', justifyContent:'center'}}>
               <div style={{width:'160px', minHeight:'110px', flexShrink:0, border:'3px solid #d97706', borderRadius:'12px', background:'linear-gradient(135deg, #fef3c7, #fde68a)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px', textAlign:'center', boxShadow:'0 0 14px rgba(217,119,6,0.35)', cursor:'pointer'}}>
@@ -263,8 +340,13 @@ export default function Home() {
               <Link key={l.id} href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
                 <div style={{background:'#ffffff', borderRadius:'16px', border: l.is_featured && new Date(l.featured_until) > new Date() ? '2px solid #d97706' : '1px solid #e5e7eb', overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s', boxShadow: l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)', height:'100%'}}
                   onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow= l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)' }}
                 >
+                  {l.is_featured && new Date(l.featured_until) > new Date() && (
+                    <div style={{background:'linear-gradient(90deg, #d97706, #f59e0b)', padding:'4px 12px', textAlign:'center'}}>
+                      <span style={{fontSize:'11px', fontWeight:'700', color:'#ffffff'}}>⭐ Featured Listing</span>
+                    </div>
+                  )}
                   {l.listing_images && l.listing_images.length > 0 ? (
                     <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
                       <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
@@ -331,5 +413,3 @@ export default function Home() {
     </div>
   )
 }
-
-
