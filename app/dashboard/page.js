@@ -1,6 +1,5 @@
 'use client'
-import { showPrice } from '../translations'
-import { showPrice } from '../translations'
+import { showPrice } from '../../translations'
 import { useState, useEffect } from 'react'
 import { supabase, getCurrentUser, deleteListing, logout } from '@/lib/supabase'
 import Link from 'next/link'
@@ -229,4 +228,6 @@ export default function Dashboard() {
     </div>
   )
 }
+
+
 
