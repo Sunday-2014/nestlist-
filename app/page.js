@@ -11,6 +11,7 @@ export default function Home() {
   const [search, setSearch] = useState('')
   const [type, setType] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
+  const [listingType, setListingType] = useState('')
   const [lang, setLang] = useState('en')
   const [menuOpen, setMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -46,6 +47,7 @@ export default function Home() {
     )
     if (type) results = results.filter(l => l.property_type === type)
     if (maxPrice) results = results.filter(l => l.price <= parseInt(maxPrice))
+    if (listingType) results = results.filter(l => (l.listing_type || 'Rent') === listingType)
     setFiltered(results)
   }
 
@@ -53,10 +55,13 @@ export default function Home() {
     if (e.key === 'Enter') handleSearch()
   }
 
-  const showPrice = (l) => {
-    if (l.currency === 'Contact') return <span style={{fontSize:'14px', color:'#ea580c', fontWeight:'700'}}>Contact for price</span>
-    if (l.currency === 'ETB') return <span>{l.price?.toLocaleString()} <span style={{fontSize:'13px', color:'#166534', fontWeight:'700'}}>ETB</span><span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></span>
-    return <span>${l.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></span>
+  const showCardPrice = (l) => {
+    if (l.currency === 'Contact') return <span style={{fontSize:'13px', color:'#ea580c', fontWeight:'700'}}>Contact for price</span>
+    const isForSale = l.listing_type === 'Sale'
+    const amount = isForSale ? l.sale_price : l.price
+    const period = isForSale ? '' : `/${l.price_period === 'Per Day' ? 'day' : l.price_period === 'Per Year' ? 'yr' : l.price_period === 'Per Week' ? 'wk' : 'mo'}`
+    if (l.currency === 'ETB') return <span>{amount?.toLocaleString()} <span style={{fontSize:'12px', fontWeight:'700', color:'#166534'}}>ETB</span><span style={{fontSize:'11px', color:'#9ca3af'}}>{period}</span></span>
+    return <span>${amount?.toLocaleString()}<span style={{fontSize:'11px', color:'#9ca3af'}}>{period}</span></span>
   }
 
   return (
@@ -69,7 +74,7 @@ export default function Home() {
           {/* LOGO */}
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <div style={{position:'relative', width:'44px', height:'44px', flexShrink:0}}>
-              <img src="/logo.gif" alt="EnjeraPressList logo" style={{width:'44px', height:'44px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}} />
+              <img src="/logo.gif" alt="logo" style={{width:'44px', height:'44px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}} />
               <span style={{
                 position:'absolute', bottom:'-12px', right:'-18px',
                 background:'#ea580c', color:'#ffffff',
@@ -178,6 +183,12 @@ export default function Home() {
                 onKeyDown={handleKeyDown}
               />
               <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+                {/* FOR RENT / FOR SALE FILTER */}
+                <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={listingType} onChange={e => setListingType(e.target.value)}>
+                  <option value="">🏠 All listings</option>
+                  <option value="Rent">🏠 For Rent</option>
+                  <option value="Sale">🔑 For Sale</option>
+                </select>
                 <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={type} onChange={e => setType(e.target.value)}>
                   <option value="">{t.allTypes}</option>
                   <option value="Apartment">{t.apartment}</option>
@@ -185,6 +196,11 @@ export default function Home() {
                   <option value="Studio">{t.studio}</option>
                   <option value="Condo">{t.condo}</option>
                   <option value="Townhouse">{t.townhouse}</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Office">Office</option>
+                  <option value="Shop">Shop</option>
+                  <option value="Land">Land</option>
+                  <option value="Other">Other</option>
                 </select>
                 <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={maxPrice} onChange={e => setMaxPrice(e.target.value)}>
                   <option value="">{t.anyPrice}</option>
@@ -237,14 +253,22 @@ export default function Home() {
                   {l.listing_images && l.listing_images.length > 0 ? (
                     <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
                       <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
-                      <div style={{position:'absolute', top:'12px', left:'12px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px'}}>{l.property_type}</div>
+                      {/* FOR RENT / FOR SALE BADGE */}
+                      <div style={{position:'absolute', top:'12px', left:'12px', display:'flex', gap:'4px'}}>
+                        <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>
+                          {l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}
+                        </span>
+                      </div>
                       {l.listing_images.length > 1 && (
                         <div style={{position:'absolute', bottom:'8px', right:'8px', background:'rgba(0,0,0,0.55)', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'6px'}}>+{l.listing_images.length - 1} photos</div>
                       )}
                     </div>
                   ) : (
-                    <div style={{padding:'12px 14px 0'}}>
-                      <span style={{background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>
+                    <div style={{padding:'12px 14px 0', display:'flex', gap:'4px'}}>
+                      <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>
+                        {l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}
+                      </span>
+                      <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>
                     </div>
                   )}
                   <div style={{padding:'14px'}}>
@@ -255,7 +279,7 @@ export default function Home() {
                     )}
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
                       <div>
-                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>{showPrice(l)}</p>
+                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>{showCardPrice(l)}</p>
                         <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>
                       </div>
                       <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', whiteSpace:'nowrap'}}>{t.viewDetails}</div>
@@ -273,15 +297,7 @@ export default function Home() {
         <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'10px', marginBottom:'8px'}}>
           <div style={{position:'relative', width:'32px', height:'32px'}}>
             <img src="/logo.gif" alt="logo" style={{width:'32px', height:'32px', borderRadius:'50%', border:'2px solid #d97706'}} />
-            <span style={{
-              position:'absolute', bottom:'-6px', right:'-10px',
-              background:'#ea580c', color:'#ffffff',
-              fontSize:'12px', fontWeight:'700',
-              padding:'2px 6px', borderRadius:'6px',
-              border:'1px solid #1f2937',
-              whiteSpace:'nowrap',
-              fontFamily:"'Dancing Script', cursive"
-            }}>List</span>
+            <span style={{position:'absolute', bottom:'-6px', right:'-10px', background:'#ea580c', color:'#ffffff', fontSize:'12px', fontWeight:'700', padding:'2px 6px', borderRadius:'6px', border:'1px solid #1f2937', whiteSpace:'nowrap', fontFamily:"'Dancing Script', cursive"}}>List</span>
           </div>
           <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 0 8px'}}>{t.siteName}</p>
         </div>
