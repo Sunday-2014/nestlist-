@@ -9,7 +9,7 @@ export default function ListProperty() {
     price:'', currency:'USD', price_period:'Per Month',
     sale_price:'', down_payment:'', monthly_after_down:'',
     bedrooms:'1 bedroom', bathrooms:'1 bathroom', description:'',
-    address:'', city:'', state:'DC', zip:'', neighborhood:'',
+    address:'', city:'', state:'', zip:'', neighborhood:'',
     contact_name:'', contact_email:'', contact_phone:'',
     contact_method:'Email', available_from:''
   })
@@ -170,18 +170,14 @@ export default function ListProperty() {
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>🏷️ Listing Type</div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
-            <button
-              onClick={() => setForm({...form, listing_type:'Rent'})}
-              style={{padding:'16px', borderRadius:'12px', border: isRent ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isRent ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center', transition:'all 0.15s'}}
-            >
+            <button onClick={() => setForm({...form, listing_type:'Rent'})}
+              style={{padding:'16px', borderRadius:'12px', border: isRent ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isRent ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'24px', marginBottom:'6px'}}>🏠</div>
               <p style={{fontSize:'15px', fontWeight:'700', color: isRent ? '#ea580c' : '#374151', margin:'0 0 2px'}}>For Rent</p>
               <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Monthly / Daily / Yearly rental</p>
             </button>
-            <button
-              onClick={() => setForm({...form, listing_type:'Sale'})}
-              style={{padding:'16px', borderRadius:'12px', border: isSale ? '3px solid #166534' : '2px solid #e5e7eb', background: isSale ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center', transition:'all 0.15s'}}
-            >
+            <button onClick={() => setForm({...form, listing_type:'Sale'})}
+              style={{padding:'16px', borderRadius:'12px', border: isSale ? '3px solid #166534' : '2px solid #e5e7eb', background: isSale ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'24px', marginBottom:'6px'}}>🔑</div>
               <p style={{fontSize:'15px', fontWeight:'700', color: isSale ? '#166534' : '#374151', margin:'0 0 2px'}}>For Sale</p>
               <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Full sale / down payment</p>
@@ -227,8 +223,6 @@ export default function ListProperty() {
         {/* PRICING */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>💰 Pricing</div>
-
-          {/* CURRENCY */}
           <div style={{marginBottom:'16px'}}>
             <label style={labelStyle}>Currency</label>
             <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
@@ -241,7 +235,6 @@ export default function ListProperty() {
             </div>
           </div>
 
-          {/* RENT PRICING */}
           {isRent && !isContact && (
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
               <div>
@@ -257,7 +250,6 @@ export default function ListProperty() {
             </div>
           )}
 
-          {/* SALE PRICING */}
           {isSale && !isContact && (
             <div>
               <div style={{marginBottom:'14px'}}>
@@ -292,16 +284,128 @@ export default function ListProperty() {
           <div style={sectionTitleStyle}>📍 Location</div>
           <div style={{marginBottom:'14px'}}>
             <label style={labelStyle}>Street Address</label>
-            <input style={inputStyle} placeholder="123 Maple Street, Apt 4B" {...f('address')} />
+            <input style={inputStyle} placeholder="e.g. Bole Road, House No. 123" {...f('address')} />
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
               <label style={labelStyle}>City *</label>
-              <input style={inputStyle} placeholder="e.g. Addis Ababa or Washington DC" {...f('city')} />
+              <input
+                style={inputStyle}
+                placeholder="e.g. Addis Ababa or Washington DC"
+                list="city-suggestions"
+                {...f('city')}
+              />
+              <datalist id="city-suggestions">
+                <option value="Addis Ababa" />
+                <option value="Dire Dawa" />
+                <option value="Harar" />
+                <option value="Bahir Dar" />
+                <option value="Gondar" />
+                <option value="Dessie" />
+                <option value="Debre Markos" />
+                <option value="Debre Birhan" />
+                <option value="Woldia" />
+                <option value="Kombolcha" />
+                <option value="Debre Tabor" />
+                <option value="Lalibela" />
+                <option value="Finote Selam" />
+                <option value="Bure" />
+                <option value="Mota" />
+                <option value="Addet" />
+                <option value="Kemissie" />
+                <option value="Sekota" />
+                <option value="Dangila" />
+                <option value="Injibara" />
+                <option value="Metema" />
+                <option value="Humera" />
+                <option value="Kobo" />
+                <option value="Merawi" />
+                <option value="Addis Zemen" />
+                <option value="Woreta" />
+                <option value="Chagni" />
+                <option value="Shewarobit" />
+                <option value="Adama" />
+                <option value="Jimma" />
+                <option value="Bishoftu" />
+                <option value="Shashamane" />
+                <option value="Asella" />
+                <option value="Ziway" />
+                <option value="Nekemte" />
+                <option value="Ambo" />
+                <option value="Holeta" />
+                <option value="Burayu" />
+                <option value="Sebeta" />
+                <option value="Woliso" />
+                <option value="Welkite" />
+                <option value="Robe" />
+                <option value="Goba" />
+                <option value="Gimbi" />
+                <option value="Bedele" />
+                <option value="Metu" />
+                <option value="Tepi" />
+                <option value="Dodola" />
+                <option value="Yabelo" />
+                <option value="Moyale" />
+                <option value="Negele Borana" />
+                <option value="Fitche" />
+                <option value="Dembi Dollo" />
+                <option value="Shambu" />
+                <option value="Hawassa" />
+                <option value="Yirgalem" />
+                <option value="Aleta Wendo" />
+                <option value="Wondo Genet" />
+                <option value="Arba Minch" />
+                <option value="Sodo" />
+                <option value="Hosaena" />
+                <option value="Bonga" />
+                <option value="Jinka" />
+                <option value="Mizan Teferi" />
+                <option value="Mekelle" />
+                <option value="Axum" />
+                <option value="Adwa" />
+                <option value="Shire" />
+                <option value="Adigrat" />
+                <option value="Wukro" />
+                <option value="Maychew" />
+                <option value="Alamata" />
+                <option value="Jijiga" />
+                <option value="Kebri Dahar" />
+                <option value="Gode" />
+                <option value="Dolo Odo" />
+                <option value="Degehabur" />
+                <option value="Semera" />
+                <option value="Logia" />
+                <option value="Dubti" />
+                <option value="Awash" />
+                <option value="Asaita" />
+                <option value="Assosa" />
+                <option value="Gambela" />
+                <option value="Itang" />
+                <option value="Washington DC" />
+                <option value="New York, NY" />
+                <option value="Los Angeles, CA" />
+                <option value="Dallas, TX" />
+                <option value="Minneapolis, MN" />
+                <option value="Seattle, WA" />
+                <option value="Atlanta, GA" />
+                <option value="Chicago, IL" />
+                <option value="Houston, TX" />
+                <option value="Denver, CO" />
+                <option value="Columbus, OH" />
+                <option value="San Jose, CA" />
+                <option value="Nashville, TN" />
+                <option value="Las Vegas, NV" />
+                <option value="Phoenix, AZ" />
+                <option value="Charlotte, NC" />
+                <option value="Boston, MA" />
+                <option value="Philadelphia, PA" />
+                <option value="Baltimore, MD" />
+                <option value="Detroit, MI" />
+              </datalist>
             </div>
             <div>
               <label style={labelStyle}>State / Region</label>
-              <input style={inputStyle} placeholder="e.g. Oromia, DC, VA" {...f('state')} />
+              <input style={inputStyle} placeholder="e.g. Amhara, Oromia, DC, VA" {...f('state')} />
             </div>
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px'}}>
@@ -311,7 +415,44 @@ export default function ListProperty() {
             </div>
             <div>
               <label style={labelStyle}>Neighborhood / Subcity</label>
-              <input style={inputStyle} placeholder="e.g. Bole, Capitol Hill" {...f('neighborhood')} />
+              <input
+                style={inputStyle}
+                placeholder="e.g. Bole, Capitol Hill"
+                list="neighborhood-suggestions"
+                {...f('neighborhood')}
+              />
+              <datalist id="neighborhood-suggestions">
+                <option value="Bole" />
+                <option value="Kirkos" />
+                <option value="Yeka" />
+                <option value="Nifas Silk-Lafto" />
+                <option value="Kolfe Keranio" />
+                <option value="Gulele" />
+                <option value="Lideta" />
+                <option value="Addis Ketema" />
+                <option value="Akaky Kaliti" />
+                <option value="Lemi Kura" />
+                <option value="Arada" />
+                <option value="Bole Medhanialem" />
+                <option value="Sarbet" />
+                <option value="CMC" />
+                <option value="Megenagna" />
+                <option value="Mexico" />
+                <option value="Piassa" />
+                <option value="Gerji" />
+                <option value="Summit" />
+                <option value="Ayat" />
+                <option value="Saris" />
+                <option value="Lebu" />
+                <option value="Gotera" />
+                <option value="Kasanchis" />
+                <option value="Arat Kilo" />
+                <option value="Sidist Kilo" />
+                <option value="Amist Kilo" />
+                <option value="Mekanissa" />
+                <option value="Kera" />
+                <option value="Tor Hailoch" />
+              </datalist>
             </div>
           </div>
         </div>
@@ -324,7 +465,7 @@ export default function ListProperty() {
           </p>
           <div
             onClick={() => fileInputRef.current.click()}
-            style={{border:'2px dashed #d1d5db', borderRadius:'12px', padding:'36px 24px', textAlign:'center', cursor:'pointer', background:'#f9fafb', marginBottom:'16px', transition:'all 0.2s'}}
+            style={{border:'2px dashed #d1d5db', borderRadius:'12px', padding:'36px 24px', textAlign:'center', cursor:'pointer', background:'#f9fafb', marginBottom:'16px'}}
             onMouseEnter={e => { e.currentTarget.style.borderColor='#ea580c'; e.currentTarget.style.background='#fff7ed' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor='#d1d5db'; e.currentTarget.style.background='#f9fafb' }}
           >
@@ -403,3 +544,4 @@ export default function ListProperty() {
     </div>
   )
 }
+
