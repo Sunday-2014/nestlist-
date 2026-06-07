@@ -46,7 +46,7 @@ export default function Home() {
       l.neighborhood?.toLowerCase().includes(search.toLowerCase())
     )
     if (type) results = results.filter(l => l.property_type === type)
-    if (maxPrice) results = results.filter(l => l.price <= parseInt(maxPrice))
+    if (maxPrice) results = results.filter(l => (l.price || l.sale_price) <= parseInt(maxPrice))
     if (listingType) results = results.filter(l => (l.listing_type || 'Rent') === listingType)
     setFiltered(results)
   }
@@ -153,7 +153,6 @@ export default function Home() {
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
           <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'12px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
 
-          {/* HERO TITLE — AD FRAMES ONLY ON DESKTOP */}
           {!isMobile ? (
             <div style={{display:'flex', alignItems:'center', gap:'16px', margin:'0 0 12px', justifyContent:'center'}}>
               <div style={{width:'160px', minHeight:'110px', flexShrink:0, border:'3px solid #d97706', borderRadius:'12px', background:'linear-gradient(135deg, #fef3c7, #fde68a)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px', textAlign:'center', boxShadow:'0 0 14px rgba(217,119,6,0.35)', cursor:'pointer'}}>
@@ -183,7 +182,6 @@ export default function Home() {
                 onKeyDown={handleKeyDown}
               />
               <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
-                {/* FOR RENT / FOR SALE FILTER */}
                 <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={listingType} onChange={e => setListingType(e.target.value)}>
                   <option value="">🏠 All listings</option>
                   <option value="Rent">🏠 For Rent</option>
@@ -203,11 +201,21 @@ export default function Home() {
                   <option value="Other">Other</option>
                 </select>
                 <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={maxPrice} onChange={e => setMaxPrice(e.target.value)}>
-                  <option value="">{t.anyPrice}</option>
-                  <option value="1500">{t.under1500}</option>
-                  <option value="2500">{t.under2500}</option>
-                  <option value="3500">{t.under3500}</option>
-                  <option value="5000">{t.under5000}</option>
+                  <option value="">Any price</option>
+                  <optgroup label="$ USD">
+                    <option value="1500">Under $1,500</option>
+                    <option value="2500">Under $2,500</option>
+                    <option value="3500">Under $3,500</option>
+                    <option value="5000">Under $5,000</option>
+                    <option value="10000">Under $10,000</option>
+                  </optgroup>
+                  <optgroup label="🇪🇹 ETB">
+                    <option value="5000">Under 5,000 ETB</option>
+                    <option value="10000">Under 10,000 ETB</option>
+                    <option value="20000">Under 20,000 ETB</option>
+                    <option value="50000">Under 50,000 ETB</option>
+                    <option value="100000">Under 100,000 ETB</option>
+                  </optgroup>
                 </select>
                 <button onClick={handleSearch} style={{flex:'1', minWidth:'80px', padding:'11px 20px', borderRadius:'10px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>{t.search}</button>
               </div>
@@ -253,7 +261,6 @@ export default function Home() {
                   {l.listing_images && l.listing_images.length > 0 ? (
                     <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
                       <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
-                      {/* FOR RENT / FOR SALE BADGE */}
                       <div style={{position:'absolute', top:'12px', left:'12px', display:'flex', gap:'4px'}}>
                         <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>
                           {l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}
