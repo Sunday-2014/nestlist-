@@ -9,12 +9,17 @@ const ethWeekdays = ['እሑድ','ሰኞ','ማክሰኞ','ረቡዕ','ሐሙስ'
 const wdMap = {'Sunday':0,'Monday':1,'Tuesday':2,'Wednesday':3,'Thursday':4,'Friday':5,'Saturday':6}
 
 function toEthiopian(gDate) {
-  const JDN = Math.floor((gDate - new Date(Date.UTC(1970,0,1)))/86400000)+2440588
-  const r = (JDN-1723856)%1461
-  const n = Math.floor(r/365)<4?Math.floor(r/365):3
-  const year = 4*Math.floor((JDN-1723856)/1461)+n
-  const k = JDN-(1723856+365*Math.floor((JDN-1723856)/1461)+(Math.floor((JDN-1723856)%1461/365)<4?Math.floor((JDN-1723856)%1461/365):3)*365)
-  return {year, month:Math.floor(k/30)+1, day:(k%30)+1}
+  const JDN = Math.floor((gDate - new Date(Date.UTC(1970,0,1))) / 86400000) + 2440588
+  const diff = JDN - 1724221
+  if (diff < 0) return {year:1, month:1, day:1}
+  const cycle = Math.floor(diff / 1461)
+  const remaining = diff % 1461
+  const yearInCycle = Math.min(Math.floor(remaining / 365), 3)
+  const year = cycle * 4 + yearInCycle + 1
+  const dayOfYear = remaining - yearInCycle * 365
+  const month = Math.floor(dayOfYear / 30) + 1
+  const day = (dayOfYear % 30) + 1
+  return {year, month, day}
 }
 
 function LiveClock() {
@@ -33,22 +38,24 @@ function LiveClock() {
       }).formatToParts(now)
       const h24 = parseInt(ethParts.find(p=>p.type==='hour').value)
       const mm = ethParts.find(p=>p.type==='minute').value
-      let h = h24-6
-      if(h<=0) h+=12
-      if(h>12) h-=12
+      let h = h24 - 6
+      if (h <= 0) h += 12
+      if (h > 12) h -= 12
       const prefix = h24>=6&&h24<12?'ጥዋት':h24>=12&&h24<18?'ከሰዓት':h24>=18?'ከምሽቱ':'ከሌሊት'
-      setEthTime(prefix+' '+h+':'+mm)
+      setEthTime(prefix + ' ' + h + ':' + mm)
 
-      const ethNow = new Date(new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Addis_Ababa'}).format(now))
-      const {year,month,day} = toEthiopian(ethNow)
+      const ethDateStr = new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Addis_Ababa'}).format(now)
+      const ethNow = new Date(ethDateStr + 'T00:00:00Z')
+      const {year, month, day} = toEthiopian(ethNow)
       const wd = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Addis_Ababa',weekday:'long'}).format(now)
-      setEthDate(ethWeekdays[wdMap[wd]||0]+' '+ethMonths[month-1]+' '+day+', '+year+' ዓ.ም')
+      const monthName = ethMonths[Math.min(month-1, 12)]
+      setEthDate(ethWeekdays[wdMap[wd]||0] + ' ' + monthName + ' ' + day + ', ' + year + ' ዓ.ም')
 
       const dcParts = new Intl.DateTimeFormat('en-US',{
         timeZone:'America/New_York',
         hour:'2-digit', minute:'2-digit', hour12:true
       }).formatToParts(now)
-      setDcTime(dcParts.find(p=>p.type==='hour').value+':'+dcParts.find(p=>p.type==='minute').value+' '+dcParts.find(p=>p.type==='dayPeriod').value)
+      setDcTime(dcParts.find(p=>p.type==='hour').value + ':' + dcParts.find(p=>p.type==='minute').value + ' ' + dcParts.find(p=>p.type==='dayPeriod').value)
       setDcDate(new Intl.DateTimeFormat('en-US',{
         timeZone:'America/New_York', weekday:'short', month:'short', day:'numeric', year:'numeric'
       }).format(now))
@@ -159,8 +166,7 @@ export default function Home() {
                 background:'#ea580c', color:'#ffffff',
                 fontSize:'16px', fontWeight:'700',
                 padding:'3px 9px', borderRadius:'8px',
-                border:'2px solid #ffffff',
-                whiteSpace:'nowrap',
+                border:'2px solid #ffffff', whiteSpace:'nowrap',
                 fontFamily:"'Dancing Script', cursive",
                 boxShadow:'0 1px 4px rgba(0,0,0,0.25)'
               }}>List</span>
