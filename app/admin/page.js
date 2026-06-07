@@ -11,7 +11,8 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('listings')
   const [deleting, setDeleting] = useState(null)
-  const [stats, setStats] = useState({ totalListings:0, totalUsers:0, totalViews:0, activeListings:0 })
+  const [featureDays, setFeatureDays] = useState({})
+  const [stats, setStats] = useState({ totalListings:0, totalUsers:0, totalViews:0, activeListings:0, featuredListings:0 })
 
   useEffect(() => {
     checkAdmin()
@@ -35,6 +36,7 @@ export default function AdminPanel() {
     const { data: listingsData, error: listingsError } = await supabase
       .from('listings')
       .select('*, listing_images(public_url, position)')
+      .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false })
 
     if (listingsError) console.error('Listings error:', listingsError)
@@ -52,7 +54,8 @@ export default function AdminPanel() {
         totalListings: listingsData.length,
         totalUsers: usersData?.length || 0,
         totalViews: listingsData.reduce((sum, l) => sum + (l.views || 0), 0),
-        activeListings: listingsData.filter(l => l.is_active).length
+        activeListings: listingsData.filter(l => l.is_active).length,
+        featuredListings: listingsData.filter(l => l.is_featured).length,
       })
     }
     if (usersData) setUsers(usersData)
@@ -72,6 +75,21 @@ export default function AdminPanel() {
   const handleToggleActive = async (id, currentStatus) => {
     await supabase.from('listings').update({ is_active: !currentStatus }).eq('id', id)
     setListings(prev => prev.map(l => l.id === id ? {...l, is_active: !currentStatus} : l))
+  }
+
+  const handleFeature = async (id) => {
+    const days = parseInt(featureDays[id] || 7)
+    const until = new Date()
+    until.setDate(until.getDate() + days)
+    await supabase.from('listings').update({ is_featured: true, featured_until: until.toISOString() }).eq('id', id)
+    setListings(prev => prev.map(l => l.id === id ? {...l, is_featured: true, featured_until: until.toISOString()} : l))
+    setStats(prev => ({...prev, featuredListings: prev.featuredListings + 1}))
+  }
+
+  const handleUnfeature = async (id) => {
+    await supabase.from('listings').update({ is_featured: false, featured_until: null }).eq('id', id)
+    setListings(prev => prev.map(l => l.id === id ? {...l, is_featured: false, featured_until: null} : l))
+    setStats(prev => ({...prev, featuredListings: prev.featuredListings - 1}))
   }
 
   const handleToggleAdmin = async (userId, currentStatus) => {
@@ -96,9 +114,9 @@ export default function AdminPanel() {
           <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
             <div style={{position:'relative', width:'36px', height:'36px', flexShrink:0}}>
               <img src="/logo.gif" alt="logo" style={{width:'36px', height:'36px', borderRadius:'50%', border:'2px solid #d97706'}} />
-              <span style={{position:'absolute', bottom:'-1px', right:'-3px', background:'#ea580c', color:'#ffffff', fontSize:'9px', fontWeight:'900', width:'15px', height:'15px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #1f2937'}}>L</span>
+              <span style={{position:'absolute', bottom:'-6px', right:'-10px', background:'#ea580c', color:'#ffffff', fontSize:'12px', fontWeight:'700', padding:'1px 5px', borderRadius:'5px', border:'2px solid #1f2937', whiteSpace:'nowrap', fontFamily:"'Dancing Script', cursive"}}>List</span>
             </div>
-            <div>
+            <div style={{marginLeft:'6px'}}>
               <span style={{fontSize:'16px', fontWeight:'800', color:'#ffffff'}}>EnjeraPressList</span>
               <span style={{fontSize:'11px', color:'#ea580c', fontWeight:'700', marginLeft:'8px', background:'rgba(234,88,12,0.2)', padding:'2px 8px', borderRadius:'4px'}}>ADMIN</span>
             </div>
@@ -119,23 +137,19 @@ export default function AdminPanel() {
         </div>
 
         {/* STATS */}
-        <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:'12px', marginBottom:'28px'}}>
-          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
-            <p style={{fontSize:'36px', fontWeight:'800', color:'#ea580c', margin:'0'}}>{stats.totalListings}</p>
-            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Listings</p>
-          </div>
-          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
-            <p style={{fontSize:'36px', fontWeight:'800', color:'#166534', margin:'0'}}>{stats.activeListings}</p>
-            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Active Listings</p>
-          </div>
-          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
-            <p style={{fontSize:'36px', fontWeight:'800', color:'#1877F2', margin:'0'}}>{stats.totalUsers}</p>
-            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Users</p>
-          </div>
-          <div style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
-            <p style={{fontSize:'36px', fontWeight:'800', color:'#7c3aed', margin:'0'}}>{stats.totalViews}</p>
-            <p style={{fontSize:'12px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>Total Views</p>
-          </div>
+        <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(150px, 1fr))', gap:'12px', marginBottom:'28px'}}>
+          {[
+            { label:'Total Listings', value: stats.totalListings, color:'#ea580c' },
+            { label:'Active Listings', value: stats.activeListings, color:'#166534' },
+            { label:'⭐ Featured', value: stats.featuredListings, color:'#d97706' },
+            { label:'Total Users', value: stats.totalUsers, color:'#1877F2' },
+            { label:'Total Views', value: stats.totalViews, color:'#7c3aed' },
+          ].map((s, i) => (
+            <div key={i} style={{background:'#ffffff', borderRadius:'14px', padding:'16px 20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', textAlign:'center'}}>
+              <p style={{fontSize:'32px', fontWeight:'800', color:s.color, margin:'0'}}>{s.value}</p>
+              <p style={{fontSize:'11px', color:'#6b7280', margin:'4px 0 0', fontWeight:'600', textTransform:'uppercase', letterSpacing:'0.05em'}}>{s.label}</p>
+            </div>
+          ))}
         </div>
 
         {/* TABS */}
@@ -157,29 +171,56 @@ export default function AdminPanel() {
               </div>
             ) : listings.map(l => {
               const firstImage = l.listing_images?.sort((a,b) => a.position - b.position)[0]
+              const featuredUntil = l.featured_until ? new Date(l.featured_until).toLocaleDateString() : null
+              const isExpired = l.featured_until && new Date(l.featured_until) < new Date()
               return (
-                <div key={l.id} style={{background:'#ffffff', borderRadius:'16px', border:'1px solid #e5e7eb', overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', display:'flex', flexWrap:'wrap'}}>
+                <div key={l.id} style={{background:'#ffffff', borderRadius:'16px', border: l.is_featured && !isExpired ? '2px solid #d97706' : '1px solid #e5e7eb', overflow:'hidden', boxShadow: l.is_featured && !isExpired ? '0 0 12px rgba(217,119,6,0.2)' : '0 1px 4px rgba(0,0,0,0.05)', display:'flex', flexWrap:'wrap'}}>
                   <div style={{width:'120px', minHeight:'100px', background:'linear-gradient(135deg, #fff7ed, #ffedd5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'32px', flexShrink:0, position:'relative', overflow:'hidden'}}>
                     {firstImage ? <img src={firstImage.public_url} alt="" style={{width:'100%', height:'100%', objectFit:'cover', position:'absolute', inset:0}} /> : '🏠'}
+                    {l.is_featured && !isExpired && (
+                      <div style={{position:'absolute', top:'6px', left:'6px', background:'#d97706', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'2px 6px', borderRadius:'4px'}}>⭐ Featured</div>
+                    )}
                   </div>
                   <div style={{flex:'1', padding:'14px', minWidth:'200px'}}>
                     <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'10px', flexWrap:'wrap'}}>
                       <div style={{flex:1}}>
                         <div style={{display:'flex', alignItems:'center', gap:'6px', marginBottom:'6px', flexWrap:'wrap'}}>
                           <span style={{background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'2px 8px', borderRadius:'4px'}}>{l.property_type}</span>
+                          <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'2px 8px', borderRadius:'4px'}}>{l.listing_type === 'Sale' ? '🔑 Sale' : '🏠 Rent'}</span>
                           <span style={{background: l.is_active ? '#f0fdf4' : '#fef2f2', color: l.is_active ? '#166534' : '#dc2626', fontSize:'10px', fontWeight:'700', padding:'2px 8px', borderRadius:'4px', border: l.is_active ? '1px solid #bbf7d0' : '1px solid #fca5a5'}}>{l.is_active ? '✓ Active' : '✗ Inactive'}</span>
                           <span style={{background:'#f5f3ff', color:'#7c3aed', fontSize:'10px', fontWeight:'700', padding:'2px 8px', borderRadius:'4px', border:'1px solid #ddd6fe'}}>👁 {l.views || 0} views</span>
+                          {l.is_featured && !isExpired && <span style={{background:'#fef3c7', color:'#92400e', fontSize:'10px', fontWeight:'700', padding:'2px 8px', borderRadius:'4px', border:'1px solid #fde68a'}}>⭐ Until {featuredUntil}</span>}
+                          {isExpired && <span style={{background:'#fef2f2', color:'#dc2626', fontSize:'10px', fontWeight:'700', padding:'2px 8px', borderRadius:'4px', border:'1px solid #fca5a5'}}>⭐ Expired</span>}
                         </div>
                         <p style={{fontSize:'14px', fontWeight:'700', color:'#111827', margin:'0 0 3px'}}>{l.title}</p>
                         <p style={{fontSize:'12px', color:'#6b7280', margin:'0 0 3px'}}>📍 {[l.neighborhood, l.city, l.state].filter(Boolean).join(', ')}</p>
-                        <p style={{fontSize:'12px', color:'#9ca3af', margin:'0 0 3px'}}>💰 ${l.price?.toLocaleString()}/mo · {l.bedrooms}</p>
-                        <p style={{fontSize:'11px', color:'#9ca3af', margin:'0'}}>📧 {l.contact_email} · Listed {new Date(l.created_at).toLocaleDateString()}</p>
+                        <p style={{fontSize:'12px', color:'#9ca3af', margin:'0 0 3px'}}>📧 {l.contact_email} · Listed {new Date(l.created_at).toLocaleDateString()}</p>
                       </div>
                       <div style={{display:'flex', flexDirection:'column', gap:'6px', flexShrink:0}}>
                         <Link href={`/listing/${l.id}`} style={{fontSize:'12px', fontWeight:'600', color:'#374151', padding:'6px 12px', borderRadius:'7px', border:'1.5px solid #d1d5db', textDecoration:'none', textAlign:'center', whiteSpace:'nowrap'}}>👁 View</Link>
                         <button onClick={() => handleToggleActive(l.id, l.is_active)} style={{fontSize:'12px', fontWeight:'600', color:'#ffffff', padding:'6px 12px', borderRadius:'7px', background: l.is_active ? '#d97706' : '#166534', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>
                           {l.is_active ? '⏸ Deactivate' : '▶ Activate'}
                         </button>
+                        {l.is_featured && !isExpired ? (
+                          <button onClick={() => handleUnfeature(l.id)} style={{fontSize:'12px', fontWeight:'600', color:'#92400e', padding:'6px 12px', borderRadius:'7px', background:'#fef3c7', border:'1px solid #fde68a', cursor:'pointer', whiteSpace:'nowrap'}}>
+                            ✕ Unfeature
+                          </button>
+                        ) : (
+                          <div style={{display:'flex', gap:'4px'}}>
+                            <select
+                              value={featureDays[l.id] || '7'}
+                              onChange={e => setFeatureDays({...featureDays, [l.id]: e.target.value})}
+                              style={{fontSize:'11px', padding:'5px 4px', borderRadius:'6px', border:'1px solid #d1d5db', background:'#f9fafb', color:'#374151', flex:1}}
+                            >
+                              <option value="7">7 days</option>
+                              <option value="30">30 days</option>
+                              <option value="90">90 days</option>
+                            </select>
+                            <button onClick={() => handleFeature(l.id)} style={{fontSize:'11px', fontWeight:'700', color:'#ffffff', padding:'5px 8px', borderRadius:'6px', background:'#d97706', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>
+                              ⭐ Feature
+                            </button>
+                          </div>
+                        )}
                         <button onClick={() => handleDeleteListing(l.id)} disabled={deleting === l.id} style={{fontSize:'12px', fontWeight:'600', color:'#ffffff', padding:'6px 12px', borderRadius:'7px', background: deleting === l.id ? '#d1d5db' : '#dc2626', border:'none', cursor: deleting === l.id ? 'not-allowed' : 'pointer', whiteSpace:'nowrap'}}>
                           {deleting === l.id ? '...' : '🗑 Delete'}
                         </button>
@@ -216,10 +257,10 @@ export default function AdminPanel() {
                 </div>
                 <div style={{display:'flex', gap:'8px'}}>
                   {u.id !== user?.id ? (
-                    <button
-                      onClick={() => handleToggleAdmin(u.id, u.is_admin)}
-                      style={{fontSize:'12px', fontWeight:'600', color:'#ffffff', padding:'7px 14px', borderRadius:'8px', background: u.is_admin ? '#dc2626' : '#ea580c', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}
-                    >{u.is_admin ? 'Remove Admin' : '👑 Make Admin'}</button>
+                    <button onClick={() => handleToggleAdmin(u.id, u.is_admin)}
+                      style={{fontSize:'12px', fontWeight:'600', color:'#ffffff', padding:'7px 14px', borderRadius:'8px', background: u.is_admin ? '#dc2626' : '#ea580c', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>
+                      {u.is_admin ? 'Remove Admin' : '👑 Make Admin'}
+                    </button>
                   ) : (
                     <span style={{fontSize:'12px', color:'#9ca3af', padding:'7px 14px'}}>You (Owner)</span>
                   )}
@@ -230,7 +271,6 @@ export default function AdminPanel() {
         )}
       </div>
 
-      {/* FOOTER */}
       <footer style={{background:'#1f2937', borderTop:'2px solid #ea580c', padding:'20px 16px', textAlign:'center'}}>
         <p style={{fontSize:'13px', color:'#9ca3af', margin:'0'}}>EnjeraPressList.Com Admin Panel · Restricted Access</p>
       </footer>

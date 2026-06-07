@@ -22,8 +22,15 @@ export default function Home() {
     const savedLang = localStorage.getItem('enjera_lang') || 'en'
     setLang(savedLang)
     getListings().then(data => {
-      setListings(data)
-      setFiltered(data)
+      const sorted = [...data].sort((a, b) => {
+        const aFeatured = a.is_featured && new Date(a.featured_until) > new Date()
+        const bFeatured = b.is_featured && new Date(b.featured_until) > new Date()
+        if (aFeatured && !bFeatured) return -1
+        if (!aFeatured && bFeatured) return 1
+        return 0
+      })
+      setListings(sorted)
+      setFiltered(sorted)
       setLoading(false)
     }).catch(() => setLoading(false))
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -254,7 +261,7 @@ export default function Home() {
           <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap:'16px'}}>
             {filtered.map(l => (
               <Link key={l.id} href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
-                <div style={{background:'#ffffff', borderRadius:'16px', border:'1px solid #e5e7eb', overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', height:'100%'}}
+                <div style={{background:'#ffffff', borderRadius:'16px', border: l.is_featured && new Date(l.featured_until) > new Date() ? '2px solid #d97706' : '1px solid #e5e7eb', overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s', boxShadow: l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)', height:'100%'}}
                   onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
                   onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)' }}
                 >
@@ -319,3 +326,4 @@ export default function Home() {
     </div>
   )
 }
+
