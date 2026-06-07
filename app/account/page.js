@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { supabase, getCurrentUser } from '@/lib/supabase'
 import Link from 'next/link'
+import Logo from '@/app/components/Logo'
+
 
 export default function Account() {
   const [user, setUser] = useState(null)
@@ -133,11 +135,7 @@ export default function Account() {
       <nav style={{background:'#ffffff', borderBottom:'2px solid #ea580c', boxShadow:'0 2px 12px rgba(0,0,0,0.08)', position:'sticky', top:0, zIndex:100}}>
         <div style={{maxWidth:'800px', margin:'0 auto', padding:'12px 24px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-            <div style={{position:'relative', width:'40px', height:'40px'}}>
-              <img src="/logo.gif" alt="logo" style={{width:'40px', height:'40px', borderRadius:'50%', border:'2px solid #d97706'}} />
-              <span style={{position:'absolute', bottom:'-1px', right:'-3px', background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'900', width:'16px', height:'16px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff'}}>L</span>
-            </div>
-            <Link href="/" style={{fontSize:'18px', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>EnjeraPressList.Com</Link>
+            <Logo />
           </div>
           <Link href="/dashboard" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none'}}>← Back to dashboard</Link>
         </div>
@@ -314,3 +312,5 @@ export default function Account() {
     </div>
   )
 }
+
+

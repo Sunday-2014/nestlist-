@@ -69,11 +69,27 @@ export default function Home() {
           {/* LOGO */}
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <div style={{position:'relative', width:'44px', height:'44px', flexShrink:0}}>
-              <img src="/logo.gif" alt="logo" style={{width:'44px', height:'44px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}} />
-              <span style={{position:'absolute', bottom:'-2px', right:'-4px', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'900', width:'20px', height:'20px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff'}}>L</span>
+              <img src="/logo.gif" alt="EnjeraPressList logo" style={{width:'44px', height:'44px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}} />
+              <span style={{
+                position:'absolute', bottom:'-12px', right:'-18px',
+                background:'#ea580c', color:'#ffffff',
+                fontSize:'16px', fontWeight:'700',
+                padding:'3px 9px', borderRadius:'8px',
+                border:'2px solid #ffffff',
+                whiteSpace:'nowrap',
+                fontFamily:"'Dancing Script', cursive",
+                boxShadow:'0 1px 4px rgba(0,0,0,0.25)'
+              }}>List</span>
             </div>
-            <div>
-              <span style={{fontSize:'clamp(14px, 3.5vw, 22px)', fontWeight:'800', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite', display:'block'}}>{t.siteName}</span>
+            <div style={{marginLeft:'8px'}}>
+              <span style={{
+                fontSize:'clamp(15px, 4vw, 22px)', fontWeight:'800',
+                background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)',
+                backgroundSize:'200% auto',
+                WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+                animation:'shine 3s linear infinite',
+                letterSpacing:'-0.5px', display:'block'
+              }}>{t.siteName}</span>
               <span style={{fontSize:'10px', color:'#6b7280', fontWeight:'500'}}>{t.tagline}</span>
             </div>
           </div>
@@ -93,10 +109,7 @@ export default function Home() {
 
           {/* MOBILE HAMBURGER */}
           {isMobile && (
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              style={{background:'none', border:'2px solid #d1d5db', borderRadius:'8px', padding:'6px 10px', cursor:'pointer', fontSize:'20px', color:'#374151'}}
-            >☰</button>
+            <button onClick={() => setMenuOpen(!menuOpen)} style={{background:'none', border:'2px solid #d1d5db', borderRadius:'8px', padding:'6px 10px', cursor:'pointer', fontSize:'20px', color:'#374151'}}>☰</button>
           )}
         </div>
 
@@ -260,11 +273,19 @@ export default function Home() {
         <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'10px', marginBottom:'8px'}}>
           <div style={{position:'relative', width:'32px', height:'32px'}}>
             <img src="/logo.gif" alt="logo" style={{width:'32px', height:'32px', borderRadius:'50%', border:'2px solid #d97706'}} />
-            <span style={{position:'absolute', bottom:'-1px', right:'-3px', background:'#ea580c', color:'#ffffff', fontSize:'8px', fontWeight:'900', width:'13px', height:'13px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid #1f2937'}}>L</span>
+            <span style={{
+              position:'absolute', bottom:'-6px', right:'-10px',
+              background:'#ea580c', color:'#ffffff',
+              fontSize:'12px', fontWeight:'700',
+              padding:'2px 6px', borderRadius:'6px',
+              border:'1px solid #1f2937',
+              whiteSpace:'nowrap',
+              fontFamily:"'Dancing Script', cursive"
+            }}>List</span>
           </div>
-          <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0'}}>{t.siteName}</p>
+          <p style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', margin:'0 0 0 8px'}}>{t.siteName}</p>
         </div>
-        <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px'}}>
+        <div style={{display:'flex', justifyContent:'center', gap:'4px', marginBottom:'10px', marginTop:'12px'}}>
           <div style={{height:'4px', width:'50px', background:'#078930', borderRadius:'2px'}}></div>
           <div style={{height:'4px', width:'50px', background:'#FCDD09', borderRadius:'2px'}}></div>
           <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
