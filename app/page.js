@@ -68,13 +68,13 @@ function LiveClock() {
   return (
     <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', marginBottom:'12px'}}>
       <div style={{display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap', justifyContent:'center'}}>
-        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>🇪🇹 አዲስ አበባ ሰዓት፡</span>
+        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>🇪🇹 አዲስ አበባ ሰዓት፡</s<span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>አዲስ አበባ ሰዓት፡</span>pan>
         <span style={{fontSize:'13px', fontWeight:'700', color:'#166534', fontFamily:'monospace'}}>{ethTime}</span>
         <span style={{fontSize:'12px', color:'#d97706'}}>|</span>
         <span style={{fontSize:'12px', color:'#92400e', fontWeight:'500'}}>{ethDate}</span>
       </div>
       <div style={{display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap', justifyContent:'center'}}>
-        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>🇺🇸 DC / NY Current Time:</span>
+        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>DC / NY ሰዓት፡</span>
         <span style={{fontSize:'13px', fontWeight:'700', color:'#ea580c', fontFamily:'monospace'}}>{dcTime}</span>
         <span style={{fontSize:'12px', color:'#d97706'}}>|</span>
         <span style={{fontSize:'12px', color:'#92400e', fontWeight:'500'}}>{dcDate}</span>
