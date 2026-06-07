@@ -321,9 +321,15 @@ export default function Home() {
           <div style={{height:'4px', width:'50px', background:'#DA121A', borderRadius:'2px'}}></div>
         </div>
         <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>{t.footerTagline}</p>
+        <div style={{display:'flex', justifyContent:'center', gap:'16px', marginTop:'10px', flexWrap:'wrap'}}>
+          <Link href="/terms" style={{fontSize:'12px', color:'#9ca3af', textDecoration:'none'}}>📋 Terms of Service</Link>
+          <Link href="/privacy" style={{fontSize:'12px', color:'#9ca3af', textDecoration:'none'}}>🔒 Privacy Policy</Link>
+          <Link href="/contact" style={{fontSize:'12px', color:'#9ca3af', textDecoration:'none'}}>📬 Contact Us</Link>
+        </div>
       </footer>
 
     </div>
   )
 }
+
 
