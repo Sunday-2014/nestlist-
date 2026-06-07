@@ -5,10 +5,13 @@ import Link from 'next/link'
 
 export default function ListProperty() {
   const [form, setForm] = useState({
-    title:'', property_type:'Apartment', price:'', currency:'USD', bedrooms:'1 bedroom',
-    bathrooms:'1 bathroom', description:'', address:'', city:'', state:'DC',
-    zip:'', neighborhood:'', contact_name:'', contact_email:'',
-    contact_phone:'', contact_method:'Email', available_from:''
+    title:'', property_type:'Apartment', listing_type:'Rent',
+    price:'', currency:'USD', price_period:'Per Month',
+    sale_price:'', down_payment:'', monthly_after_down:'',
+    bedrooms:'1 bedroom', bathrooms:'1 bathroom', description:'',
+    address:'', city:'', state:'DC', zip:'', neighborhood:'',
+    contact_name:'', contact_email:'', contact_phone:'',
+    contact_method:'Email', available_from:''
   })
   const [files, setFiles] = useState([])
   const [previews, setPreviews] = useState([])
@@ -46,17 +49,8 @@ export default function ListProperty() {
         validFiles.push(file)
         validPreviews.push({ url: URL.createObjectURL(file), type: 'image' })
       } else if (file.type.startsWith('video/')) {
-        const video = document.createElement('video')
-        video.preload = 'metadata'
-        video.src = URL.createObjectURL(file)
-        video.onloadedmetadata = () => {
-          if (video.duration > 30) { setError('Video must be 30 seconds or less'); return }
-        }
         validFiles.push(file)
         validPreviews.push({ url: URL.createObjectURL(file), type: 'video' })
-      } else {
-        setError('Only JPG, PNG, WEBP images and MP4 videos allowed')
-        return
       }
     }
     setError('')
@@ -72,18 +66,22 @@ export default function ListProperty() {
   const handleSubmit = async () => {
     setError('')
     if (!form.title) { setError('Please add a title'); return }
-    if (!form.price) { setError('Please add a price'); return }
     if (!form.city) { setError('Please add a city'); return }
-    if (!form.contact_name) { setError('Please add your name'); return }
+    if (form.listing_type === 'Rent' && !form.price && form.currency !== 'Contact') { setError('Please add a rental price'); return }
+    if (form.listing_type === 'Sale' && !form.sale_price && form.currency !== 'Contact') { setError('Please add a sale price'); return }
     if (!form.contact_phone) { setError('Please add a contact phone number'); return }
-    const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
-    if (!phoneRegex.test(form.contact_phone.replace(/\s/g, ''))) { setError('Please enter a valid phone number (e.g. +1 555 000 0000)'); return }
     setLoading(true)
     try {
       const user = await getCurrentUser()
       if (!user) { window.location.href = '/login'; return }
       setUploadProgress('Saving listing...')
-      const listing = await createListing({ ...form, price: parseInt(form.price) })
+      const listing = await createListing({
+        ...form,
+        price: form.price ? parseInt(form.price) : null,
+        sale_price: form.sale_price ? parseInt(form.sale_price) : null,
+        down_payment: form.down_payment ? parseInt(form.down_payment) : null,
+        monthly_after_down: form.monthly_after_down ? parseInt(form.monthly_after_down) : null,
+      })
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           setUploadProgress(`Uploading file ${i + 1} of ${files.length}...`)
@@ -108,8 +106,7 @@ export default function ListProperty() {
   }
 
   const lockedInputStyle = {
-    ...inputStyle,
-    background:'#f3f4f6', color:'#6b7280', cursor:'not-allowed'
+    ...inputStyle, background:'#f3f4f6', color:'#6b7280', cursor:'not-allowed'
   }
 
   const labelStyle = {
@@ -131,6 +128,10 @@ export default function ListProperty() {
     display:'flex', alignItems:'center', gap:'8px'
   }
 
+  const isRent = form.listing_type === 'Rent'
+  const isSale = form.listing_type === 'Sale'
+  const isContact = form.currency === 'Contact'
+
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif'}}>
 
@@ -140,9 +141,9 @@ export default function ListProperty() {
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <div style={{position:'relative', width:'40px', height:'40px'}}>
               <img src="/logo.gif" alt="logo" style={{width:'40px', height:'40px', borderRadius:'50%', border:'2px solid #d97706'}} />
-              <span style={{position:'absolute', bottom:'-1px', right:'-3px', background:'#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'900', width:'16px', height:'16px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #ffffff'}}>L</span>
+              <span style={{position:'absolute', bottom:'-8px', right:'-12px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', padding:'2px 7px', borderRadius:'6px', border:'2px solid #ffffff', whiteSpace:'nowrap', fontFamily:"'Dancing Script', cursive"}}>List</span>
             </div>
-            <Link href="/" style={{fontSize:'18px', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent'}}>EnjeraPressList.Com</Link>
+            <Link href="/" style={{fontSize:'18px', fontWeight:'800', textDecoration:'none', background:'linear-gradient(90deg, #ea580c, #f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', marginLeft:'8px'}}>EnjeraPressList.Com</Link>
           </div>
           <Link href="/" style={{fontSize:'14px', fontWeight:'600', color:'#6b7280', textDecoration:'none'}}>← Back to listings</Link>
         </div>
@@ -165,7 +166,30 @@ export default function ListProperty() {
           </div>
         )}
 
-        {/* Property Details */}
+        {/* LISTING TYPE */}
+        <div style={sectionStyle}>
+          <div style={sectionTitleStyle}>🏷️ Listing Type</div>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+            <button
+              onClick={() => setForm({...form, listing_type:'Rent'})}
+              style={{padding:'16px', borderRadius:'12px', border: isRent ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isRent ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center', transition:'all 0.15s'}}
+            >
+              <div style={{fontSize:'24px', marginBottom:'6px'}}>🏠</div>
+              <p style={{fontSize:'15px', fontWeight:'700', color: isRent ? '#ea580c' : '#374151', margin:'0 0 2px'}}>For Rent</p>
+              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Monthly / Daily / Yearly rental</p>
+            </button>
+            <button
+              onClick={() => setForm({...form, listing_type:'Sale'})}
+              style={{padding:'16px', borderRadius:'12px', border: isSale ? '3px solid #166534' : '2px solid #e5e7eb', background: isSale ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center', transition:'all 0.15s'}}
+            >
+              <div style={{fontSize:'24px', marginBottom:'6px'}}>🔑</div>
+              <p style={{fontSize:'15px', fontWeight:'700', color: isSale ? '#166534' : '#374151', margin:'0 0 2px'}}>For Sale</p>
+              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Full sale / down payment</p>
+            </button>
+          </div>
+        </div>
+
+        {/* PROPERTY DETAILS */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>🏠 Property Details</div>
           <div style={{marginBottom:'14px'}}>
@@ -176,42 +200,94 @@ export default function ListProperty() {
             <div>
               <label style={labelStyle}>Property Type</label>
               <select style={inputStyle} {...f('property_type')}>
-                {['Apartment','House','Studio','Condo','Townhouse'].map(t => <option key={t}>{t}</option>)}
+                {['Apartment','House','Studio','Condo','Townhouse','Villa','Office','Shop','Land','Other'].map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Price *</label>
-              <div style={{display:'flex', gap:'8px'}}>
-                <select style={{...inputStyle, width:'120px', flexShrink:0}} {...f('currency')}>
-                  <option value="USD">$ USD</option>
-                  <option value="ETB">ETB ብር</option>
-                  <option value="Contact">Contact us</option>
-                </select>
-                <input style={inputStyle} type="number" placeholder="e.g. 1800" {...f('price')} disabled={form.currency === 'Contact'} />
-              </div>
+              <label style={labelStyle}>Bedrooms</label>
+              <select style={inputStyle} {...f('bedrooms')}>
+                {['Studio','1 bedroom','2 bedrooms','3 bedrooms','4 bedrooms','5+ bedrooms','N/A'].map(t => <option key={t}>{t}</option>)}
+              </select>
             </div>
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
-              <label style={labelStyle}>Bedrooms</label>
-              <select style={inputStyle} {...f('bedrooms')}>
-                {['Studio','1 bedroom','2 bedrooms','3 bedrooms','4+ bedrooms'].map(t => <option key={t}>{t}</option>)}
-              </select>
-            </div>
-            <div>
               <label style={labelStyle}>Bathrooms</label>
               <select style={inputStyle} {...f('bathrooms')}>
-                {['1 bathroom','1.5 bathrooms','2 bathrooms','3+ bathrooms'].map(t => <option key={t}>{t}</option>)}
+                {['1 bathroom','1.5 bathrooms','2 bathrooms','3+ bathrooms','N/A'].map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
           </div>
           <div>
             <label style={labelStyle}>Description</label>
-            <textarea style={{...inputStyle, minHeight:'100px', resize:'vertical'}} placeholder="Describe the property — highlights, nearby amenities, lease terms…" {...f('description')} />
+            <textarea style={{...inputStyle, minHeight:'100px', resize:'vertical'}} placeholder="Describe the property — highlights, nearby amenities, terms…" {...f('description')} />
           </div>
         </div>
 
-        {/* Location */}
+        {/* PRICING */}
+        <div style={sectionStyle}>
+          <div style={sectionTitleStyle}>💰 Pricing</div>
+
+          {/* CURRENCY */}
+          <div style={{marginBottom:'16px'}}>
+            <label style={labelStyle}>Currency</label>
+            <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+              {['USD','ETB','Contact'].map(c => (
+                <button key={c} onClick={() => setForm({...form, currency:c})}
+                  style={{padding:'8px 16px', borderRadius:'8px', border: form.currency === c ? '2px solid #ea580c' : '2px solid #e5e7eb', background: form.currency === c ? '#fff7ed' : '#f9fafb', color: form.currency === c ? '#ea580c' : '#374151', fontWeight:'700', fontSize:'13px', cursor:'pointer'}}>
+                  {c === 'USD' ? '$ USD' : c === 'ETB' ? '🇪🇹 ETB ብር' : '📞 Contact for price'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* RENT PRICING */}
+          {isRent && !isContact && (
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+              <div>
+                <label style={labelStyle}>Rental Price *</label>
+                <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 15000' : 'e.g. 1800'} {...f('price')} />
+              </div>
+              <div>
+                <label style={labelStyle}>Price Period</label>
+                <select style={inputStyle} {...f('price_period')}>
+                  {['Per Month','Per Day','Per Year','Per Week'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* SALE PRICING */}
+          {isSale && !isContact && (
+            <div>
+              <div style={{marginBottom:'14px'}}>
+                <label style={labelStyle}>Total Sale Price *</label>
+                <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 5000000' : 'e.g. 250000'} {...f('sale_price')} />
+              </div>
+              <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
+                <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
+                <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+                  <div>
+                    <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
+                    <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 500000' : 'e.g. 50000'} {...f('down_payment')} />
+                  </div>
+                  <div>
+                    <label style={{...labelStyle, color:'#166534'}}>Monthly After Down Payment</label>
+                    <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 20000' : 'e.g. 1500'} {...f('monthly_after_down')} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isContact && (
+            <div style={{background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:'10px', padding:'14px'}}>
+              <p style={{fontSize:'13px', color:'#92400e', margin:'0', fontWeight:'600'}}>📞 Price will be hidden — renters will contact you directly for pricing details.</p>
+            </div>
+          )}
+        </div>
+
+        {/* LOCATION */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>📍 Location</div>
           <div style={{marginBottom:'14px'}}>
@@ -221,28 +297,26 @@ export default function ListProperty() {
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
               <label style={labelStyle}>City *</label>
-              <input style={inputStyle} placeholder="Washington" {...f('city')} />
+              <input style={inputStyle} placeholder="e.g. Addis Ababa or Washington DC" {...f('city')} />
             </div>
             <div>
-              <label style={labelStyle}>State</label>
-              <select style={inputStyle} {...f('state')}>
-                {['DC','VA','MD','NY','CA','TX','FL','IL','Other'].map(t => <option key={t}>{t}</option>)}
-              </select>
+              <label style={labelStyle}>State / Region</label>
+              <input style={inputStyle} placeholder="e.g. Oromia, DC, VA" {...f('state')} />
             </div>
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px'}}>
             <div>
-              <label style={labelStyle}>ZIP Code</label>
+              <label style={labelStyle}>ZIP / Postal Code</label>
               <input style={inputStyle} placeholder="20001" {...f('zip')} />
             </div>
             <div>
-              <label style={labelStyle}>Neighborhood</label>
-              <input style={inputStyle} placeholder="Capitol Hill" {...f('neighborhood')} />
+              <label style={labelStyle}>Neighborhood / Subcity</label>
+              <input style={inputStyle} placeholder="e.g. Bole, Capitol Hill" {...f('neighborhood')} />
             </div>
           </div>
         </div>
 
-        {/* Photos & Video */}
+        {/* PHOTOS & VIDEO */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>📸 Photos & Video</div>
           <p style={{fontSize:'13px', color:'#6b7280', marginBottom:'16px', fontWeight:'500', lineHeight:'1.6'}}>
@@ -278,11 +352,11 @@ export default function ListProperty() {
           )}
         </div>
 
-        {/* Contact */}
+        {/* CONTACT */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>📞 Contact Information</div>
           <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'12px 14px', marginBottom:'16px'}}>
-            <p style={{fontSize:'13px', color:'#166534', margin:'0', fontWeight:'600'}}>🔒 Your registered email is automatically used as your contact email — this ensures renters always reach the verified account owner.</p>
+            <p style={{fontSize:'13px', color:'#166534', margin:'0', fontWeight:'600'}}>🔒 Your registered email is automatically used as your contact email.</p>
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
@@ -299,12 +373,7 @@ export default function ListProperty() {
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
               <label style={labelStyle}>Contact Email 🔒 Verified</label>
-              <input
-                style={lockedInputStyle}
-                value={form.contact_email}
-                readOnly
-                title="This is your verified account email and cannot be changed"
-              />
+              <input style={lockedInputStyle} value={form.contact_email} readOnly />
             </div>
             <div>
               <label style={labelStyle}>Contact Phone *</label>
@@ -334,5 +403,3 @@ export default function ListProperty() {
     </div>
   )
 }
-
-
