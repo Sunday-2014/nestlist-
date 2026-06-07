@@ -77,10 +77,10 @@ export default function ListProperty() {
       setUploadProgress('Saving listing...')
       const listing = await createListing({
         ...form,
-        price: form.price ? parseInt(form.price) : null,
-        sale_price: form.sale_price ? parseInt(form.sale_price) : null,
-        down_payment: form.down_payment ? parseInt(form.down_payment) : null,
-        monthly_after_down: form.monthly_after_down ? parseInt(form.monthly_after_down) : null,
+        price: form.price ? parseInt(form.price.toString().replace(/,/g, '')) : null,
+        sale_price: form.sale_price ? parseInt(form.sale_price.toString().replace(/,/g, '')) : null,
+        down_payment: form.down_payment ? parseInt(form.down_payment.toString().replace(/,/g, '')) : null,
+        monthly_after_down: form.monthly_after_down ? parseInt(form.monthly_after_down.toString().replace(/,/g, '')) : null,
       })
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
@@ -131,6 +131,18 @@ export default function ListProperty() {
   const isRent = form.listing_type === 'Rent'
   const isSale = form.listing_type === 'Sale'
   const isContact = form.currency === 'Contact'
+
+  const formatNumber = (val) => {
+    if (!val) return ''
+    const num = val.toString().replace(/,/g, '')
+    if (isNaN(num)) return val
+    return parseInt(num).toLocaleString()
+  }
+
+  const handlePriceChange = (field, value) => {
+    const raw = value.replace(/[^0-9]/g, '')
+    setForm({...form, [field]: raw})
+  }
 
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif'}}>
@@ -239,7 +251,14 @@ export default function ListProperty() {
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
               <div>
                 <label style={labelStyle}>Rental Price *</label>
-                <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 15000' : 'e.g. 1800'} {...f('price')} />
+                <input
+                  style={inputStyle}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={form.currency === 'ETB' ? 'e.g. 1,500,000' : 'e.g. 1,800'}
+                  value={formatNumber(form.price)}
+                  onChange={e => handlePriceChange('price', e.target.value)}
+                />
               </div>
               <div>
                 <label style={labelStyle}>Price Period</label>
@@ -254,18 +273,39 @@ export default function ListProperty() {
             <div>
               <div style={{marginBottom:'14px'}}>
                 <label style={labelStyle}>Total Sale Price *</label>
-                <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 5000000' : 'e.g. 250000'} {...f('sale_price')} />
+                <input
+                  style={inputStyle}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={form.currency === 'ETB' ? 'e.g. 5,000,000' : 'e.g. 250,000'}
+                  value={formatNumber(form.sale_price)}
+                  onChange={e => handlePriceChange('sale_price', e.target.value)}
+                />
               </div>
               <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
                 <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
                 <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
                   <div>
                     <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
-                    <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 500000' : 'e.g. 50000'} {...f('down_payment')} />
+                    <input
+                      style={inputStyle}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder={form.currency === 'ETB' ? 'e.g. 500,000' : 'e.g. 50,000'}
+                      value={formatNumber(form.down_payment)}
+                      onChange={e => handlePriceChange('down_payment', e.target.value)}
+                    />
                   </div>
                   <div>
                     <label style={{...labelStyle, color:'#166534'}}>Monthly After Down Payment</label>
-                    <input style={inputStyle} type="number" placeholder={form.currency === 'ETB' ? 'e.g. 20000' : 'e.g. 1500'} {...f('monthly_after_down')} />
+                    <input
+                      style={inputStyle}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder={form.currency === 'ETB' ? 'e.g. 20,000' : 'e.g. 1,500'}
+                      value={formatNumber(form.monthly_after_down)}
+                      onChange={e => handlePriceChange('monthly_after_down', e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
@@ -311,7 +351,7 @@ export default function ListProperty() {
                 <option value="Finote Selam" />
                 <option value="Bure" />
                 <option value="Mota" />
-                <option value="Addet Gojjam" />
+                <option value="Addet" />
                 <option value="Kemissie" />
                 <option value="Sekota" />
                 <option value="Dangila" />
@@ -324,9 +364,9 @@ export default function ListProperty() {
                 <option value="Woreta" />
                 <option value="Chagni" />
                 <option value="Shewarobit" />
-                <option value="Nazret/Adama" />
+                <option value="Adama" />
                 <option value="Jimma" />
-                <option value="DebreZeyit/Bishoftu" />
+                <option value="Bishoftu" />
                 <option value="Shashamane" />
                 <option value="Asella" />
                 <option value="Ziway" />
@@ -544,5 +584,3 @@ export default function ListProperty() {
     </div>
   )
 }
-
-
