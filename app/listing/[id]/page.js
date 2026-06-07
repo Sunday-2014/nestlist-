@@ -41,6 +41,26 @@ export default function ListingDetail({ params }) {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleRevealContact = async () => {
+    setShowContact(true)
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          landlordEmail: listing.contact_email,
+          landlordName: listing.contact_name,
+          renterEmail: 'anonymous@visitor.com',
+          renterName: 'A visitor',
+          listingTitle: listing.title,
+          message: ''
+        })
+      })
+    } catch(e) {
+      console.error('Email error:', e)
+    }
+  }
+
   const formatPrice = (amount, currency) => {
     if (!amount) return ''
     if (currency === 'ETB') return `${amount?.toLocaleString()} ETB`
@@ -166,7 +186,7 @@ export default function ListingDetail({ params }) {
                 <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 4px', fontWeight:'600'}}>📧 ••••••@••••••.com</p>
                 {listing.contact_phone && <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'600'}}>📞 ••• ••• ••••</p>}
               </div>
-              <button onClick={() => setShowContact(true)}
+              <button onClick={handleRevealContact}
                 style={{display:'block', width:'100%', padding:'14px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', textAlign:'center', borderRadius:'10px', border:'none', cursor:'pointer', marginBottom:'10px', boxSizing:'border-box'}}>
                 👁 Reveal Contact Info
               </button>
@@ -196,8 +216,6 @@ export default function ListingDetail({ params }) {
 
         {/* TITLE + STATS */}
         <div style={{background:'#ffffff', borderRadius:'16px', padding:'20px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
-
-          {/* LISTING TYPE + PROPERTY TYPE BADGES */}
           <div style={{display:'flex', alignItems:'center', gap:'8px', marginBottom:'10px', flexWrap:'wrap'}}>
             <span style={{background: isForSale ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 10px', borderRadius:'6px'}}>
               {isForSale ? '🔑 For Sale' : '🏠 For Rent'}
@@ -212,8 +230,6 @@ export default function ListingDetail({ params }) {
           </p>
 
           <div style={{display:'flex', flexWrap:'wrap', gap:'10px'}}>
-
-            {/* RENT PRICE */}
             {!isForSale && listing.currency !== 'Contact' && (
               <div style={{background:'#fff7ed', borderRadius:'10px', padding:'10px 16px', border:'1px solid #fed7aa', textAlign:'center'}}>
                 <p style={{fontSize:'11px', color:'#9a3412', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Price</p>
@@ -221,32 +237,24 @@ export default function ListingDetail({ params }) {
                 {listing.price_period && <p style={{fontSize:'11px', color:'#9a3412', margin:'2px 0 0', fontWeight:'500'}}>{listing.price_period}</p>}
               </div>
             )}
-
-            {/* CONTACT FOR PRICE */}
             {listing.currency === 'Contact' && (
               <div style={{background:'#fff7ed', borderRadius:'10px', padding:'10px 16px', border:'1px solid #fed7aa', textAlign:'center'}}>
                 <p style={{fontSize:'11px', color:'#9a3412', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Price</p>
                 <p style={{fontSize:'16px', fontWeight:'700', color:'#ea580c', margin:'0'}}>Contact for price</p>
               </div>
             )}
-
-            {/* SALE PRICE */}
             {isForSale && listing.currency !== 'Contact' && listing.sale_price && (
               <div style={{background:'#f0fdf4', borderRadius:'10px', padding:'10px 16px', border:'1px solid #bbf7d0', textAlign:'center'}}>
                 <p style={{fontSize:'11px', color:'#166534', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Sale Price</p>
                 <p style={{fontSize:'20px', fontWeight:'800', color:'#166534', margin:'0'}}>{formatPrice(listing.sale_price, listing.currency)}</p>
               </div>
             )}
-
-            {/* DOWN PAYMENT */}
             {isForSale && listing.down_payment && (
               <div style={{background:'#eff6ff', borderRadius:'10px', padding:'10px 16px', border:'1px solid #bfdbfe', textAlign:'center'}}>
                 <p style={{fontSize:'11px', color:'#1d4ed8', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Down Payment</p>
                 <p style={{fontSize:'18px', fontWeight:'800', color:'#1d4ed8', margin:'0'}}>{formatPrice(listing.down_payment, listing.currency)}</p>
               </div>
             )}
-
-            {/* MONTHLY AFTER DOWN */}
             {isForSale && listing.monthly_after_down && (
               <div style={{background:'#fdf4ff', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e9d5ff', textAlign:'center'}}>
                 <p style={{fontSize:'11px', color:'#7c3aed', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Monthly After Down</p>
@@ -254,7 +262,6 @@ export default function ListingDetail({ params }) {
                 <p style={{fontSize:'11px', color:'#7c3aed', margin:'2px 0 0', fontWeight:'500'}}>per month</p>
               </div>
             )}
-
             <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
               <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase', letterSpacing:'0.05em'}}>Bedrooms</p>
               <p style={{fontSize:'16px', fontWeight:'700', color:'#111827', margin:'0'}}>{listing.bedrooms}</p>
