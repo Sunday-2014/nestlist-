@@ -1,4 +1,5 @@
 'use client'
+import { showPrice } from '../translations'
 import { useState, useEffect } from 'react'
 import { supabase, getCurrentUser, deleteListing, logout } from '@/lib/supabase'
 import Link from 'next/link'
@@ -187,7 +188,7 @@ export default function Dashboard() {
                         <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 4px', lineHeight:'1.3'}}>{l.title}</p>
                         <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 8px'}}>📍 {[l.neighborhood, l.city, l.state].filter(Boolean).join(', ')}</p>
                         <div style={{display:'flex', gap:'16px', flexWrap:'wrap'}}>
-                          <span style={{fontSize:'16px', fontWeight:'800', color:'#ea580c'}}>${l.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></span>
+                          <span style={{fontSize:'16px', fontWeight:'800', color:'#ea580c'}}>{showPrice(l)}</span>
                           <span style={{fontSize:'13px', color:'#6b7280', fontWeight:'500'}}>{l.bedrooms}</span>
                           <span style={{fontSize:'13px', color:'#6b7280', fontWeight:'500'}}>{l.listing_images?.length || 0} photos</span>
                         </div>

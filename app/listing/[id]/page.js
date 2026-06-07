@@ -1,4 +1,5 @@
 'use client'
+import { showPrice } from '../../../translations'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -132,7 +133,7 @@ export default function ListingDetail({ params }) {
           <div style={{display:'flex', flexWrap:'wrap', gap:'10px'}}>
             <div style={{background:'#fff7ed', borderRadius:'10px', padding:'10px 16px', border:'1px solid #fed7aa', textAlign:'center'}}>
               <p style={{fontSize:'11px', color:'#9a3412', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase'}}>Price</p>
-              <p style={{fontSize:'20px', fontWeight:'800', color:'#ea580c', margin:'0'}}>${listing.price?.toLocaleString()}<span style={{fontSize:'12px', fontWeight:'500', color:'#9ca3af'}}>/mo</span></p>
+              <p style={{fontSize:'20px', fontWeight:'800', color:'#ea580c', margin:'0'}}>{showPrice(listing)}</p>
             </div>
             <div style={{background:'#f9fafb', borderRadius:'10px', padding:'10px 16px', border:'1px solid #e5e7eb', textAlign:'center'}}>
               <p style={{fontSize:'11px', color:'#6b7280', margin:'0 0 2px', fontWeight:'700', textTransform:'uppercase'}}>Bedrooms</p>
