@@ -68,13 +68,13 @@ function LiveClock() {
   return (
     <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', marginBottom:'12px'}}>
       <div style={{display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap', justifyContent:'center'}}>
-        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>አዲስ አበባ ሰዓት፡</span>
+        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>አዲስ አበባ፡</span>
         <span style={{fontSize:'13px', fontWeight:'700', color:'#166534', fontFamily:'monospace'}}>{ethTime}</span>
         <span style={{fontSize:'12px', color:'#d97706'}}>|</span>
         <span style={{fontSize:'12px', color:'#92400e', fontWeight:'500'}}>{ethDate}</span>
       </div>
       <div style={{display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap', justifyContent:'center'}}>
-        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>DC / NY ሰዓት፡</span>
+        <span style={{fontSize:'13px', fontWeight:'600', color:'#92400e'}}>DC / NY፡</span>
         <span style={{fontSize:'13px', fontWeight:'700', color:'#ea580c', fontFamily:'monospace'}}>{dcTime}</span>
         <span style={{fontSize:'12px', color:'#d97706'}}>|</span>
         <span style={{fontSize:'12px', color:'#92400e', fontWeight:'500'}}>{dcDate}</span>
@@ -322,7 +322,6 @@ export default function Home() {
       <div style={{maxWidth:'1100px', margin:'0 auto', padding:'24px 16px 64px', boxSizing:'border-box'}}>
         <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'20px', flexWrap:'wrap', gap:'10px'}}>
           <div>
-            <h3 style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 2px'}}>{t.availableRentals}</h3>
             <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'500'}}>{filtered.length} {filtered.length === 1 ? t.listingFound : t.listingsFound}</p>
           </div>
           <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'9px 16px', borderRadius:'10px', background:'#166534', textDecoration:'none', display:'inline-block', border:'2px solid #166534', whiteSpace:'nowrap'}}>{t.addYourListing}</Link>
