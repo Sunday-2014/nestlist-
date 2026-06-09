@@ -19,6 +19,11 @@ export const metadata = {
   alternates: {
     canonical: "https://www.enjerapresslist.com",
   },
+  icons: {
+    icon: '/logo.gif',
+    shortcut: '/logo.gif',
+    apple: '/logo.gif',
+  },
   openGraph: {
     title: "EnjeraPressList.Com — Free Rental & Property Listings",
     description: "Find or list rental properties for free in Ethiopia and USA. No agents, no fees. Connect directly with landlords.",
@@ -58,13 +63,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/logo.gif" />
+        <link rel="shortcut icon" href="/logo.gif" />
+        <link rel="apple-touch-icon" href="/logo.gif" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ea580c" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="EnjeraList" />
-        <link rel="apple-touch-icon" href="/logo.gif" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet" />
