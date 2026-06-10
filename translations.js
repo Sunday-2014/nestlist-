@@ -2,14 +2,14 @@
   en: {
     // Navbar
     siteName: 'EnjeraPressList.Com',
-    tagline: 'Free Rental Listings',
+    tagline: 'Free Listing',
     myListings: 'My Listings',
     addListing: '+ Add Listing',
     signIn: 'Sign in',
     register: 'Register',
 
     // Hero
-    badge: '100% Free · No Hidden Fees',
+    badge: 'Current Time And Date',
     heroTitle: 'Find or List Rentals & Properties for Sale AnyWhere in the World',
     heroSubtitle: 'Browse rentals, list your property or post it for sale — connect directly with owners, no agents, no fees.',
     searchPlaceholder: 'Search city, neighborhood or title...',
@@ -48,14 +48,14 @@
   am: {
     // Navbar
     siteName: 'EnjeraPressList.Com',
-    tagline: 'ይህ እንጀራ ፕረስ ሊስቲንግ ነው',
+    tagline: 'ይህ እንጀራ ፕረስ ሊስት ነው!',
     myListings: 'የእኔ ሊስቶች',
     addListing: '+ አዲስ ሊስቲንግ ያስገቡ',
     signIn: 'ወደ አካውንትዎ ይግቡ',
     register: 'ነፃ አካውንት ይክፈቱ',
 
     // Hero
-    badge: 'ሙሉ በሙሉ በነፃ ',
+    badge: 'የአሁኑ ሰዓት እና ቀን',
     heroTitle: 'በመላው አለም ለኪራይ ወይም ለሽያጭ የሚሆኑ ቤቶችን ይፈልጉ ወይም ሊስት ያስገቡ',
     heroSubtitle: 'የሚከራይ ቤት የፈልጉ ፣ ቤትዎን ያከራዩ — ቀጥታ ከባለቤቶች ጋር ይገናኙ።',
     searchPlaceholder: 'ከተማ፣ ሰፈር ወይም ቀበሌ ይፈልጉ...',
@@ -98,6 +98,7 @@ export function showPrice(listing) {
   if (currency === 'ETB') return `${listing.price?.toLocaleString()} ETB/mo`
   return `$${listing.price?.toLocaleString()}/mo`
 }
+
 
 
 
