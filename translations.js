@@ -9,7 +9,7 @@
     register: 'Register',
 
     // Hero
-    badge: '🌟Current Time And Date🌟',
+    badge: '🌎Current Time And Date🌎',
     heroTitle: 'Find or List Rentals & Properties for Sale AnyWhere in the World',
     heroSubtitle: 'Browse rentals, list your property or post it for sale — connect directly with owners, no agents, no fees.',
     searchPlaceholder: 'Search city, neighborhood or title...',
@@ -55,7 +55,7 @@
     register: 'ነፃ አካውንት ይክፈቱ',
 
     // Hero
-    badge: '🌟የአሁኑ ሰዓት እና ቀን🌟',
+    badge: '🌍የአሁኑ ሰዓት እና ቀን🌍',
     heroTitle: 'በመላው አለም ለኪራይ ወይም ለሽያጭ የሚሆኑ ቤቶችን ይፈልጉ ወይም ሊስት ያስገቡ',
     heroSubtitle: 'የሚከራይ ቤት የፈልጉ ፣ ቤትዎን ያከራዩ — ቀጥታ ከባለቤቶች ጋር ይገናኙ።',
     searchPlaceholder: 'ከተማ፣ ሰፈር ወይም ቀበሌ ይፈልጉ...',
