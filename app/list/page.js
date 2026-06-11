@@ -330,8 +330,26 @@ export default function ListProperty() {
             <div style={sectionTitleStyle}>💼 Job Details</div>
 
             {/* LANGUAGE TOGGLE */}
+            {/* JOB POSTING TYPE */}
             <div style={{marginBottom:'16px'}}>
-              <label style={labelStyle}>Post Language / የልጥፍ ቋንቋ</label>
+              <label style={labelStyle}>I am / እኔ ነኝ</label>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+                <button onClick={() => setForm({...form, job_employment_type:'Looking for Work'})}
+                  style={{padding:'14px', borderRadius:'12px', border: form.job_employment_type === 'Looking for Work' ? '3px solid #1877F2' : '2px solid #e5e7eb', background: form.job_employment_type === 'Looking for Work' ? '#eff6ff' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+                  <div style={{fontSize:'24px', marginBottom:'6px'}}>👤</div>
+                  <p style={{fontSize:'14px', fontWeight:'700', color: form.job_employment_type === 'Looking for Work' ? '#1877F2' : '#374151', margin:'0 0 2px'}}>Looking for Work</p>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0'}}>ስራ እፈልጋለሁ</p>
+                </button>
+                <button onClick={() => setForm({...form, job_employment_type:'Hiring'})}
+                  style={{padding:'14px', borderRadius:'12px', border: form.job_employment_type === 'Hiring' ? '3px solid #166534' : '2px solid #e5e7eb', background: form.job_employment_type === 'Hiring' ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+                  <div style={{fontSize:'24px', marginBottom:'6px'}}>🏢</div>
+                  <p style={{fontSize:'14px', fontWeight:'700', color: form.job_employment_type === 'Hiring' ? '#166534' : '#374151', margin:'0 0 2px'}}>Hiring / Employee Needed</p>
+                  <p style={{fontSize:'11px', color:'#6b7280', margin:'0'}}>ሰራተኛ ያስፈልጋል</p>
+                </button>
+              </div>
+            </div>
+            <div style={{marginBottom:'16px'}}>
+              <label style={labelStyle}>Post Language / የማስታወቂያ ቋንቋ</label>
               <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
                 {[
                   {value:'English', label:'🇺🇸 English Only'},
@@ -601,3 +619,4 @@ export default function ListProperty() {
     </div>
   )
 }
+
