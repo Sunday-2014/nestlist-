@@ -31,7 +31,6 @@ function LiveClock() {
   useEffect(() => {
     const update = () => {
       const now = new Date()
-
       const ethParts = new Intl.DateTimeFormat('en-US',{
         timeZone:'Africa/Addis_Ababa',
         hour:'numeric', minute:'2-digit', hour12:false
@@ -43,14 +42,12 @@ function LiveClock() {
       if (h > 12) h -= 12
       const prefix = h24>=6&&h24<12?'ጥዋት':h24>=12&&h24<18?'ከሰዓት':h24>=18?'ከምሽቱ':'ከሌሊት'
       setEthTime(prefix + ' ' + h + ':' + mm)
-
       const ethDateStr = new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Addis_Ababa'}).format(now)
       const ethNow = new Date(ethDateStr + 'T00:00:00Z')
       const {year, month, day} = toEthiopian(ethNow)
       const wd = new Intl.DateTimeFormat('en-US',{timeZone:'Africa/Addis_Ababa',weekday:'long'}).format(now)
       const monthName = ethMonths[Math.min(month-1, 12)]
       setEthDate(ethWeekdays[wdMap[wd]||0] + ' ' + monthName + ' ' + day + ', ' + year + ' ዓ.ም')
-
       const dcParts = new Intl.DateTimeFormat('en-US',{
         timeZone:'America/New_York',
         hour:'2-digit', minute:'2-digit', hour12:true
@@ -94,6 +91,7 @@ export default function Home() {
   const [lang, setLang] = useState('en')
   const [menuOpen, setMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [jobsOpen, setJobsOpen] = useState(false)
 
   const t = translations[lang]
 
@@ -124,7 +122,8 @@ export default function Home() {
     localStorage.setItem('enjera_lang', newLang)
   }
 
-  const handleSearch = () => {
+  const handleSearch = (overrideType) => {
+    const activeType = overrideType !== undefined ? overrideType : listingType
     let results = listings
     if (search) results = results.filter(l =>
       l.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -133,7 +132,11 @@ export default function Home() {
     )
     if (type) results = results.filter(l => l.property_type === type)
     if (maxPrice) results = results.filter(l => (l.price || l.sale_price) <= parseInt(maxPrice))
-    if (listingType) results = results.filter(l => (l.listing_type || 'Rent') === listingType)
+    if (activeType === 'Looking for Work' || activeType === 'Hiring') {
+      results = results.filter(l => l.job_employment_type === activeType)
+    } else if (activeType) {
+      results = results.filter(l => (l.listing_type || 'Rent') === activeType)
+    }
     setFiltered(results)
   }
 
@@ -142,6 +145,7 @@ export default function Home() {
   }
 
   const showCardPrice = (l) => {
+    if (l.listing_category === 'Job') return <span style={{fontSize:'13px', color:'#1877F2', fontWeight:'700'}}>{l.job_type || 'Job'}</span>
     if (l.currency === 'Contact') return <span style={{fontSize:'13px', color:'#ea580c', fontWeight:'700'}}>Contact for price</span>
     const isForSale = l.listing_type === 'Sale'
     const amount = isForSale ? l.sale_price : l.price
@@ -150,41 +154,33 @@ export default function Home() {
     return <span>${amount?.toLocaleString()}<span style={{fontSize:'11px', color:'#9ca3af'}}>{period}</span></span>
   }
 
+  const getCardBadge = (l) => {
+    if (l.listing_category === 'Job') {
+      return l.job_employment_type === 'Looking for Work'
+        ? <span style={{background:'#1877F2', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>👤 Looking for Work</span>
+        : <span style={{background:'#166534', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>🏢 Hiring</span>
+    }
+    if (l.listing_category === 'Vehicle') return <span style={{background:'#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>🚗 Vehicle</span>
+    return <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}</span>
+  }
+
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', margin:0, padding:0, overflowX:'hidden'}}>
 
       {/* NAVBAR */}
       <nav style={{background:'#ffffff', position:'sticky', top:0, zIndex:100, boxShadow:'0 2px 12px rgba(0,0,0,0.08)', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-
-          {/* LOGO */}
           <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
             <div style={{position:'relative', width:'44px', height:'44px', flexShrink:0}}>
               <img src="/logo.gif" alt="logo" style={{width:'44px', height:'44px', borderRadius:'50%', display:'block', border:'2px solid #d97706'}} />
-              <span style={{
-                position:'absolute', bottom:'-12px', right:'-18px',
-                background:'#ea580c', color:'#ffffff',
-                fontSize:'16px', fontWeight:'700',
-                padding:'3px 9px', borderRadius:'8px',
-                border:'2px solid #ffffff', whiteSpace:'nowrap',
-                fontFamily:"'Dancing Script', cursive",
-                boxShadow:'0 1px 4px rgba(0,0,0,0.25)'
-              }}>List</span>
+              <span style={{position:'absolute', bottom:'-12px', right:'-18px', background:'#ea580c', color:'#ffffff', fontSize:'16px', fontWeight:'700', padding:'3px 9px', borderRadius:'8px', border:'2px solid #ffffff', whiteSpace:'nowrap', fontFamily:"'Dancing Script', cursive", boxShadow:'0 1px 4px rgba(0,0,0,0.25)'}}>List</span>
             </div>
             <div style={{marginLeft:'8px'}}>
-              <span style={{
-                fontSize:'clamp(15px, 4vw, 22px)', fontWeight:'800',
-                background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)',
-                backgroundSize:'200% auto',
-                WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
-                animation:'shine 3s linear infinite',
-                letterSpacing:'-0.5px', display:'block'
-              }}>{t.siteName}</span>
+              <span style={{fontSize:'clamp(15px, 4vw, 22px)', fontWeight:'800', background:'linear-gradient(90deg, #ea580c, #f97316, #fb923c, #ea580c)', backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'shine 3s linear infinite', letterSpacing:'-0.5px', display:'block'}}>{t.siteName}</span>
               <span style={{fontSize:'10px', color:'#6b7280', fontWeight:'500'}}>{t.tagline}</span>
             </div>
           </div>
 
-          {/* DESKTOP NAV */}
           {!isMobile && (
             <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
               <button onClick={toggleLang} style={{fontSize:'12px', fontWeight:'700', color:'#374151', padding:'6px 10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', whiteSpace:'nowrap'}}>
@@ -197,13 +193,11 @@ export default function Home() {
             </div>
           )}
 
-          {/* MOBILE HAMBURGER */}
           {isMobile && (
             <button onClick={() => setMenuOpen(!menuOpen)} style={{background:'none', border:'2px solid #d1d5db', borderRadius:'8px', padding:'6px 10px', cursor:'pointer', fontSize:'20px', color:'#374151'}}>☰</button>
           )}
         </div>
 
-        {/* MOBILE MENU */}
         {isMobile && menuOpen && (
           <div style={{background:'#ffffff', borderTop:'1px solid #e5e7eb', padding:'12px 16px', display:'flex', flexDirection:'column', gap:'8px'}}>
             <button onClick={() => { toggleLang(); setMenuOpen(false) }} style={{fontSize:'13px', fontWeight:'700', color:'#374151', padding:'10px', borderRadius:'8px', border:'2px solid #d1d5db', background:'#ffffff', cursor:'pointer', textAlign:'left'}}>
@@ -216,14 +210,12 @@ export default function Home() {
           </div>
         )}
 
-        {/* ETHIOPIAN FLAG STRIPES */}
         <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
           <div style={{height:'6px', background:'#078930', width:'100%'}}></div>
           <div style={{height:'6px', background:'#FCDD09', width:'100%'}}></div>
           <div style={{height:'6px', background:'#DA121A', width:'100%'}}></div>
         </div>
 
-        {/* CONTACT US BAR */}
         <div style={{background:'linear-gradient(90deg, #fef3c7, #fde68a, #fef3c7)', width:'100%', padding:'7px 16px', boxSizing:'border-box'}}>
           <div style={{maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center'}}>
             <Link href="/contact" style={{fontSize:'13px', fontWeight:'700', color:'#92400e', textDecoration:'none', display:'flex', alignItems:'center', gap:'6px'}}>
@@ -236,13 +228,10 @@ export default function Home() {
       {/* HERO */}
       <div style={{background:'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)', borderBottom:'1px solid #fdba74', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
-
           <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'8px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
 
-          {/* LIVE CLOCK */}
           <LiveClock />
 
-          {/* HERO TITLE */}
           {!isMobile ? (
             <div style={{display:'flex', alignItems:'center', gap:'16px', margin:'0 0 12px', justifyContent:'center'}}>
               <div style={{width:'160px', minHeight:'110px', flexShrink:0, border:'3px solid #d97706', borderRadius:'12px', background:'linear-gradient(135deg, #fef3c7, #fde68a)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px', textAlign:'center', cursor:'pointer'}}>
@@ -307,7 +296,7 @@ export default function Home() {
                     <option value="100000">Under 100,000 ETB</option>
                   </optgroup>
                 </select>
-                <button onClick={handleSearch} style={{flex:'1', minWidth:'80px', padding:'11px 20px', borderRadius:'10px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>{t.search}</button>
+                <button onClick={() => handleSearch()} style={{flex:'1', minWidth:'80px', padding:'11px 20px', borderRadius:'10px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>{t.search}</button>
               </div>
             </div>
           </div>
@@ -324,7 +313,39 @@ export default function Home() {
           <div>
             <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'500'}}>{filtered.length} {filtered.length === 1 ? t.listingFound : t.listingsFound}</p>
           </div>
-          <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'9px 16px', borderRadius:'10px', background:'#166534', textDecoration:'none', display:'inline-block', border:'2px solid #166534', whiteSpace:'nowrap'}}>{t.addYourListing}</Link>
+
+          <div style={{display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'center'}}>
+            {/* JOBS DROPDOWN */}
+            <div style={{position:'relative'}}>
+              <button onClick={() => setJobsOpen(!jobsOpen)}
+                style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'9px 16px', borderRadius:'10px', background:'#1877F2', border:'2px solid #1877F2', cursor:'pointer', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'6px'}}>
+                💼 Jobs {jobsOpen ? '▲' : '▼'}
+              </button>
+              {jobsOpen && (
+                <div style={{position:'absolute', top:'110%', left:0, background:'#ffffff', borderRadius:'12px', border:'1px solid #e5e7eb', boxShadow:'0 8px 24px rgba(0,0,0,0.12)', zIndex:200, minWidth:'240px', overflow:'hidden'}}>
+                  <button
+                    onClick={() => { setListingType('Looking for Work'); setJobsOpen(false); handleSearch('Looking for Work') }}
+                    style={{width:'100%', padding:'14px 16px', textAlign:'left', background:'#ffffff', border:'none', borderBottom:'1px solid #f3f4f6', cursor:'pointer', fontSize:'13px', fontWeight:'600', color:'#374151'}}
+                    onMouseEnter={e => e.currentTarget.style.background='#eff6ff'}
+                    onMouseLeave={e => e.currentTarget.style.background='#ffffff'}
+                  >
+                    👤 Looking for Work<br/>
+                    <span style={{fontSize:'11px', color:'#6b7280', fontWeight:'400'}}>ስራ እፈልጋለሁ</span>
+                  </button>
+                  <button
+                    onClick={() => { setListingType('Hiring'); setJobsOpen(false); handleSearch('Hiring') }}
+                    style={{width:'100%', padding:'14px 16px', textAlign:'left', background:'#ffffff', border:'none', cursor:'pointer', fontSize:'13px', fontWeight:'600', color:'#374151'}}
+                    onMouseEnter={e => e.currentTarget.style.background='#f0fdf4'}
+                    onMouseLeave={e => e.currentTarget.style.background='#ffffff'}
+                  >
+                    🏢 Hiring / Employee Needed<br/>
+                    <span style={{fontSize:'11px', color:'#6b7280', fontWeight:'400'}}>ሰራተኛ ያስፈልጋል</span>
+                  </button>
+                </div>
+              )}
+            </div>
+            <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'9px 16px', borderRadius:'10px', background:'#166534', textDecoration:'none', display:'inline-block', border:'2px solid #166534', whiteSpace:'nowrap'}}>{t.addYourListing}</Link>
+          </div>
         </div>
 
         {loading ? (
@@ -356,9 +377,7 @@ export default function Home() {
                     <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
                       <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
                       <div style={{position:'absolute', top:'12px', left:'12px', display:'flex', gap:'4px'}}>
-                        <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>
-                          {l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}
-                        </span>
+                        {getCardBadge(l)}
                       </div>
                       {l.listing_images.length > 1 && (
                         <div style={{position:'absolute', bottom:'8px', right:'8px', background:'rgba(0,0,0,0.55)', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'6px'}}>+{l.listing_images.length - 1} photos</div>
@@ -366,10 +385,8 @@ export default function Home() {
                     </div>
                   ) : (
                     <div style={{padding:'12px 14px 0', display:'flex', gap:'4px'}}>
-                      <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>
-                        {l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}
-                      </span>
-                      <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>
+                      {getCardBadge(l)}
+                      {l.listing_category !== 'Job' && <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>}
                     </div>
                   )}
                   <div style={{padding:'14px'}}>
@@ -381,7 +398,7 @@ export default function Home() {
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
                       <div>
                         <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>{showCardPrice(l)}</p>
-                        <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>
+                        {l.listing_category !== 'Job' && <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>}
                       </div>
                       <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', whiteSpace:'nowrap'}}>{t.viewDetails}</div>
                     </div>
