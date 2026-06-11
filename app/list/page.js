@@ -73,7 +73,7 @@ export default function ListProperty() {
       if (form.listing_type === 'Rent' && !form.price && form.currency !== 'Contact') { setError('Please add a rental price'); return }
       if (form.listing_type === 'Sale' && !form.sale_price && form.currency !== 'Contact') { setError('Please add a sale price'); return }
     } else if (form.listing_category === 'Vehicle') {
-      if (!form.sale_price && form.currency !== 'Contact') { setError('Please add a vehicle price'); return }
+      if (!form.sale_price && form.currency !== 'Contact') { setError('Please add a price'); return }
     }
     if (!form.contact_phone) { setError('Please add a contact phone number'); return }
     setLoading(true)
@@ -83,8 +83,12 @@ export default function ListProperty() {
       setUploadProgress('Saving listing...')
       const listing = await createListing({
         ...form,
-        price: form.price ? parseInt(form.price.toString().replace(/,/g, '')) : 0,
-        sale_price: form.sale_price ? parseInt(form.sale_price.toString().replace(/,/g, '')) : null,
+        price: form.listing_category === 'Vehicle' && form.listing_type === 'Rent'
+          ? parseInt(form.sale_price?.toString().replace(/,/g, '') || '0')
+          : form.price ? parseInt(form.price.toString().replace(/,/g, '')) : 0,
+        sale_price: form.listing_category === 'Vehicle' && form.listing_type === 'Sale'
+          ? parseInt(form.sale_price?.toString().replace(/,/g, '') || '0')
+          : form.sale_price ? parseInt(form.sale_price.toString().replace(/,/g, '')) : null,
         down_payment: form.down_payment ? parseInt(form.down_payment.toString().replace(/,/g, '')) : null,
         monthly_after_down: form.monthly_after_down ? parseInt(form.monthly_after_down.toString().replace(/,/g, '')) : null,
       })
@@ -191,16 +195,16 @@ export default function ListProperty() {
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>📋 What are you listing?</div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'12px'}}>
-            <button onClick={() => setForm({...form, listing_category:'Property'})}
+            <button onClick={() => setForm({...form, listing_category:'Property', listing_type:'Rent'})}
               style={{padding:'16px', borderRadius:'12px', border: isProperty ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isProperty ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'28px', marginBottom:'6px'}}>🏠</div>
               <p style={{fontSize:'14px', fontWeight:'700', color: isProperty ? '#ea580c' : '#374151', margin:'0 0 2px'}}>Property</p>
               <p style={{fontSize:'11px', color:'#6b7280', margin:'0'}}>House, Apartment, Land</p>
             </button>
-            <button onClick={() => setForm({...form, listing_category:'Vehicle', listing_type:'Sale'})}
-              style={{padding:'16px', borderRadius:'12px', border: isVehicle ? '3px solid #166534' : '2px solid #e5e7eb', background: isVehicle ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+            <button onClick={() => setForm({...form, listing_category:'Vehicle', listing_type:'Sale', currency:'USD'})}
+              style={{padding:'16px', borderRadius:'12px', border: isVehicle ? '3px solid #7c3aed' : '2px solid #e5e7eb', background: isVehicle ? '#f5f3ff' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'28px', marginBottom:'6px'}}>🚗</div>
-              <p style={{fontSize:'14px', fontWeight:'700', color: isVehicle ? '#166534' : '#374151', margin:'0 0 2px'}}>Vehicle</p>
+              <p style={{fontSize:'14px', fontWeight:'700', color: isVehicle ? '#7c3aed' : '#374151', margin:'0 0 2px'}}>Vehicle</p>
               <p style={{fontSize:'11px', color:'#6b7280', margin:'0'}}>Car, Motorcycle, Bicycle</p>
             </button>
             <button onClick={() => setForm({...form, listing_category:'Job', listing_type:'Sale', currency:'Contact'})}
@@ -228,6 +232,27 @@ export default function ListProperty() {
                 <div style={{fontSize:'24px', marginBottom:'6px'}}>🔑</div>
                 <p style={{fontSize:'15px', fontWeight:'700', color: isSale ? '#166534' : '#374151', margin:'0 0 2px'}}>For Sale</p>
                 <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Full sale / down payment</p>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* VEHICLE LISTING TYPE */}
+        {isVehicle && (
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>🏷️ Vehicle Listing Type</div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+              <button onClick={() => setForm({...form, listing_type:'Sale'})}
+                style={{padding:'16px', borderRadius:'12px', border: isSale ? '3px solid #7c3aed' : '2px solid #e5e7eb', background: isSale ? '#f5f3ff' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+                <div style={{fontSize:'24px', marginBottom:'6px'}}>🔑</div>
+                <p style={{fontSize:'15px', fontWeight:'700', color: isSale ? '#7c3aed' : '#374151', margin:'0 0 2px'}}>For Sale</p>
+                <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Selling my vehicle</p>
+              </button>
+              <button onClick={() => setForm({...form, listing_type:'Rent'})}
+                style={{padding:'16px', borderRadius:'12px', border: isRent ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isRent ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+                <div style={{fontSize:'24px', marginBottom:'6px'}}>🔄</div>
+                <p style={{fontSize:'15px', fontWeight:'700', color: isRent ? '#ea580c' : '#374151', margin:'0 0 2px'}}>For Rent</p>
+                <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Renting my vehicle</p>
               </button>
             </div>
           </div>
@@ -319,7 +344,7 @@ export default function ListProperty() {
             </div>
             <div>
               <label style={labelStyle}>Description</label>
-              <textarea style={{...inputStyle, minHeight:'100px', resize:'vertical'}} placeholder="Describe the vehicle — features, history, reason for selling…" {...f('description')} />
+              <textarea style={{...inputStyle, minHeight:'100px', resize:'vertical'}} placeholder="Describe the vehicle — features, history, reason for selling or renting…" {...f('description')} />
             </div>
           </div>
         )}
@@ -329,8 +354,6 @@ export default function ListProperty() {
           <div style={sectionStyle}>
             <div style={sectionTitleStyle}>💼 Job Details</div>
 
-            {/* LANGUAGE TOGGLE */}
-            {/* JOB POSTING TYPE */}
             <div style={{marginBottom:'16px'}}>
               <label style={labelStyle}>I am / እኔ ነኝ</label>
               <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
@@ -348,8 +371,9 @@ export default function ListProperty() {
                 </button>
               </div>
             </div>
+
             <div style={{marginBottom:'16px'}}>
-              <label style={labelStyle}>Post Language / የማስታወቂያ ቋንቋ</label>
+              <label style={labelStyle}>Post Language / የልጥፍ ቋንቋ</label>
               <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
                 {[
                   {value:'English', label:'🇺🇸 English Only'},
@@ -378,10 +402,10 @@ export default function ListProperty() {
                   <option value="Contract">Contract / ኮንትራት</option>
                   <option value="Day Job">Day Job / የቀን ስራ</option>
                   <option value="Household Assistant">Household Assistant / የቤት ሰራተኛ</option>
-                  <option value="Home Care">Home Care / የቤት ፅዳት</option>
-                  <option value="Nanny">Nanny /የሕፃናት እንክብካቤ </option>
+                  <option value="Home Care">Home Care / የቤት እንክብካቤ</option>
+                  <option value="Nanny">Nanny / አያሪ</option>
                   <option value="Driver">Driver / ሹፌር</option>
-                  <option value="Security">Security / ጠባቂ/ዘበኛ</option>
+                  <option value="Security">Security / ጠባቂ</option>
                   <option value="Other">Other / ሌላ</option>
                 </select>
               </div>
@@ -416,7 +440,7 @@ export default function ListProperty() {
           </div>
         )}
 
-        {/* PRICING — hide for jobs */}
+        {/* PRICING */}
         {!isJob && (
           <div style={sectionStyle}>
             <div style={sectionTitleStyle}>💰 Pricing</div>
@@ -432,6 +456,7 @@ export default function ListProperty() {
               </div>
             </div>
 
+            {/* PROPERTY RENT PRICING */}
             {isProperty && isRent && !isContact && (
               <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
                 <div>
@@ -450,36 +475,65 @@ export default function ListProperty() {
               </div>
             )}
 
-            {(isVehicle || (isProperty && isSale)) && !isContact && (
+            {/* PROPERTY SALE PRICING */}
+            {isProperty && isSale && !isContact && (
               <div>
                 <div style={{marginBottom:'14px'}}>
-                  <label style={labelStyle}>{isVehicle ? 'Vehicle Price *' : 'Total Sale Price *'}</label>
+                  <label style={labelStyle}>Total Sale Price *</label>
                   <input style={inputStyle} type="text" inputMode="numeric"
-                    placeholder={form.currency === 'ETB' ? 'e.g. 1,200,000' : 'e.g. 25,000'}
+                    placeholder={form.currency === 'ETB' ? 'e.g. 5,000,000' : 'e.g. 250,000'}
                     value={formatNumber(form.sale_price)}
                     onChange={e => handlePriceChange('sale_price', e.target.value)} />
                 </div>
-                {isProperty && (
-                  <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
-                    <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
-                    <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
-                      <div>
-                        <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
-                        <input style={inputStyle} type="text" inputMode="numeric"
-                          placeholder={form.currency === 'ETB' ? 'e.g. 500,000' : 'e.g. 50,000'}
-                          value={formatNumber(form.down_payment)}
-                          onChange={e => handlePriceChange('down_payment', e.target.value)} />
-                      </div>
-                      <div>
-                        <label style={{...labelStyle, color:'#166534'}}>Monthly After Down</label>
-                        <input style={inputStyle} type="text" inputMode="numeric"
-                          placeholder={form.currency === 'ETB' ? 'e.g. 20,000' : 'e.g. 1,500'}
-                          value={formatNumber(form.monthly_after_down)}
-                          onChange={e => handlePriceChange('monthly_after_down', e.target.value)} />
-                      </div>
+                <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
+                  <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
+                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+                    <div>
+                      <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
+                      <input style={inputStyle} type="text" inputMode="numeric"
+                        placeholder={form.currency === 'ETB' ? 'e.g. 500,000' : 'e.g. 50,000'}
+                        value={formatNumber(form.down_payment)}
+                        onChange={e => handlePriceChange('down_payment', e.target.value)} />
+                    </div>
+                    <div>
+                      <label style={{...labelStyle, color:'#166534'}}>Monthly After Down</label>
+                      <input style={inputStyle} type="text" inputMode="numeric"
+                        placeholder={form.currency === 'ETB' ? 'e.g. 20,000' : 'e.g. 1,500'}
+                        value={formatNumber(form.monthly_after_down)}
+                        onChange={e => handlePriceChange('monthly_after_down', e.target.value)} />
                     </div>
                   </div>
-                )}
+                </div>
+              </div>
+            )}
+
+            {/* VEHICLE SALE PRICING */}
+            {isVehicle && isSale && !isContact && (
+              <div style={{marginBottom:'14px'}}>
+                <label style={labelStyle}>Vehicle Sale Price *</label>
+                <input style={inputStyle} type="text" inputMode="numeric"
+                  placeholder={form.currency === 'ETB' ? 'e.g. 1,200,000' : 'e.g. 25,000'}
+                  value={formatNumber(form.sale_price)}
+                  onChange={e => handlePriceChange('sale_price', e.target.value)} />
+              </div>
+            )}
+
+            {/* VEHICLE RENT PRICING */}
+            {isVehicle && isRent && !isContact && (
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+                <div>
+                  <label style={labelStyle}>Rental Price *</label>
+                  <input style={inputStyle} type="text" inputMode="numeric"
+                    placeholder={form.currency === 'ETB' ? 'e.g. 2,000' : 'e.g. 80'}
+                    value={formatNumber(form.price)}
+                    onChange={e => handlePriceChange('price', e.target.value)} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Rental Period</label>
+                  <select style={inputStyle} {...f('price_period')}>
+                    {['Per Day','Per Week','Per Month'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
               </div>
             )}
 
@@ -547,7 +601,7 @@ export default function ListProperty() {
             onMouseLeave={e => { e.currentTarget.style.borderColor='#d1d5db'; e.currentTarget.style.background='#f9fafb' }}>
             <div style={{fontSize:'40px', marginBottom:'10px'}}>📁</div>
             <p style={{fontSize:'15px', fontWeight:'700', color:'#374151', margin:'0 0 6px'}}>Click to upload photos</p>
-            <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>JPG, PNG, WEBP</p>
+            <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>JPG, PNG, WEBP · MP4 (max 30 sec)</p>
             <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" onChange={handleFileChange} style={{display:'none'}} />
           </div>
           {previews.length > 0 && (
@@ -619,5 +673,3 @@ export default function ListProperty() {
     </div>
   )
 }
-
-
