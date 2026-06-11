@@ -70,8 +70,12 @@ export default function Terms() {
             content: 'Your use of the Site is also governed by our Privacy Policy, which is incorporated into these Terms of Service by reference. Please review our Privacy Policy to understand our practices.'
           },
           {
-            title: '10. Contact',
-            content: 'If you have any questions about these Terms of Service, please contact us at info@enjerapresslist.com.'
+            title: '10. Job Listings Policy',
+            content: 'Job listings must be for real, legitimate employment opportunities. Employers must not post fraudulent, misleading, or exploitative job offers. Job seekers must provide accurate information about their skills and experience. EnjeraPressList.Com serves solely as a platform connecting employers and job seekers and bears no responsibility whatsoever for any harm, injury, wage disputes, harassment, discrimination, or any other claims of any nature arising from employment relationships formed through this platform. We do not conduct background checks, verify credentials, or screen employers or job seekers in any way. All employment arrangements are entered into solely at the risk of the parties involved. Users are strongly encouraged to exercise their own due diligence, verify all job opportunities independently, and take all necessary precautions before accepting any offer or entering any working arrangement.'
+          },
+          {
+            title: '11. Contact',
+            content: 'If you have any questions about these Terms of Service, please contact us by clicking on contact us.'
           },
         ].map((section, i) => (
           <div key={i} style={{background:'#ffffff', borderRadius:'16px', padding:'24px', border:'1px solid #e5e7eb', marginBottom:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
@@ -98,3 +102,4 @@ export default function Terms() {
     </div>
   )
 }
+
