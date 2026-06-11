@@ -11,6 +11,7 @@ export default function ListProperty() {
     bedrooms:'1 bedroom', bathrooms:'1 bathroom', description:'',
     address:'', city:'', state:'', zip:'', neighborhood:'',
     vehicle_make:'', vehicle_model:'', vehicle_year:'', vehicle_mileage:'', vehicle_condition:'Good',
+    job_type:'Full Time', job_employment_type:'Full Time', job_company:'', job_salary:'', job_experience:'Any', job_language:'Both',
     contact_name:'', contact_email:'', contact_phone:'',
     contact_method:'Email', available_from:''
   })
@@ -71,8 +72,8 @@ export default function ListProperty() {
     if (form.listing_category === 'Property') {
       if (form.listing_type === 'Rent' && !form.price && form.currency !== 'Contact') { setError('Please add a rental price'); return }
       if (form.listing_type === 'Sale' && !form.sale_price && form.currency !== 'Contact') { setError('Please add a sale price'); return }
-    } else {
-      if (!form.sale_price && form.currency !== 'Contact') { setError('Please add a price'); return }
+    } else if (form.listing_category === 'Vehicle') {
+      if (!form.sale_price && form.currency !== 'Contact') { setError('Please add a vehicle price'); return }
     }
     if (!form.contact_phone) { setError('Please add a contact phone number'); return }
     setLoading(true)
@@ -135,6 +136,7 @@ export default function ListProperty() {
 
   const isProperty = form.listing_category === 'Property'
   const isVehicle = form.listing_category === 'Vehicle'
+  const isJob = form.listing_category === 'Job'
   const isRent = form.listing_type === 'Rent'
   const isSale = form.listing_type === 'Sale'
   const isContact = form.currency === 'Contact'
@@ -188,18 +190,24 @@ export default function ListProperty() {
         {/* LISTING CATEGORY */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>📋 What are you listing?</div>
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'12px'}}>
             <button onClick={() => setForm({...form, listing_category:'Property'})}
               style={{padding:'16px', borderRadius:'12px', border: isProperty ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isProperty ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'28px', marginBottom:'6px'}}>🏠</div>
-              <p style={{fontSize:'15px', fontWeight:'700', color: isProperty ? '#ea580c' : '#374151', margin:'0 0 2px'}}>Property</p>
-              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>House, Apartment, Villa, Land</p>
+              <p style={{fontSize:'14px', fontWeight:'700', color: isProperty ? '#ea580c' : '#374151', margin:'0 0 2px'}}>Property</p>
+              <p style={{fontSize:'11px', color:'#6b7280', margin:'0'}}>House, Apartment, Land</p>
             </button>
             <button onClick={() => setForm({...form, listing_category:'Vehicle', listing_type:'Sale'})}
               style={{padding:'16px', borderRadius:'12px', border: isVehicle ? '3px solid #166534' : '2px solid #e5e7eb', background: isVehicle ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
               <div style={{fontSize:'28px', marginBottom:'6px'}}>🚗</div>
-              <p style={{fontSize:'15px', fontWeight:'700', color: isVehicle ? '#166534' : '#374151', margin:'0 0 2px'}}>Vehicle</p>
-              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Car, Motorcycle, Bicycle</p>
+              <p style={{fontSize:'14px', fontWeight:'700', color: isVehicle ? '#166534' : '#374151', margin:'0 0 2px'}}>Vehicle</p>
+              <p style={{fontSize:'11px', color:'#6b7280', margin:'0'}}>Car, Motorcycle, Bicycle</p>
+            </button>
+            <button onClick={() => setForm({...form, listing_category:'Job', listing_type:'Sale', currency:'Contact'})}
+              style={{padding:'16px', borderRadius:'12px', border: isJob ? '3px solid #1877F2' : '2px solid #e5e7eb', background: isJob ? '#eff6ff' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+              <div style={{fontSize:'28px', marginBottom:'6px'}}>💼</div>
+              <p style={{fontSize:'14px', fontWeight:'700', color: isJob ? '#1877F2' : '#374151', margin:'0 0 2px'}}>Job</p>
+              <p style={{fontSize:'11px', color:'#6b7280', margin:'0'}}>Full time, Part time, Contract</p>
             </button>
           </div>
         </div>
@@ -316,89 +324,165 @@ export default function ListProperty() {
           </div>
         )}
 
-        {/* PRICING */}
-        <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>💰 Pricing</div>
-          <div style={{marginBottom:'16px'}}>
-            <label style={labelStyle}>Currency</label>
-            <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
-              {['USD','ETB','Contact'].map(c => (
-                <button key={c} onClick={() => setForm({...form, currency:c})}
-                  style={{padding:'8px 16px', borderRadius:'8px', border: form.currency === c ? '2px solid #ea580c' : '2px solid #e5e7eb', background: form.currency === c ? '#fff7ed' : '#f9fafb', color: form.currency === c ? '#ea580c' : '#374151', fontWeight:'700', fontSize:'13px', cursor:'pointer'}}>
-                  {c === 'USD' ? '$ USD' : c === 'ETB' ? '🇪🇹 ETB ብር' : '📞 Contact for price'}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* JOB DETAILS */}
+        {isJob && (
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>💼 Job Details</div>
 
-          {isProperty && isRent && !isContact && (
+            {/* LANGUAGE TOGGLE */}
+            <div style={{marginBottom:'16px'}}>
+              <label style={labelStyle}>Post Language / የልጥፍ ቋንቋ</label>
+              <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+                {[
+                  {value:'English', label:'🇺🇸 English Only'},
+                  {value:'Amharic', label:'🇪🇹 አማርኛ Only'},
+                  {value:'Both', label:'🌍 Both / ሁለቱም'}
+                ].map(l => (
+                  <button key={l.value} onClick={() => setForm({...form, job_language:l.value})}
+                    style={{padding:'8px 14px', borderRadius:'8px', border: form.job_language === l.value ? '2px solid #1877F2' : '2px solid #e5e7eb', background: form.job_language === l.value ? '#eff6ff' : '#f9fafb', color: form.job_language === l.value ? '#1877F2' : '#374151', fontWeight:'700', fontSize:'12px', cursor:'pointer'}}>
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{marginBottom:'14px'}}>
+              <label style={labelStyle}>Job Title * / የስራ ርዕስ</label>
+              <input style={inputStyle} placeholder="e.g. House Cleaner / የቤት ሰራተኛ ያስፈልጋል" {...f('title')} />
+            </div>
+
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
               <div>
-                <label style={labelStyle}>Rental Price *</label>
-                <input style={inputStyle} type="text" inputMode="numeric"
-                  placeholder={form.currency === 'ETB' ? 'e.g. 15,000' : 'e.g. 1,800'}
-                  value={formatNumber(form.price)}
-                  onChange={e => handlePriceChange('price', e.target.value)} />
+                <label style={labelStyle}>Job Type / የስራ አይነት</label>
+                <select style={inputStyle} {...f('job_type')}>
+                  <option value="Full Time">Full Time / ሙሉ ጊዜ</option>
+                  <option value="Part Time">Part Time / ግማሽ ጊዜ</option>
+                  <option value="Contract">Contract / ኮንትራት</option>
+                  <option value="Day Job">Day Job / የቀን ስራ</option>
+                  <option value="Household Assistant">Household Assistant / የቤት ሰራተኛ</option>
+                  <option value="Home Care">Home Care / የቤት እንክብካቤ</option>
+                  <option value="Nanny">Nanny / አያሪ</option>
+                  <option value="Driver">Driver / ሹፌር</option>
+                  <option value="Security">Security / ጠባቂ</option>
+                  <option value="Other">Other / ሌላ</option>
+                </select>
               </div>
               <div>
-                <label style={labelStyle}>Price Period</label>
-                <select style={inputStyle} {...f('price_period')}>
-                  {['Per Month','Per Day','Per Year','Per Week'].map(t => <option key={t}>{t}</option>)}
+                <label style={labelStyle}>Experience / ልምድ</label>
+                <select style={inputStyle} {...f('job_experience')}>
+                  <option value="Any">Any / ማንኛውም</option>
+                  <option value="No Experience">No Experience / ልምድ አያስፈልግም</option>
+                  <option value="1+ Years">1+ Years / 1+ አመት</option>
+                  <option value="2+ Years">2+ Years / 2+ አመት</option>
+                  <option value="5+ Years">5+ Years / 5+ አመት</option>
                 </select>
               </div>
             </div>
-          )}
 
-          {(isVehicle || (isProperty && isSale)) && !isContact && (
-            <div>
-              <div style={{marginBottom:'14px'}}>
-                <label style={labelStyle}>{isVehicle ? 'Vehicle Price *' : 'Total Sale Price *'}</label>
-                <input style={inputStyle} type="text" inputMode="numeric"
-                  placeholder={form.currency === 'ETB' ? 'e.g. 1,200,000' : 'e.g. 25,000'}
-                  value={formatNumber(form.sale_price)}
-                  onChange={e => handlePriceChange('sale_price', e.target.value)} />
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+              <div>
+                <label style={labelStyle}>Company / ድርጅት (optional)</label>
+                <input style={inputStyle} placeholder="e.g. Family Home / ቤተሰብ" {...f('job_company')} />
               </div>
-              {isProperty && (
-                <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
-                  <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
-                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
-                    <div>
-                      <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
-                      <input style={inputStyle} type="text" inputMode="numeric"
-                        placeholder={form.currency === 'ETB' ? 'e.g. 500,000' : 'e.g. 50,000'}
-                        value={formatNumber(form.down_payment)}
-                        onChange={e => handlePriceChange('down_payment', e.target.value)} />
-                    </div>
-                    <div>
-                      <label style={{...labelStyle, color:'#166634'}}>Monthly After Down</label>
-                      <input style={inputStyle} type="text" inputMode="numeric"
-                        placeholder={form.currency === 'ETB' ? 'e.g. 20,000' : 'e.g. 1,500'}
-                        value={formatNumber(form.monthly_after_down)}
-                        onChange={e => handlePriceChange('monthly_after_down', e.target.value)} />
+              <div>
+                <label style={labelStyle}>Salary / ደሞዝ (optional)</label>
+                <input style={inputStyle} placeholder="e.g. $500/mo or 15,000 ETB" {...f('job_salary')} />
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Job Description * / የስራ ዝርዝር</label>
+              <textarea style={{...inputStyle, minHeight:'120px', resize:'vertical'}}
+                placeholder="Describe the job — duties, requirements, schedule, benefits...&#10;&#10;የስራ ዝርዝር ያስገቡ — ተግባራት፣ መስፈርቶች፣ የስራ ሰዓት…" {...f('description')} />
+            </div>
+          </div>
+        )}
+
+        {/* PRICING — hide for jobs */}
+        {!isJob && (
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>💰 Pricing</div>
+            <div style={{marginBottom:'16px'}}>
+              <label style={labelStyle}>Currency</label>
+              <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+                {['USD','ETB','Contact'].map(c => (
+                  <button key={c} onClick={() => setForm({...form, currency:c})}
+                    style={{padding:'8px 16px', borderRadius:'8px', border: form.currency === c ? '2px solid #ea580c' : '2px solid #e5e7eb', background: form.currency === c ? '#fff7ed' : '#f9fafb', color: form.currency === c ? '#ea580c' : '#374151', fontWeight:'700', fontSize:'13px', cursor:'pointer'}}>
+                    {c === 'USD' ? '$ USD' : c === 'ETB' ? '🇪🇹 ETB ብር' : '📞 Contact for price'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {isProperty && isRent && !isContact && (
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+                <div>
+                  <label style={labelStyle}>Rental Price *</label>
+                  <input style={inputStyle} type="text" inputMode="numeric"
+                    placeholder={form.currency === 'ETB' ? 'e.g. 15,000' : 'e.g. 1,800'}
+                    value={formatNumber(form.price)}
+                    onChange={e => handlePriceChange('price', e.target.value)} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Price Period</label>
+                  <select style={inputStyle} {...f('price_period')}>
+                    {['Per Month','Per Day','Per Year','Per Week'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {(isVehicle || (isProperty && isSale)) && !isContact && (
+              <div>
+                <div style={{marginBottom:'14px'}}>
+                  <label style={labelStyle}>{isVehicle ? 'Vehicle Price *' : 'Total Sale Price *'}</label>
+                  <input style={inputStyle} type="text" inputMode="numeric"
+                    placeholder={form.currency === 'ETB' ? 'e.g. 1,200,000' : 'e.g. 25,000'}
+                    value={formatNumber(form.sale_price)}
+                    onChange={e => handlePriceChange('sale_price', e.target.value)} />
+                </div>
+                {isProperty && (
+                  <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
+                    <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
+                    <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+                      <div>
+                        <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
+                        <input style={inputStyle} type="text" inputMode="numeric"
+                          placeholder={form.currency === 'ETB' ? 'e.g. 500,000' : 'e.g. 50,000'}
+                          value={formatNumber(form.down_payment)}
+                          onChange={e => handlePriceChange('down_payment', e.target.value)} />
+                      </div>
+                      <div>
+                        <label style={{...labelStyle, color:'#166534'}}>Monthly After Down</label>
+                        <input style={inputStyle} type="text" inputMode="numeric"
+                          placeholder={form.currency === 'ETB' ? 'e.g. 20,000' : 'e.g. 1,500'}
+                          value={formatNumber(form.monthly_after_down)}
+                          onChange={e => handlePriceChange('monthly_after_down', e.target.value)} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
 
-          {isContact && (
-            <div style={{background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:'10px', padding:'14px'}}>
-              <p style={{fontSize:'13px', color:'#92400e', margin:'0', fontWeight:'600'}}>📞 Price will be hidden — buyers will contact you directly.</p>
-            </div>
-          )}
-        </div>
+            {isContact && (
+              <div style={{background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:'10px', padding:'14px'}}>
+                <p style={{fontSize:'13px', color:'#92400e', margin:'0', fontWeight:'600'}}>📞 Price will be hidden — buyers will contact you directly.</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* LOCATION */}
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>📍 Location</div>
+          <div style={sectionTitleStyle}>📍 Location {isJob ? '/ አካባቢ' : ''}</div>
           <div style={{marginBottom:'14px'}}>
-            <label style={labelStyle}>Street Address</label>
-            <input style={inputStyle} placeholder="e.g. Bole Road, House No. 123" {...f('address')} />
+            <label style={labelStyle}>Street Address {isJob ? '(optional)' : ''}</label>
+            <input style={inputStyle} placeholder={isJob ? 'e.g. Bole Area / ቦሌ አካባቢ' : 'e.g. Bole Road, House No. 123'} {...f('address')} />
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
-              <label style={labelStyle}>City *</label>
+              <label style={labelStyle}>City * {isJob ? '/ ከተማ' : ''}</label>
               <input style={inputStyle} placeholder="e.g. Addis Ababa or Washington DC"
                 list="city-suggestions" {...f('city')} />
               <datalist id="city-suggestions">
@@ -407,10 +491,11 @@ export default function ListProperty() {
                 <option value="Jimma" /><option value="Adama" /><option value="Bishoftu" />
                 <option value="Washington DC" /><option value="New York, NY" /><option value="Los Angeles, CA" />
                 <option value="Dallas, TX" /><option value="Minneapolis, MN" /><option value="Atlanta, GA" />
+                <option value="Seattle, WA" /><option value="Houston, TX" /><option value="Chicago, IL" />
               </datalist>
             </div>
             <div>
-              <label style={labelStyle}>State / Region</label>
+              <label style={labelStyle}>State / Region {isJob ? '/ ክልል' : ''}</label>
               <input style={inputStyle} placeholder="e.g. Amhara, Oromia, DC, VA" {...f('state')} />
             </div>
           </div>
@@ -420,8 +505,8 @@ export default function ListProperty() {
               <input style={inputStyle} placeholder="20001" {...f('zip')} />
             </div>
             <div>
-              <label style={labelStyle}>Neighborhood / Subcity</label>
-              <input style={inputStyle} placeholder="e.g. Bole, Capitol Hill"
+              <label style={labelStyle}>Neighborhood {isJob ? '/ ሰፈር' : '/ Subcity'}</label>
+              <input style={inputStyle} placeholder={isJob ? 'e.g. Bole / ቦሌ' : 'e.g. Bole, Capitol Hill'}
                 list="neighborhood-suggestions" {...f('neighborhood')} />
               <datalist id="neighborhood-suggestions">
                 <option value="Bole" /><option value="CMC" /><option value="Megenagna" />
@@ -432,19 +517,19 @@ export default function ListProperty() {
           </div>
         </div>
 
-        {/* PHOTOS & VIDEO */}
+        {/* PHOTOS */}
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>📸 Photos & Video</div>
+          <div style={sectionTitleStyle}>📸 {isJob ? 'Photos (optional) / ፎቶ' : 'Photos & Video'}</div>
           <p style={{fontSize:'13px', color:'#6b7280', marginBottom:'16px', lineHeight:'1.6'}}>
-            Upload up to <strong>4 photos</strong> and <strong>1 video</strong>. Listings with photos get 3x more inquiries.
+            {isJob ? 'Add a company logo or job-related photo (optional)' : 'Upload up to 4 photos and 1 video. Listings with photos get 3x more inquiries.'}
           </p>
           <div onClick={() => fileInputRef.current.click()}
             style={{border:'2px dashed #d1d5db', borderRadius:'12px', padding:'36px 24px', textAlign:'center', cursor:'pointer', background:'#f9fafb', marginBottom:'16px'}}
             onMouseEnter={e => { e.currentTarget.style.borderColor='#ea580c'; e.currentTarget.style.background='#fff7ed' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor='#d1d5db'; e.currentTarget.style.background='#f9fafb' }}>
             <div style={{fontSize:'40px', marginBottom:'10px'}}>📁</div>
-            <p style={{fontSize:'15px', fontWeight:'700', color:'#374151', margin:'0 0 6px'}}>Click to upload photos or video</p>
-            <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>JPG, PNG, WEBP · MP4 (max 30 sec)</p>
+            <p style={{fontSize:'15px', fontWeight:'700', color:'#374151', margin:'0 0 6px'}}>Click to upload photos</p>
+            <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>JPG, PNG, WEBP</p>
             <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" onChange={handleFileChange} style={{display:'none'}} />
           </div>
           {previews.length > 0 && (
@@ -468,13 +553,13 @@ export default function ListProperty() {
 
         {/* CONTACT */}
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>📞 Contact Information</div>
+          <div style={sectionTitleStyle}>📞 Contact {isJob ? '/ አድራሻ' : 'Information'}</div>
           <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'12px 14px', marginBottom:'16px'}}>
             <p style={{fontSize:'13px', color:'#166534', margin:'0', fontWeight:'600'}}>🔒 Your registered email is automatically used as your contact email.</p>
           </div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
-              <label style={labelStyle}>Your Name *</label>
+              <label style={labelStyle}>Your Name * {isJob ? '/ ስምዎ' : ''}</label>
               <input style={inputStyle} placeholder="Jane Smith" {...f('contact_name')} />
             </div>
             <div>
@@ -494,10 +579,12 @@ export default function ListProperty() {
               <input style={inputStyle} type="tel" placeholder="+1 (555) 000-0000" {...f('contact_phone')} />
             </div>
           </div>
-          <div>
-            <label style={labelStyle}>Available From</label>
-            <input style={{...inputStyle, width:'auto'}} type="date" {...f('available_from')} />
-          </div>
+          {!isJob && (
+            <div>
+              <label style={labelStyle}>Available From</label>
+              <input style={{...inputStyle, width:'auto'}} type="date" {...f('available_from')} />
+            </div>
+          )}
         </div>
 
         {uploadProgress && (
