@@ -378,10 +378,10 @@ export default function ListProperty() {
                   <option value="Contract">Contract / ኮንትራት</option>
                   <option value="Day Job">Day Job / የቀን ስራ</option>
                   <option value="Household Assistant">Household Assistant / የቤት ሰራተኛ</option>
-                  <option value="Home Care">Home Care / የቤት እንክብካቤ</option>
-                  <option value="Nanny">Nanny / አያሪ</option>
+                  <option value="Home Care">Home Care / የቤት ፅዳት</option>
+                  <option value="Nanny">Nanny /የሕፃናት እንክብካቤ </option>
                   <option value="Driver">Driver / ሹፌር</option>
-                  <option value="Security">Security / ጠባቂ</option>
+                  <option value="Security">Security / ጠባቂ/ዘበኛ</option>
                   <option value="Other">Other / ሌላ</option>
                 </select>
               </div>
@@ -619,4 +619,5 @@ export default function ListProperty() {
     </div>
   )
 }
+
 
