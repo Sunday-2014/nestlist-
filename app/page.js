@@ -91,7 +91,10 @@ export default function Home() {
   const [lang, setLang] = useState('en')
   const [menuOpen, setMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [jobsOpen, setJobsOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('listings') // 'listings' or 'jobs'
+  const [jobFilter, setJobFilter] = useState('') // '' | 'Looking for Work' | 'Hiring'
+  const [jobTypeFilter, setJobTypeFilter] = useState('')
+  const [jobSearch, setJobSearch] = useState('')
 
   const t = translations[lang]
 
@@ -107,7 +110,7 @@ export default function Home() {
         return 0
       })
       setListings(sorted)
-      setFiltered(sorted)
+      setFiltered(sorted.filter(l => l.listing_category !== 'Job'))
       setLoading(false)
     }).catch(() => setLoading(false))
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -122,9 +125,8 @@ export default function Home() {
     localStorage.setItem('enjera_lang', newLang)
   }
 
-  const handleSearch = (overrideType) => {
-    const activeType = overrideType !== undefined ? overrideType : listingType
-    let results = listings
+  const handleSearch = () => {
+    let results = listings.filter(l => l.listing_category !== 'Job')
     if (search) results = results.filter(l =>
       l.title?.toLowerCase().includes(search.toLowerCase()) ||
       l.city?.toLowerCase().includes(search.toLowerCase()) ||
@@ -132,12 +134,20 @@ export default function Home() {
     )
     if (type) results = results.filter(l => l.property_type === type)
     if (maxPrice) results = results.filter(l => (l.price || l.sale_price) <= parseInt(maxPrice))
-    if (activeType === 'Looking for Work' || activeType === 'Hiring') {
-      results = results.filter(l => l.job_employment_type === activeType)
-    } else if (activeType) {
-      results = results.filter(l => (l.listing_type || 'Rent') === activeType)
-    }
+    if (listingType) results = results.filter(l => (l.listing_type || 'Rent') === listingType)
     setFiltered(results)
+  }
+
+  const getJobListings = () => {
+    let results = listings.filter(l => l.listing_category === 'Job')
+    if (jobFilter) results = results.filter(l => l.job_employment_type === jobFilter)
+    if (jobTypeFilter) results = results.filter(l => l.job_type === jobTypeFilter)
+    if (jobSearch) results = results.filter(l =>
+      l.title?.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      l.city?.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      l.description?.toLowerCase().includes(jobSearch.toLowerCase())
+    )
+    return results
   }
 
   const handleKeyDown = (e) => {
@@ -163,6 +173,53 @@ export default function Home() {
     if (l.listing_category === 'Vehicle') return <span style={{background:'#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>🚗 Vehicle</span>
     return <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}</span>
   }
+
+  const jobListings = getJobListings()
+
+  const ListingCard = ({l}) => (
+    <Link key={l.id} href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
+      <div style={{background:'#ffffff', borderRadius:'16px', border: l.is_featured && new Date(l.featured_until) > new Date() ? '2px solid #d97706' : '1px solid #e5e7eb', overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s', boxShadow: l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)', height:'100%'}}
+        onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow= l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)' }}
+      >
+        {l.is_featured && new Date(l.featured_until) > new Date() && (
+          <div style={{background:'linear-gradient(90deg, #d97706, #f59e0b)', padding:'4px 12px', textAlign:'center'}}>
+            <span style={{fontSize:'11px', fontWeight:'700', color:'#ffffff'}}>⭐ Featured Listing</span>
+          </div>
+        )}
+        {l.listing_images && l.listing_images.length > 0 ? (
+          <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
+            <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
+            <div style={{position:'absolute', top:'12px', left:'12px', display:'flex', gap:'4px'}}>
+              {getCardBadge(l)}
+            </div>
+            {l.listing_images.length > 1 && (
+              <div style={{position:'absolute', bottom:'8px', right:'8px', background:'rgba(0,0,0,0.55)', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'6px'}}>+{l.listing_images.length - 1} photos</div>
+            )}
+          </div>
+        ) : (
+          <div style={{padding:'12px 14px 0', display:'flex', gap:'4px'}}>
+            {getCardBadge(l)}
+            {l.listing_category !== 'Job' && <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>}
+          </div>
+        )}
+        <div style={{padding:'14px'}}>
+          <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 6px', lineHeight:'1.4'}}>{l.title}</p>
+          <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 6px', fontWeight:'500'}}>📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}</p>
+          {l.description && !l.listing_images?.length && (
+            <p style={{fontSize:'12px', color:'#9ca3af', margin:'0 0 10px', lineHeight:'1.5', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden'}}>{l.description}</p>
+          )}
+          <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
+            <div>
+              <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>{showCardPrice(l)}</p>
+              {l.listing_category !== 'Job' && <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>}
+            </div>
+            <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', whiteSpace:'nowrap'}}>{t.viewDetails}</div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
 
   return (
     <div style={{minHeight:'100vh', background:'#f8fafc', fontFamily:'system-ui, -apple-system, sans-serif', margin:0, padding:0, overflowX:'hidden'}}>
@@ -229,7 +286,6 @@ export default function Home() {
       <div style={{background:'linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)', borderBottom:'1px solid #fdba74', width:'100%', boxSizing:'border-box'}}>
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'32px 16px 28px', textAlign:'center'}}>
           <div style={{display:'inline-block', background:'#ea580c', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'4px 14px', borderRadius:'99px', marginBottom:'8px', letterSpacing:'0.08em', textTransform:'uppercase'}}>{t.badge}</div>
-
           <LiveClock />
 
           {!isMobile ? (
@@ -250,56 +306,58 @@ export default function Home() {
 
           <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>{t.heroSubtitle}</p>
 
-          {/* SEARCH BOX */}
-          <div style={{background:'#ffffff', borderRadius:'16px', padding:'12px', maxWidth:'780px', margin:'0 auto', boxShadow:'0 4px 24px rgba(0,0,0,0.10)', border:'1px solid #e5e7eb', boxSizing:'border-box'}}>
-            <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
-              <input
-                style={{width:'100%', padding:'12px 16px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'14px', color:'#111827', outline:'none', background:'#f9fafb', fontWeight:'500', boxSizing:'border-box'}}
-                placeholder={t.searchPlaceholder}
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-              <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
-                <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={listingType} onChange={e => setListingType(e.target.value)}>
-                  <option value="">🏠 All listings</option>
-                  <option value="Rent">🏠 For Rent</option>
-                  <option value="Sale">🔑 For Sale</option>
-                </select>
-                <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={type} onChange={e => setType(e.target.value)}>
-                  <option value="">{t.allTypes}</option>
-                  <option value="Apartment">{t.apartment}</option>
-                  <option value="House">{t.house}</option>
-                  <option value="Studio">{t.studio}</option>
-                  <option value="Condo">{t.condo}</option>
-                  <option value="Townhouse">{t.townhouse}</option>
-                  <option value="Villa">Villa</option>
-                  <option value="Office">Office</option>
-                  <option value="Shop">Shop</option>
-                  <option value="Land">Land</option>
-                  <option value="Other">Other</option>
-                </select>
-                <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={maxPrice} onChange={e => setMaxPrice(e.target.value)}>
-                  <option value="">Any price</option>
-                  <optgroup label="$ USD">
-                    <option value="1500">Under $1,500</option>
-                    <option value="2500">Under $2,500</option>
-                    <option value="3500">Under $3,500</option>
-                    <option value="5000">Under $5,000</option>
-                    <option value="10000">Under $10,000</option>
-                  </optgroup>
-                  <optgroup label="🇪🇹 ETB">
-                    <option value="5000">Under 5,000 ETB</option>
-                    <option value="10000">Under 10,000 ETB</option>
-                    <option value="20000">Under 20,000 ETB</option>
-                    <option value="50000">Under 50,000 ETB</option>
-                    <option value="100000">Under 100,000 ETB</option>
-                  </optgroup>
-                </select>
-                <button onClick={() => handleSearch()} style={{flex:'1', minWidth:'80px', padding:'11px 20px', borderRadius:'10px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>{t.search}</button>
+          {/* SEARCH BOX — only show on listings tab */}
+          {activeTab === 'listings' && (
+            <div style={{background:'#ffffff', borderRadius:'16px', padding:'12px', maxWidth:'780px', margin:'0 auto', boxShadow:'0 4px 24px rgba(0,0,0,0.10)', border:'1px solid #e5e7eb', boxSizing:'border-box'}}>
+              <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
+                <input
+                  style={{width:'100%', padding:'12px 16px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'14px', color:'#111827', outline:'none', background:'#f9fafb', fontWeight:'500', boxSizing:'border-box'}}
+                  placeholder={t.searchPlaceholder}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <div style={{display:'flex', gap:'8px', flexWrap:'wrap'}}>
+                  <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={listingType} onChange={e => setListingType(e.target.value)}>
+                    <option value="">🏠 All listings</option>
+                    <option value="Rent">🏠 For Rent</option>
+                    <option value="Sale">🔑 For Sale</option>
+                  </select>
+                  <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={type} onChange={e => setType(e.target.value)}>
+                    <option value="">{t.allTypes}</option>
+                    <option value="Apartment">{t.apartment}</option>
+                    <option value="House">{t.house}</option>
+                    <option value="Studio">{t.studio}</option>
+                    <option value="Condo">{t.condo}</option>
+                    <option value="Townhouse">{t.townhouse}</option>
+                    <option value="Villa">Villa</option>
+                    <option value="Office">Office</option>
+                    <option value="Shop">Shop</option>
+                    <option value="Land">Land</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <select style={{flex:'1', minWidth:'120px', padding:'11px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', fontWeight:'500', outline:'none'}} value={maxPrice} onChange={e => setMaxPrice(e.target.value)}>
+                    <option value="">Any price</option>
+                    <optgroup label="$ USD">
+                      <option value="1500">Under $1,500</option>
+                      <option value="2500">Under $2,500</option>
+                      <option value="3500">Under $3,500</option>
+                      <option value="5000">Under $5,000</option>
+                      <option value="10000">Under $10,000</option>
+                    </optgroup>
+                    <optgroup label="🇪🇹 ETB">
+                      <option value="5000">Under 5,000 ETB</option>
+                      <option value="10000">Under 10,000 ETB</option>
+                      <option value="20000">Under 20,000 ETB</option>
+                      <option value="50000">Under 50,000 ETB</option>
+                      <option value="100000">Under 100,000 ETB</option>
+                    </optgroup>
+                  </select>
+                  <button onClick={handleSearch} style={{flex:'1', minWidth:'80px', padding:'11px 20px', borderRadius:'10px', background:'#ea580c', color:'#ffffff', fontSize:'14px', fontWeight:'700', border:'none', cursor:'pointer', whiteSpace:'nowrap'}}>{t.search}</button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div style={{marginTop:'16px'}}>
             <Link href="/list" style={{fontSize:'14px', fontWeight:'600', color:'#ea580c', textDecoration:'none', display:'inline-flex', alignItems:'center', gap:'6px'}}>{t.listFree}</Link>
@@ -307,108 +365,152 @@ export default function Home() {
         </div>
       </div>
 
-      {/* LISTINGS */}
-      <div style={{maxWidth:'1100px', margin:'0 auto', padding:'24px 16px 64px', boxSizing:'border-box'}}>
-        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'20px', flexWrap:'wrap', gap:'10px'}}>
-          <div>
-            <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'500'}}>{filtered.length} {filtered.length === 1 ? t.listingFound : t.listingsFound}</p>
-          </div>
+      {/* MAIN TABS */}
+      <div style={{maxWidth:'1100px', margin:'0 auto', padding:'24px 16px 0', boxSizing:'border-box'}}>
+        <div style={{display:'flex', gap:'4px', background:'#ffffff', padding:'4px', borderRadius:'12px', border:'1px solid #e5e7eb', width:'fit-content', marginBottom:'24px'}}>
+          <button onClick={() => setActiveTab('listings')}
+            style={{fontSize:'14px', fontWeight:'700', padding:'10px 24px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'listings' ? '#ea580c' : 'transparent', color: activeTab === 'listings' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            🏠 Listings
+          </button>
+          <button onClick={() => setActiveTab('jobs')}
+            style={{fontSize:'14px', fontWeight:'700', padding:'10px 24px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'jobs' ? '#1877F2' : 'transparent', color: activeTab === 'jobs' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            💼 Jobs {listings.filter(l => l.listing_category === 'Job').length > 0 && <span style={{background:'#ef4444', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'1px 6px', borderRadius:'99px', marginLeft:'6px'}}>{listings.filter(l => l.listing_category === 'Job').length}</span>}
+          </button>
+        </div>
+      </div>
 
-          <div style={{display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'center'}}>
-            {/* JOBS DROPDOWN */}
-            <div style={{position:'relative'}}>
-              <button onClick={() => setJobsOpen(!jobsOpen)}
-                style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'9px 16px', borderRadius:'10px', background:'#1877F2', border:'2px solid #1877F2', cursor:'pointer', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:'6px'}}>
-                💼 Jobs {jobsOpen ? '▲' : '▼'}
-              </button>
-              {jobsOpen && (
-                <div style={{position:'absolute', top:'110%', left:0, background:'#ffffff', borderRadius:'12px', border:'1px solid #e5e7eb', boxShadow:'0 8px 24px rgba(0,0,0,0.12)', zIndex:200, minWidth:'240px', overflow:'hidden'}}>
-                  <button
-                    onClick={() => { setListingType('Looking for Work'); setJobsOpen(false); handleSearch('Looking for Work') }}
-                    style={{width:'100%', padding:'14px 16px', textAlign:'left', background:'#ffffff', border:'none', borderBottom:'1px solid #f3f4f6', cursor:'pointer', fontSize:'13px', fontWeight:'600', color:'#374151'}}
-                    onMouseEnter={e => e.currentTarget.style.background='#eff6ff'}
-                    onMouseLeave={e => e.currentTarget.style.background='#ffffff'}
-                  >
-                    👤 Looking for Work<br/>
-                    <span style={{fontSize:'11px', color:'#6b7280', fontWeight:'400'}}>ስራ እፈልጋለሁ</span>
-                  </button>
-                  <button
-                    onClick={() => { setListingType('Hiring'); setJobsOpen(false); handleSearch('Hiring') }}
-                    style={{width:'100%', padding:'14px 16px', textAlign:'left', background:'#ffffff', border:'none', cursor:'pointer', fontSize:'13px', fontWeight:'600', color:'#374151'}}
-                    onMouseEnter={e => e.currentTarget.style.background='#f0fdf4'}
-                    onMouseLeave={e => e.currentTarget.style.background='#ffffff'}
-                  >
-                    🏢 Hiring / Employee Needed<br/>
-                    <span style={{fontSize:'11px', color:'#6b7280', fontWeight:'400'}}>ሰራተኛ ያስፈልጋል</span>
-                  </button>
-                </div>
-              )}
-            </div>
+      {/* LISTINGS TAB */}
+      {activeTab === 'listings' && (
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'0 16px 64px', boxSizing:'border-box'}}>
+          <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'20px', flexWrap:'wrap', gap:'10px'}}>
+            <p style={{fontSize:'13px', color:'#6b7280', margin:'0', fontWeight:'500'}}>{filtered.length} {filtered.length === 1 ? t.listingFound : t.listingsFound}</p>
             <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'9px 16px', borderRadius:'10px', background:'#166534', textDecoration:'none', display:'inline-block', border:'2px solid #166534', whiteSpace:'nowrap'}}>{t.addYourListing}</Link>
           </div>
-        </div>
 
-        {loading ? (
-          <div style={{textAlign:'center', padding:'80px 0'}}>
-            <div className="spinner" style={{margin:'0 auto 16px'}}></div>
-            <p style={{color:'#6b7280', fontSize:'14px'}}>Loading listings...</p>
+          {loading ? (
+            <div style={{textAlign:'center', padding:'80px 0'}}>
+              <div className="spinner" style={{margin:'0 auto 16px'}}></div>
+              <p style={{color:'#6b7280', fontSize:'14px'}}>Loading listings...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={{textAlign:'center', padding:'60px 24px', background:'#ffffff', borderRadius:'16px', border:'2px dashed #d1d5db'}}>
+              <div style={{fontSize:'48px', marginBottom:'12px'}}>🏠</div>
+              <p style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 8px'}}>{t.noListingsFound}</p>
+              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>{t.tryDifferent}</p>
+              <Link href="/list" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'12px 28px', borderRadius:'10px', background:'#ea580c', textDecoration:'none', display:'inline-block'}}>{t.listPropertyFree}</Link>
+            </div>
+          ) : (
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap:'16px'}}>
+              {filtered.map(l => <ListingCard key={l.id} l={l} />)}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* JOBS TAB */}
+      {activeTab === 'jobs' && (
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'0 16px 64px', boxSizing:'border-box'}}>
+
+          {/* JOB HEADER */}
+          <div style={{background:'linear-gradient(135deg, #eff6ff, #dbeafe)', borderRadius:'16px', padding:'24px', marginBottom:'20px', border:'1px solid #bfdbfe'}}>
+            <h2 style={{fontSize:'22px', fontWeight:'800', color:'#1e3a8a', margin:'0 0 8px'}}>💼 Jobs Board / የስራ ቦርድ</h2>
+            <p style={{fontSize:'14px', color:'#1d4ed8', margin:'0 0 16px'}}>Find jobs or post your opening — free for everyone · ለሁሉም ነፃ ነው</p>
+            <div style={{display:'flex', gap:'10px', flexWrap:'wrap'}}>
+              <Link href="/list" onClick={() => {}} style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#1877F2', textDecoration:'none', display:'inline-block'}}>
+                👤 I Need a Job / ስራ እፈልጋለሁ
+              </Link>
+              <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#166534', textDecoration:'none', display:'inline-block'}}>
+                🏢 Post a Job / ሰራተኛ ያስፈልጋሉ
+              </Link>
+            </div>
           </div>
-        ) : filtered.length === 0 ? (
-          <div style={{textAlign:'center', padding:'60px 24px', background:'#ffffff', borderRadius:'16px', border:'2px dashed #d1d5db'}}>
-            <div style={{fontSize:'48px', marginBottom:'12px'}}>🏠</div>
-            <p style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 8px'}}>{t.noListingsFound}</p>
-            <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>{t.tryDifferent}</p>
-            <Link href="/list" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'12px 28px', borderRadius:'10px', background:'#ea580c', textDecoration:'none', display:'inline-block'}}>{t.listPropertyFree}</Link>
+
+          {/* JOB FILTERS */}
+          <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', marginBottom:'20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+            <div style={{display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'center'}}>
+              <input
+                style={{flex:'2', minWidth:'160px', padding:'10px 14px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', outline:'none', background:'#f9fafb'}}
+                placeholder="Search jobs... / ስራ ፈልግ..."
+                value={jobSearch}
+                onChange={e => setJobSearch(e.target.value)}
+              />
+              <select
+                style={{flex:'1', minWidth:'160px', padding:'10px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={jobFilter}
+                onChange={e => setJobFilter(e.target.value)}
+              >
+                <option value="">👥 All Jobs</option>
+                <option value="Looking for Work">👤 Looking for Work — ስራ እፈልጋለሁ</option>
+                <option value="Hiring">🏢 Hiring — ሰራተኛ ያስፈልጋል</option>
+              </select>
+              <select
+                style={{flex:'1', minWidth:'160px', padding:'10px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={jobTypeFilter}
+                onChange={e => setJobTypeFilter(e.target.value)}
+              >
+                <option value="">🗂️ All Types</option>
+                <option value="Full Time">Full Time / ሙሉ ጊዜ</option>
+                <option value="Part Time">Part Time / ግማሽ ጊዜ</option>
+                <option value="Contract">Contract / ኮንትራት</option>
+                <option value="Day Job">Day Job / የቀን ስራ</option>
+                <option value="Household Assistant">Household Assistant / የቤት ሰራተኛ</option>
+                <option value="Home Care">Home Care / የቤት እንክብካቤ</option>
+                <option value="Nanny">Nanny / አያሪ</option>
+                <option value="Driver">Driver / ሹፌር</option>
+                <option value="Security">Security / ጠባቂ</option>
+              </select>
+            </div>
           </div>
-        ) : (
-          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap:'16px'}}>
-            {filtered.map(l => (
-              <Link key={l.id} href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
-                <div style={{background:'#ffffff', borderRadius:'16px', border: l.is_featured && new Date(l.featured_until) > new Date() ? '2px solid #d97706' : '1px solid #e5e7eb', overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s', boxShadow: l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)', height:'100%'}}
-                  onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow= l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)' }}
-                >
-                  {l.is_featured && new Date(l.featured_until) > new Date() && (
-                    <div style={{background:'linear-gradient(90deg, #d97706, #f59e0b)', padding:'4px 12px', textAlign:'center'}}>
-                      <span style={{fontSize:'11px', fontWeight:'700', color:'#ffffff'}}>⭐ Featured Listing</span>
+
+          <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>{jobListings.length} job{jobListings.length !== 1 ? 's' : ''} found</p>
+
+          {loading ? (
+            <div style={{textAlign:'center', padding:'80px 0'}}>
+              <div className="spinner" style={{margin:'0 auto 16px'}}></div>
+              <p style={{color:'#6b7280', fontSize:'14px'}}>Loading jobs...</p>
+            </div>
+          ) : jobListings.length === 0 ? (
+            <div style={{textAlign:'center', padding:'60px 24px', background:'#ffffff', borderRadius:'16px', border:'2px dashed #bfdbfe'}}>
+              <div style={{fontSize:'48px', marginBottom:'12px'}}>💼</div>
+              <p style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 8px'}}>No jobs found / ምንም ስራ አልተገኘም</p>
+              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>Be the first to post a job or add your resume!</p>
+              <Link href="/list" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'12px 28px', borderRadius:'10px', background:'#1877F2', textDecoration:'none', display:'inline-block'}}>
+                Post a Job — Free / ስራ ያስገቡ
+              </Link>
+            </div>
+          ) : (
+            <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
+              {jobListings.map(l => (
+                <Link key={l.id} href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
+                  <div style={{background:'#ffffff', borderRadius:'16px', border:'1px solid #e5e7eb', padding:'18px', boxShadow:'0 1px 4px rgba(0,0,0,0.05)', display:'flex', alignItems:'flex-start', gap:'14px', flexWrap:'wrap'}}
+                    onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.10)' }}
+                    onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.05)' }}
+                  >
+                    <div style={{width:'48px', height:'48px', borderRadius:'12px', background: l.job_employment_type === 'Hiring' ? '#f0fdf4' : '#eff6ff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'24px', flexShrink:0, border: l.job_employment_type === 'Hiring' ? '2px solid #bbf7d0' : '2px solid #bfdbfe'}}>
+                      {l.job_employment_type === 'Hiring' ? '🏢' : '👤'}
                     </div>
-                  )}
-                  {l.listing_images && l.listing_images.length > 0 ? (
-                    <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
-                      <img src={l.listing_images.sort((a,b) => a.position - b.position)[0].public_url} alt={l.title} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
-                      <div style={{position:'absolute', top:'12px', left:'12px', display:'flex', gap:'4px'}}>
-                        {getCardBadge(l)}
+                    <div style={{flex:1, minWidth:'200px'}}>
+                      <div style={{display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap', marginBottom:'6px'}}>
+                        <span style={{background: l.job_employment_type === 'Hiring' ? '#166534' : '#1877F2', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>
+                          {l.job_employment_type === 'Hiring' ? '🏢 Hiring — ሰራተኛ ያስፈልጋል' : '👤 Looking for Work — ስራ እፈልጋለሁ'}
+                        </span>
+                        {l.job_type && <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.job_type}</span>}
                       </div>
-                      {l.listing_images.length > 1 && (
-                        <div style={{position:'absolute', bottom:'8px', right:'8px', background:'rgba(0,0,0,0.55)', color:'#ffffff', fontSize:'11px', fontWeight:'700', padding:'3px 8px', borderRadius:'6px'}}>+{l.listing_images.length - 1} photos</div>
-                      )}
+                      <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 4px'}}>{l.title}</p>
+                      <p style={{fontSize:'12px', color:'#6b7280', margin:'0 0 4px'}}>📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}</p>
+                      {l.job_salary && <p style={{fontSize:'12px', color:'#166534', margin:'0', fontWeight:'600'}}>💰 {l.job_salary}</p>}
+                      {l.description && <p style={{fontSize:'12px', color:'#9ca3af', margin:'6px 0 0', lineHeight:'1.5', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden'}}>{l.description}</p>}
                     </div>
-                  ) : (
-                    <div style={{padding:'12px 14px 0', display:'flex', gap:'4px'}}>
-                      {getCardBadge(l)}
-                      {l.listing_category !== 'Job' && <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>}
-                    </div>
-                  )}
-                  <div style={{padding:'14px'}}>
-                    <p style={{fontSize:'15px', fontWeight:'700', color:'#111827', margin:'0 0 6px', lineHeight:'1.4'}}>{l.title}</p>
-                    <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 6px', fontWeight:'500'}}>📍 {l.neighborhood}{l.neighborhood && l.city ? ' · ' : ''}{l.city}</p>
-                    {l.description && !l.listing_images?.length && (
-                      <p style={{fontSize:'12px', color:'#9ca3af', margin:'0 0 10px', lineHeight:'1.5', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden'}}>{l.description}</p>
-                    )}
-                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
-                      <div>
-                        <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>{showCardPrice(l)}</p>
-                        {l.listing_category !== 'Job' && <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>}
-                      </div>
-                      <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', whiteSpace:'nowrap'}}>{t.viewDetails}</div>
+                    <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#1877F2', whiteSpace:'nowrap', alignSelf:'center'}}>
+                      View Job
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer style={{background:'#1f2937', borderTop:'3px solid #ea580c', padding:'24px 16px', textAlign:'center'}}>
