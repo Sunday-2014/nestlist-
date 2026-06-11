@@ -5,11 +5,12 @@ import Link from 'next/link'
 
 export default function ListProperty() {
   const [form, setForm] = useState({
-    title:'', property_type:'Apartment', listing_type:'Rent',
+    title:'', listing_category:'Property', property_type:'Apartment', listing_type:'Rent',
     price:'', currency:'USD', price_period:'Per Month',
     sale_price:'', down_payment:'', monthly_after_down:'',
     bedrooms:'1 bedroom', bathrooms:'1 bathroom', description:'',
     address:'', city:'', state:'', zip:'', neighborhood:'',
+    vehicle_make:'', vehicle_model:'', vehicle_year:'', vehicle_mileage:'', vehicle_condition:'Good',
     contact_name:'', contact_email:'', contact_phone:'',
     contact_method:'Email', available_from:''
   })
@@ -67,8 +68,12 @@ export default function ListProperty() {
     setError('')
     if (!form.title) { setError('Please add a title'); return }
     if (!form.city) { setError('Please add a city'); return }
-    if (form.listing_type === 'Rent' && !form.price && form.currency !== 'Contact') { setError('Please add a rental price'); return }
-    if (form.listing_type === 'Sale' && !form.sale_price && form.currency !== 'Contact') { setError('Please add a sale price'); return }
+    if (form.listing_category === 'Property') {
+      if (form.listing_type === 'Rent' && !form.price && form.currency !== 'Contact') { setError('Please add a rental price'); return }
+      if (form.listing_type === 'Sale' && !form.sale_price && form.currency !== 'Contact') { setError('Please add a sale price'); return }
+    } else {
+      if (!form.sale_price && form.currency !== 'Contact') { setError('Please add a price'); return }
+    }
     if (!form.contact_phone) { setError('Please add a contact phone number'); return }
     setLoading(true)
     try {
@@ -77,7 +82,7 @@ export default function ListProperty() {
       setUploadProgress('Saving listing...')
       const listing = await createListing({
         ...form,
-        price: form.price ? parseInt(form.price.toString().replace(/,/g, '')) : null,
+        price: form.price ? parseInt(form.price.toString().replace(/,/g, '')) : 0,
         sale_price: form.sale_price ? parseInt(form.sale_price.toString().replace(/,/g, '')) : null,
         down_payment: form.down_payment ? parseInt(form.down_payment.toString().replace(/,/g, '')) : null,
         monthly_after_down: form.monthly_after_down ? parseInt(form.monthly_after_down.toString().replace(/,/g, '')) : null,
@@ -128,6 +133,8 @@ export default function ListProperty() {
     display:'flex', alignItems:'center', gap:'8px'
   }
 
+  const isProperty = form.listing_category === 'Property'
+  const isVehicle = form.listing_category === 'Vehicle'
   const isRent = form.listing_type === 'Rent'
   const isSale = form.listing_type === 'Sale'
   const isContact = form.currency === 'Contact'
@@ -168,7 +175,7 @@ export default function ListProperty() {
 
       <div style={{maxWidth:'800px', margin:'0 auto', padding:'32px 24px 64px'}}>
         <div style={{marginBottom:'28px'}}>
-          <h1 style={{fontSize:'28px', fontWeight:'800', color:'#111827', margin:'0 0 6px'}}>List Your Property</h1>
+          <h1 style={{fontSize:'28px', fontWeight:'800', color:'#111827', margin:'0 0 6px'}}>Create New Listing</h1>
           <p style={{fontSize:'15px', color:'#6b7280', margin:'0'}}>Fill in the details below. Your listing will be live immediately — 100% free.</p>
         </div>
 
@@ -178,59 +185,136 @@ export default function ListProperty() {
           </div>
         )}
 
-        {/* LISTING TYPE */}
+        {/* LISTING CATEGORY */}
         <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>🏷️ Listing Type</div>
+          <div style={sectionTitleStyle}>📋 What are you listing?</div>
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
-            <button onClick={() => setForm({...form, listing_type:'Rent'})}
-              style={{padding:'16px', borderRadius:'12px', border: isRent ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isRent ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
-              <div style={{fontSize:'24px', marginBottom:'6px'}}>🏠</div>
-              <p style={{fontSize:'15px', fontWeight:'700', color: isRent ? '#ea580c' : '#374151', margin:'0 0 2px'}}>For Rent</p>
-              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Monthly / Daily / Yearly rental</p>
+            <button onClick={() => setForm({...form, listing_category:'Property'})}
+              style={{padding:'16px', borderRadius:'12px', border: isProperty ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isProperty ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+              <div style={{fontSize:'28px', marginBottom:'6px'}}>🏠</div>
+              <p style={{fontSize:'15px', fontWeight:'700', color: isProperty ? '#ea580c' : '#374151', margin:'0 0 2px'}}>Property</p>
+              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>House, Apartment, Villa, Land</p>
             </button>
-            <button onClick={() => setForm({...form, listing_type:'Sale'})}
-              style={{padding:'16px', borderRadius:'12px', border: isSale ? '3px solid #166534' : '2px solid #e5e7eb', background: isSale ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
-              <div style={{fontSize:'24px', marginBottom:'6px'}}>🔑</div>
-              <p style={{fontSize:'15px', fontWeight:'700', color: isSale ? '#166534' : '#374151', margin:'0 0 2px'}}>For Sale</p>
-              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Full sale / down payment</p>
+            <button onClick={() => setForm({...form, listing_category:'Vehicle', listing_type:'Sale'})}
+              style={{padding:'16px', borderRadius:'12px', border: isVehicle ? '3px solid #166534' : '2px solid #e5e7eb', background: isVehicle ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+              <div style={{fontSize:'28px', marginBottom:'6px'}}>🚗</div>
+              <p style={{fontSize:'15px', fontWeight:'700', color: isVehicle ? '#166534' : '#374151', margin:'0 0 2px'}}>Vehicle</p>
+              <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Car, Motorcycle, Bicycle</p>
             </button>
           </div>
         </div>
 
+        {/* PROPERTY LISTING TYPE */}
+        {isProperty && (
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>🏷️ Listing Type</div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+              <button onClick={() => setForm({...form, listing_type:'Rent'})}
+                style={{padding:'16px', borderRadius:'12px', border: isRent ? '3px solid #ea580c' : '2px solid #e5e7eb', background: isRent ? '#fff7ed' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+                <div style={{fontSize:'24px', marginBottom:'6px'}}>🏠</div>
+                <p style={{fontSize:'15px', fontWeight:'700', color: isRent ? '#ea580c' : '#374151', margin:'0 0 2px'}}>For Rent</p>
+                <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Monthly / Daily / Yearly</p>
+              </button>
+              <button onClick={() => setForm({...form, listing_type:'Sale'})}
+                style={{padding:'16px', borderRadius:'12px', border: isSale ? '3px solid #166534' : '2px solid #e5e7eb', background: isSale ? '#f0fdf4' : '#f9fafb', cursor:'pointer', textAlign:'center'}}>
+                <div style={{fontSize:'24px', marginBottom:'6px'}}>🔑</div>
+                <p style={{fontSize:'15px', fontWeight:'700', color: isSale ? '#166534' : '#374151', margin:'0 0 2px'}}>For Sale</p>
+                <p style={{fontSize:'12px', color:'#6b7280', margin:'0'}}>Full sale / down payment</p>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* PROPERTY DETAILS */}
-        <div style={sectionStyle}>
-          <div style={sectionTitleStyle}>🏠 Property Details</div>
-          <div style={{marginBottom:'14px'}}>
-            <label style={labelStyle}>Listing Title *</label>
-            <input style={inputStyle} placeholder="e.g. Bright 2BR apartment near downtown" {...f('title')} />
-          </div>
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
-            <div>
-              <label style={labelStyle}>Property Type</label>
-              <select style={inputStyle} {...f('property_type')}>
-                {['Apartment','House','Studio','Condo','Townhouse','Villa','Office','Shop','Land','Other'].map(t => <option key={t}>{t}</option>)}
-              </select>
+        {isProperty && (
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>🏠 Property Details</div>
+            <div style={{marginBottom:'14px'}}>
+              <label style={labelStyle}>Listing Title *</label>
+              <input style={inputStyle} placeholder="e.g. Bright 2BR apartment near downtown" {...f('title')} />
+            </div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+              <div>
+                <label style={labelStyle}>Property Type</label>
+                <select style={inputStyle} {...f('property_type')}>
+                  {['Apartment','House','Studio','Condo','Townhouse','Villa','Office','Shop','Land','Other'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Bedrooms</label>
+                <select style={inputStyle} {...f('bedrooms')}>
+                  {['Studio','1 bedroom','2 bedrooms','3 bedrooms','4 bedrooms','5+ bedrooms','N/A'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+              <div>
+                <label style={labelStyle}>Bathrooms</label>
+                <select style={inputStyle} {...f('bathrooms')}>
+                  {['1 bathroom','1.5 bathrooms','2 bathrooms','3+ bathrooms','N/A'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
             </div>
             <div>
-              <label style={labelStyle}>Bedrooms</label>
-              <select style={inputStyle} {...f('bedrooms')}>
-                {['Studio','1 bedroom','2 bedrooms','3 bedrooms','4 bedrooms','5+ bedrooms','N/A'].map(t => <option key={t}>{t}</option>)}
-              </select>
+              <label style={labelStyle}>Description</label>
+              <textarea style={{...inputStyle, minHeight:'100px', resize:'vertical'}} placeholder="Describe the property…" {...f('description')} />
             </div>
           </div>
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+        )}
+
+        {/* VEHICLE DETAILS */}
+        {isVehicle && (
+          <div style={sectionStyle}>
+            <div style={sectionTitleStyle}>🚗 Vehicle Details</div>
+            <div style={{marginBottom:'14px'}}>
+              <label style={labelStyle}>Listing Title *</label>
+              <input style={inputStyle} placeholder="e.g. 2020 Toyota Corolla — Excellent Condition" {...f('title')} />
+            </div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+              <div>
+                <label style={labelStyle}>Vehicle Type</label>
+                <select style={inputStyle} {...f('property_type')}>
+                  <option value="Car">🚗 Car</option>
+                  <option value="Motorcycle">🏍️ Motorcycle</option>
+                  <option value="Bicycle">🚲 Bicycle</option>
+                  <option value="Truck">🚛 Truck</option>
+                  <option value="Van">🚐 Van</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Condition</label>
+                <select style={inputStyle} {...f('vehicle_condition')}>
+                  {['Excellent','Very Good','Good','Fair','For Parts'].map(t => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+              <div>
+                <label style={labelStyle}>Make (Brand)</label>
+                <input style={inputStyle} placeholder="e.g. Toyota, Honda, BMW" {...f('vehicle_make')} />
+              </div>
+              <div>
+                <label style={labelStyle}>Model</label>
+                <input style={inputStyle} placeholder="e.g. Corolla, Civic, X5" {...f('vehicle_model')} />
+              </div>
+            </div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
+              <div>
+                <label style={labelStyle}>Year</label>
+                <input style={inputStyle} placeholder="e.g. 2020" {...f('vehicle_year')} />
+              </div>
+              <div>
+                <label style={labelStyle}>Mileage / KM</label>
+                <input style={inputStyle} placeholder="e.g. 45,000 km" {...f('vehicle_mileage')} />
+              </div>
+            </div>
             <div>
-              <label style={labelStyle}>Bathrooms</label>
-              <select style={inputStyle} {...f('bathrooms')}>
-                {['1 bathroom','1.5 bathrooms','2 bathrooms','3+ bathrooms','N/A'].map(t => <option key={t}>{t}</option>)}
-              </select>
+              <label style={labelStyle}>Description</label>
+              <textarea style={{...inputStyle, minHeight:'100px', resize:'vertical'}} placeholder="Describe the vehicle — features, history, reason for selling…" {...f('description')} />
             </div>
           </div>
-          <div>
-            <label style={labelStyle}>Description</label>
-            <textarea style={{...inputStyle, minHeight:'100px', resize:'vertical'}} placeholder="Describe the property — highlights, nearby amenities, terms…" {...f('description')} />
-          </div>
-        </div>
+        )}
 
         {/* PRICING */}
         <div style={sectionStyle}>
@@ -247,18 +331,14 @@ export default function ListProperty() {
             </div>
           </div>
 
-          {isRent && !isContact && (
+          {isProperty && isRent && !isContact && (
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
               <div>
                 <label style={labelStyle}>Rental Price *</label>
-                <input
-                  style={inputStyle}
-                  type="text"
-                  inputMode="numeric"
-                  placeholder={form.currency === 'ETB' ? 'e.g. 1,500,000' : 'e.g. 1,800'}
+                <input style={inputStyle} type="text" inputMode="numeric"
+                  placeholder={form.currency === 'ETB' ? 'e.g. 15,000' : 'e.g. 1,800'}
                   value={formatNumber(form.price)}
-                  onChange={e => handlePriceChange('price', e.target.value)}
-                />
+                  onChange={e => handlePriceChange('price', e.target.value)} />
               </div>
               <div>
                 <label style={labelStyle}>Price Period</label>
@@ -269,52 +349,42 @@ export default function ListProperty() {
             </div>
           )}
 
-          {isSale && !isContact && (
+          {(isVehicle || (isProperty && isSale)) && !isContact && (
             <div>
               <div style={{marginBottom:'14px'}}>
-                <label style={labelStyle}>Total Sale Price *</label>
-                <input
-                  style={inputStyle}
-                  type="text"
-                  inputMode="numeric"
-                  placeholder={form.currency === 'ETB' ? 'e.g. 5,000,000' : 'e.g. 250,000'}
+                <label style={labelStyle}>{isVehicle ? 'Vehicle Price *' : 'Total Sale Price *'}</label>
+                <input style={inputStyle} type="text" inputMode="numeric"
+                  placeholder={form.currency === 'ETB' ? 'e.g. 1,200,000' : 'e.g. 25,000'}
                   value={formatNumber(form.sale_price)}
-                  onChange={e => handlePriceChange('sale_price', e.target.value)}
-                />
+                  onChange={e => handlePriceChange('sale_price', e.target.value)} />
               </div>
-              <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
-                <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
-                <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
-                  <div>
-                    <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
-                    <input
-                      style={inputStyle}
-                      type="text"
-                      inputMode="numeric"
-                      placeholder={form.currency === 'ETB' ? 'e.g. 500,000' : 'e.g. 50,000'}
-                      value={formatNumber(form.down_payment)}
-                      onChange={e => handlePriceChange('down_payment', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label style={{...labelStyle, color:'#166534'}}>Monthly After Down Payment</label>
-                    <input
-                      style={inputStyle}
-                      type="text"
-                      inputMode="numeric"
-                      placeholder={form.currency === 'ETB' ? 'e.g. 20,000' : 'e.g. 1,500'}
-                      value={formatNumber(form.monthly_after_down)}
-                      onChange={e => handlePriceChange('monthly_after_down', e.target.value)}
-                    />
+              {isProperty && (
+                <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:'10px', padding:'14px', marginBottom:'14px'}}>
+                  <p style={{fontSize:'13px', fontWeight:'700', color:'#166534', margin:'0 0 10px'}}>💳 Down Payment Options (optional)</p>
+                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px'}}>
+                    <div>
+                      <label style={{...labelStyle, color:'#166534'}}>Down Payment</label>
+                      <input style={inputStyle} type="text" inputMode="numeric"
+                        placeholder={form.currency === 'ETB' ? 'e.g. 500,000' : 'e.g. 50,000'}
+                        value={formatNumber(form.down_payment)}
+                        onChange={e => handlePriceChange('down_payment', e.target.value)} />
+                    </div>
+                    <div>
+                      <label style={{...labelStyle, color:'#166634'}}>Monthly After Down</label>
+                      <input style={inputStyle} type="text" inputMode="numeric"
+                        placeholder={form.currency === 'ETB' ? 'e.g. 20,000' : 'e.g. 1,500'}
+                        value={formatNumber(form.monthly_after_down)}
+                        onChange={e => handlePriceChange('monthly_after_down', e.target.value)} />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
           {isContact && (
             <div style={{background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:'10px', padding:'14px'}}>
-              <p style={{fontSize:'13px', color:'#92400e', margin:'0', fontWeight:'600'}}>📞 Price will be hidden — renters will contact you directly for pricing details.</p>
+              <p style={{fontSize:'13px', color:'#92400e', margin:'0', fontWeight:'600'}}>📞 Price will be hidden — buyers will contact you directly.</p>
             </div>
           )}
         </div>
@@ -329,118 +399,14 @@ export default function ListProperty() {
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px'}}>
             <div>
               <label style={labelStyle}>City *</label>
-              <input
-                style={inputStyle}
-                placeholder="e.g. Addis Ababa or Washington DC"
-                list="city-suggestions"
-                {...f('city')}
-              />
+              <input style={inputStyle} placeholder="e.g. Addis Ababa or Washington DC"
+                list="city-suggestions" {...f('city')} />
               <datalist id="city-suggestions">
-                <option value="Addis Ababa" />
-                <option value="Dire Dawa" />
-                <option value="Harar" />
-                <option value="Bahir Dar" />
-                <option value="Gondar" />
-                <option value="Dessie" />
-                <option value="Debre Markos" />
-                <option value="Debre Birhan" />
-                <option value="Woldia" />
-                <option value="Kombolcha" />
-                <option value="Debre Tabor" />
-                <option value="Lalibela" />
-                <option value="Finote Selam" />
-                <option value="Bure" />
-                <option value="Mota" />
-                <option value="Addet" />
-                <option value="Kemissie" />
-                <option value="Sekota" />
-                <option value="Dangila" />
-                <option value="Injibara" />
-                <option value="Metema" />
-                <option value="Humera" />
-                <option value="Kobo" />
-                <option value="Merawi" />
-                <option value="Addis Zemen" />
-                <option value="Woreta" />
-                <option value="Chagni" />
-                <option value="Shewarobit" />
-                <option value="Adama" />
-                <option value="Jimma" />
-                <option value="Bishoftu" />
-                <option value="Shashamane" />
-                <option value="Asella" />
-                <option value="Ziway" />
-                <option value="Nekemte" />
-                <option value="Ambo" />
-                <option value="Holeta" />
-                <option value="Burayu" />
-                <option value="Sebeta" />
-                <option value="Woliso" />
-                <option value="Welkite" />
-                <option value="Robe" />
-                <option value="Goba" />
-                <option value="Gimbi" />
-                <option value="Bedele" />
-                <option value="Metu" />
-                <option value="Tepi" />
-                <option value="Dodola" />
-                <option value="Yabelo" />
-                <option value="Moyale" />
-                <option value="Negele Borana" />
-                <option value="Fitche" />
-                <option value="Dembi Dollo" />
-                <option value="Shambu" />
-                <option value="Hawassa" />
-                <option value="Yirgalem" />
-                <option value="Aleta Wendo" />
-                <option value="Wondo Genet" />
-                <option value="Arba Minch" />
-                <option value="Sodo" />
-                <option value="Hosaena" />
-                <option value="Bonga" />
-                <option value="Jinka" />
-                <option value="Mizan Teferi" />
-                <option value="Mekelle" />
-                <option value="Axum" />
-                <option value="Adwa" />
-                <option value="Shire" />
-                <option value="Adigrat" />
-                <option value="Wukro" />
-                <option value="Maychew" />
-                <option value="Alamata" />
-                <option value="Jijiga" />
-                <option value="Kebri Dahar" />
-                <option value="Gode" />
-                <option value="Dolo Odo" />
-                <option value="Degehabur" />
-                <option value="Semera" />
-                <option value="Logia" />
-                <option value="Dubti" />
-                <option value="Awash" />
-                <option value="Asaita" />
-                <option value="Assosa" />
-                <option value="Gambela" />
-                <option value="Itang" />
-                <option value="Washington DC" />
-                <option value="New York, NY" />
-                <option value="Los Angeles, CA" />
-                <option value="Dallas, TX" />
-                <option value="Minneapolis, MN" />
-                <option value="Seattle, WA" />
-                <option value="Atlanta, GA" />
-                <option value="Chicago, IL" />
-                <option value="Houston, TX" />
-                <option value="Denver, CO" />
-                <option value="Columbus, OH" />
-                <option value="San Jose, CA" />
-                <option value="Nashville, TN" />
-                <option value="Las Vegas, NV" />
-                <option value="Phoenix, AZ" />
-                <option value="Charlotte, NC" />
-                <option value="Boston, MA" />
-                <option value="Philadelphia, PA" />
-                <option value="Baltimore, MD" />
-                <option value="Detroit, MI" />
+                <option value="Addis Ababa" /><option value="Dire Dawa" /><option value="Bahir Dar" />
+                <option value="Gondar" /><option value="Mekelle" /><option value="Hawassa" />
+                <option value="Jimma" /><option value="Adama" /><option value="Bishoftu" />
+                <option value="Washington DC" /><option value="New York, NY" /><option value="Los Angeles, CA" />
+                <option value="Dallas, TX" /><option value="Minneapolis, MN" /><option value="Atlanta, GA" />
               </datalist>
             </div>
             <div>
@@ -455,43 +421,12 @@ export default function ListProperty() {
             </div>
             <div>
               <label style={labelStyle}>Neighborhood / Subcity</label>
-              <input
-                style={inputStyle}
-                placeholder="e.g. Bole, Capitol Hill"
-                list="neighborhood-suggestions"
-                {...f('neighborhood')}
-              />
+              <input style={inputStyle} placeholder="e.g. Bole, Capitol Hill"
+                list="neighborhood-suggestions" {...f('neighborhood')} />
               <datalist id="neighborhood-suggestions">
-                <option value="Bole" />
-                <option value="Kirkos" />
-                <option value="Yeka" />
-                <option value="Nifas Silk-Lafto" />
-                <option value="Kolfe Keranio" />
-                <option value="Gulele" />
-                <option value="Lideta" />
-                <option value="Addis Ketema" />
-                <option value="Akaky Kaliti" />
-                <option value="Lemi Kura" />
-                <option value="Arada" />
-                <option value="Bole Medhanialem" />
-                <option value="Sarbet" />
-                <option value="CMC" />
-                <option value="Megenagna" />
-                <option value="Mexico" />
-                <option value="Piassa" />
-                <option value="Gerji" />
-                <option value="Summit" />
-                <option value="Ayat" />
-                <option value="Saris" />
-                <option value="Lebu" />
-                <option value="Gotera" />
-                <option value="Kasanchis" />
-                <option value="Arat Kilo" />
-                <option value="Sidist Kilo" />
-                <option value="Amist Kilo" />
-                <option value="Mekanissa" />
-                <option value="Kera" />
-                <option value="Tor Hailoch" />
+                <option value="Bole" /><option value="CMC" /><option value="Megenagna" />
+                <option value="Sarbet" /><option value="Summit" /><option value="Ayat" />
+                <option value="Kazanchis" /><option value="Piassa" /><option value="Gerji" />
               </datalist>
             </div>
           </div>
@@ -500,18 +435,16 @@ export default function ListProperty() {
         {/* PHOTOS & VIDEO */}
         <div style={sectionStyle}>
           <div style={sectionTitleStyle}>📸 Photos & Video</div>
-          <p style={{fontSize:'13px', color:'#6b7280', marginBottom:'16px', fontWeight:'500', lineHeight:'1.6'}}>
-            Upload up to <strong style={{color:'#111827'}}>4 photos</strong> and <strong style={{color:'#111827'}}>1 video (max 30 seconds)</strong>. Listings with photos get 3x more inquiries.
+          <p style={{fontSize:'13px', color:'#6b7280', marginBottom:'16px', lineHeight:'1.6'}}>
+            Upload up to <strong>4 photos</strong> and <strong>1 video</strong>. Listings with photos get 3x more inquiries.
           </p>
-          <div
-            onClick={() => fileInputRef.current.click()}
+          <div onClick={() => fileInputRef.current.click()}
             style={{border:'2px dashed #d1d5db', borderRadius:'12px', padding:'36px 24px', textAlign:'center', cursor:'pointer', background:'#f9fafb', marginBottom:'16px'}}
             onMouseEnter={e => { e.currentTarget.style.borderColor='#ea580c'; e.currentTarget.style.background='#fff7ed' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor='#d1d5db'; e.currentTarget.style.background='#f9fafb' }}
-          >
+            onMouseLeave={e => { e.currentTarget.style.borderColor='#d1d5db'; e.currentTarget.style.background='#f9fafb' }}>
             <div style={{fontSize:'40px', marginBottom:'10px'}}>📁</div>
             <p style={{fontSize:'15px', fontWeight:'700', color:'#374151', margin:'0 0 6px'}}>Click to upload photos or video</p>
-            <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>JPG, PNG, WEBP · MP4 (max 30 sec) · Up to 4 photos + 1 video</p>
+            <p style={{fontSize:'12px', color:'#9ca3af', margin:'0'}}>JPG, PNG, WEBP · MP4 (max 30 sec)</p>
             <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" onChange={handleFileChange} style={{display:'none'}} />
           </div>
           {previews.length > 0 && (
@@ -573,11 +506,8 @@ export default function ListProperty() {
           </div>
         )}
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          style={{width:'100%', padding:'16px', borderRadius:'12px', background: loading ? '#d1d5db' : '#ea580c', color:'#ffffff', fontSize:'16px', fontWeight:'800', border:'none', cursor: loading ? 'not-allowed' : 'pointer'}}
-        >
+        <button onClick={handleSubmit} disabled={loading}
+          style={{width:'100%', padding:'16px', borderRadius:'12px', background: loading ? '#d1d5db' : '#ea580c', color:'#ffffff', fontSize:'16px', fontWeight:'800', border:'none', cursor: loading ? 'not-allowed' : 'pointer'}}>
           {loading ? '⏳ Publishing...' : '🚀 Publish Listing — Free'}
         </button>
       </div>
