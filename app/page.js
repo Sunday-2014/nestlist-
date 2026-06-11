@@ -91,10 +91,13 @@ export default function Home() {
   const [lang, setLang] = useState('en')
   const [menuOpen, setMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [activeTab, setActiveTab] = useState('listings') // 'listings' or 'jobs'
-  const [jobFilter, setJobFilter] = useState('') // '' | 'Looking for Work' | 'Hiring'
+  const [activeTab, setActiveTab] = useState('listings')
+  const [jobFilter, setJobFilter] = useState('')
   const [jobTypeFilter, setJobTypeFilter] = useState('')
   const [jobSearch, setJobSearch] = useState('')
+  const [carSearch, setCarSearch] = useState('')
+  const [carTypeFilter, setCarTypeFilter] = useState('')
+  const [carConditionFilter, setCarConditionFilter] = useState('')
 
   const t = translations[lang]
 
@@ -110,7 +113,7 @@ export default function Home() {
         return 0
       })
       setListings(sorted)
-      setFiltered(sorted.filter(l => l.listing_category !== 'Job'))
+      setFiltered(sorted.filter(l => l.listing_category !== 'Job' && l.listing_category !== 'Vehicle'))
       setLoading(false)
     }).catch(() => setLoading(false))
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -126,7 +129,7 @@ export default function Home() {
   }
 
   const handleSearch = () => {
-    let results = listings.filter(l => l.listing_category !== 'Job')
+    let results = listings.filter(l => l.listing_category !== 'Job' && l.listing_category !== 'Vehicle')
     if (search) results = results.filter(l =>
       l.title?.toLowerCase().includes(search.toLowerCase()) ||
       l.city?.toLowerCase().includes(search.toLowerCase()) ||
@@ -150,6 +153,19 @@ export default function Home() {
     return results
   }
 
+  const getCarListings = () => {
+    let results = listings.filter(l => l.listing_category === 'Vehicle')
+    if (carTypeFilter) results = results.filter(l => l.property_type === carTypeFilter)
+    if (carConditionFilter) results = results.filter(l => l.vehicle_condition === carConditionFilter)
+    if (carSearch) results = results.filter(l =>
+      l.title?.toLowerCase().includes(carSearch.toLowerCase()) ||
+      l.vehicle_make?.toLowerCase().includes(carSearch.toLowerCase()) ||
+      l.vehicle_model?.toLowerCase().includes(carSearch.toLowerCase()) ||
+      l.city?.toLowerCase().includes(carSearch.toLowerCase())
+    )
+    return results
+  }
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleSearch()
   }
@@ -165,19 +181,23 @@ export default function Home() {
   }
 
   const getCardBadge = (l) => {
+    if (l.listing_category === 'Vehicle') {
+      const icons = {Car:'🚗', Motorcycle:'🏍️', Bicycle:'🚲', Truck:'🚛', Van:'🚐'}
+      return <span style={{background:'#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{icons[l.property_type] || '🚗'} {l.property_type || 'Vehicle'}</span>
+    }
     if (l.listing_category === 'Job') {
       return l.job_employment_type === 'Looking for Work'
         ? <span style={{background:'#1877F2', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>👤 Looking for Work</span>
         : <span style={{background:'#166534', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>🏢 Hiring</span>
     }
-    if (l.listing_category === 'Vehicle') return <span style={{background:'#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>🚗 Vehicle</span>
     return <span style={{background: l.listing_type === 'Sale' ? '#166534' : '#ea580c', color:'#ffffff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.listing_type === 'Sale' ? '🔑 For Sale' : '🏠 For Rent'}</span>
   }
 
   const jobListings = getJobListings()
+  const carListings = getCarListings()
 
   const ListingCard = ({l}) => (
-    <Link key={l.id} href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
+    <Link href={`/listing/${l.id}`} style={{textDecoration:'none'}}>
       <div style={{background:'#ffffff', borderRadius:'16px', border: l.is_featured && new Date(l.featured_until) > new Date() ? '2px solid #d97706' : '1px solid #e5e7eb', overflow:'hidden', transition:'transform 0.2s, box-shadow 0.2s', boxShadow: l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)', height:'100%'}}
         onMouseEnter={e => { e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)' }}
         onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow= l.is_featured && new Date(l.featured_until) > new Date() ? '0 0 16px rgba(217,119,6,0.25)' : '0 1px 4px rgba(0,0,0,0.06)' }}
@@ -198,7 +218,7 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div style={{padding:'12px 14px 0', display:'flex', gap:'4px'}}>
+          <div style={{padding:'12px 14px 0', display:'flex', gap:'4px', flexWrap:'wrap'}}>
             {getCardBadge(l)}
             {l.listing_category !== 'Job' && <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>}
           </div>
@@ -212,7 +232,8 @@ export default function Home() {
           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'10px', borderTop:'1px solid #f3f4f6'}}>
             <div>
               <p style={{fontSize:'18px', fontWeight:'800', color:'#111827', margin:'0', lineHeight:'1'}}>{showCardPrice(l)}</p>
-              {l.listing_category !== 'Job' && <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>}
+              {l.listing_category !== 'Job' && l.listing_category !== 'Vehicle' && <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.bedrooms}</p>}
+              {l.listing_category === 'Vehicle' && l.vehicle_year && <p style={{fontSize:'12px', color:'#9ca3af', margin:'4px 0 0', fontWeight:'500'}}>{l.vehicle_year} · {l.vehicle_condition}</p>}
             </div>
             <div style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'8px 16px', borderRadius:'8px', background:'#ea580c', whiteSpace:'nowrap'}}>{t.viewDetails}</div>
           </div>
@@ -306,7 +327,6 @@ export default function Home() {
 
           <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>{t.heroSubtitle}</p>
 
-          {/* SEARCH BOX — only show on listings tab */}
           {activeTab === 'listings' && (
             <div style={{background:'#ffffff', borderRadius:'16px', padding:'12px', maxWidth:'780px', margin:'0 auto', boxShadow:'0 4px 24px rgba(0,0,0,0.10)', border:'1px solid #e5e7eb', boxSizing:'border-box'}}>
               <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
@@ -367,14 +387,18 @@ export default function Home() {
 
       {/* MAIN TABS */}
       <div style={{maxWidth:'1100px', margin:'0 auto', padding:'24px 16px 0', boxSizing:'border-box'}}>
-        <div style={{display:'flex', gap:'4px', background:'#ffffff', padding:'4px', borderRadius:'12px', border:'1px solid #e5e7eb', width:'fit-content', marginBottom:'24px'}}>
+        <div style={{display:'flex', gap:'4px', background:'#ffffff', padding:'4px', borderRadius:'12px', border:'1px solid #e5e7eb', width:'fit-content', marginBottom:'24px', flexWrap:'wrap'}}>
           <button onClick={() => setActiveTab('listings')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'10px 24px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'listings' ? '#ea580c' : 'transparent', color: activeTab === 'listings' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
-            🏠 Listings
+            style={{fontSize:'14px', fontWeight:'700', padding:'10px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'listings' ? '#ea580c' : 'transparent', color: activeTab === 'listings' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            🏠 Apartment/Condo/House/Rooms
+          </button>
+          <button onClick={() => setActiveTab('cars')}
+            style={{fontSize:'14px', fontWeight:'700', padding:'10px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'cars' ? '#7c3aed' : 'transparent', color: activeTab === 'cars' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            🚗 Cars {listings.filter(l => l.listing_category === 'Vehicle').length > 0 && <span style={{background: activeTab === 'cars' ? 'rgba(255,255,255,0.3)' : '#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'1px 6px', borderRadius:'99px', marginLeft:'6px'}}>{listings.filter(l => l.listing_category === 'Vehicle').length}</span>}
           </button>
           <button onClick={() => setActiveTab('jobs')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'10px 24px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'jobs' ? '#1877F2' : 'transparent', color: activeTab === 'jobs' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
-            💼 Jobs {listings.filter(l => l.listing_category === 'Job').length > 0 && <span style={{background:'#ef4444', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'1px 6px', borderRadius:'99px', marginLeft:'6px'}}>{listings.filter(l => l.listing_category === 'Job').length}</span>}
+            style={{fontSize:'14px', fontWeight:'700', padding:'10px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'jobs' ? '#1877F2' : 'transparent', color: activeTab === 'jobs' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            💼 Jobs {listings.filter(l => l.listing_category === 'Job').length > 0 && <span style={{background: activeTab === 'jobs' ? 'rgba(255,255,255,0.3)' : '#1877F2', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'1px 6px', borderRadius:'99px', marginLeft:'6px'}}>{listings.filter(l => l.listing_category === 'Job').length}</span>}
           </button>
         </div>
       </div>
@@ -407,16 +431,88 @@ export default function Home() {
         </div>
       )}
 
+      {/* CARS TAB */}
+      {activeTab === 'cars' && (
+        <div style={{maxWidth:'1100px', margin:'0 auto', padding:'0 16px 64px', boxSizing:'border-box'}}>
+
+          {/* CARS HEADER */}
+          <div style={{background:'linear-gradient(135deg, #f5f3ff, #ede9fe)', borderRadius:'16px', padding:'24px', marginBottom:'20px', border:'1px solid #ddd6fe'}}>
+            <h2 style={{fontSize:'22px', fontWeight:'800', color:'#4c1d95', margin:'0 0 8px'}}>🚗 Cars & Vehicles for Sale</h2>
+            <p style={{fontSize:'14px', color:'#6d28d9', margin:'0 0 16px'}}>Browse cars, motorcycles, bicycles and more — direct from owners</p>
+            <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#7c3aed', textDecoration:'none', display:'inline-block'}}>
+              🚗 List Your Vehicle — Free
+            </Link>
+          </div>
+
+          {/* CAR FILTERS */}
+          <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', marginBottom:'20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
+            <div style={{display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'center'}}>
+              <input
+                style={{flex:'2', minWidth:'160px', padding:'10px 14px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', outline:'none', background:'#f9fafb'}}
+                placeholder="Search make, model, city..."
+                value={carSearch}
+                onChange={e => setCarSearch(e.target.value)}
+              />
+              <select
+                style={{flex:'1', minWidth:'140px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={carTypeFilter}
+                onChange={e => setCarTypeFilter(e.target.value)}
+              >
+                <option value="">🚗 All Vehicles</option>
+                <option value="Car">🚗 Car</option>
+                <option value="Motorcycle">🏍️ Motorcycle</option>
+                <option value="Bicycle">🚲 Bicycle</option>
+                <option value="Truck">🚛 Truck</option>
+                <option value="Van">🚐 Van</option>
+              </select>
+              <select
+                style={{flex:'1', minWidth:'140px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={carConditionFilter}
+                onChange={e => setCarConditionFilter(e.target.value)}
+              >
+                <option value="">⭐ Any Condition</option>
+                <option value="Excellent">Excellent</option>
+                <option value="Very Good">Very Good</option>
+                <option value="Good">Good</option>
+                <option value="Fair">Fair</option>
+                <option value="For Parts">For Parts</option>
+              </select>
+            </div>
+          </div>
+
+          <p style={{fontSize:'13px', color:'#6b7280', margin:'0 0 16px', fontWeight:'500'}}>{carListings.length} vehicle{carListings.length !== 1 ? 's' : ''} found</p>
+
+          {loading ? (
+            <div style={{textAlign:'center', padding:'80px 0'}}>
+              <div className="spinner" style={{margin:'0 auto 16px'}}></div>
+              <p style={{color:'#6b7280', fontSize:'14px'}}>Loading vehicles...</p>
+            </div>
+          ) : carListings.length === 0 ? (
+            <div style={{textAlign:'center', padding:'60px 24px', background:'#ffffff', borderRadius:'16px', border:'2px dashed #ddd6fe'}}>
+              <div style={{fontSize:'48px', marginBottom:'12px'}}>🚗</div>
+              <p style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 8px'}}>No vehicles found</p>
+              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>Be the first to list a car, motorcycle or bicycle for sale!</p>
+              <Link href="/list" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'12px 28px', borderRadius:'10px', background:'#7c3aed', textDecoration:'none', display:'inline-block'}}>
+                List Your Vehicle — Free
+              </Link>
+            </div>
+          ) : (
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap:'16px'}}>
+              {carListings.map(l => <ListingCard key={l.id} l={l} />)}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* JOBS TAB */}
       {activeTab === 'jobs' && (
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'0 16px 64px', boxSizing:'border-box'}}>
 
-          {/* JOB HEADER */}
           <div style={{background:'linear-gradient(135deg, #eff6ff, #dbeafe)', borderRadius:'16px', padding:'24px', marginBottom:'20px', border:'1px solid #bfdbfe'}}>
             <h2 style={{fontSize:'22px', fontWeight:'800', color:'#1e3a8a', margin:'0 0 8px'}}>💼 Jobs Board / የስራ ቦርድ</h2>
             <p style={{fontSize:'14px', color:'#1d4ed8', margin:'0 0 16px'}}>Find jobs or post your opening — free for everyone · ለሁሉም ነፃ ነው</p>
             <div style={{display:'flex', gap:'10px', flexWrap:'wrap'}}>
-              <Link href="/list" onClick={() => {}} style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#1877F2', textDecoration:'none', display:'inline-block'}}>
+              <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#1877F2', textDecoration:'none', display:'inline-block'}}>
                 👤 I Need a Job / ስራ እፈልጋለሁ
               </Link>
               <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#166534', textDecoration:'none', display:'inline-block'}}>
@@ -425,7 +521,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* JOB FILTERS */}
           <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', marginBottom:'20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
             <div style={{display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'center'}}>
               <input
@@ -435,7 +530,7 @@ export default function Home() {
                 onChange={e => setJobSearch(e.target.value)}
               />
               <select
-                style={{flex:'1', minWidth:'160px', padding:'10px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                style={{flex:'1', minWidth:'160px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
                 value={jobFilter}
                 onChange={e => setJobFilter(e.target.value)}
               >
@@ -444,7 +539,7 @@ export default function Home() {
                 <option value="Hiring">🏢 Hiring — ሰራተኛ ያስፈልጋል</option>
               </select>
               <select
-                style={{flex:'1', minWidth:'160px', padding:'10px 10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                style={{flex:'1', minWidth:'160px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
                 value={jobTypeFilter}
                 onChange={e => setJobTypeFilter(e.target.value)}
               >
@@ -537,3 +632,4 @@ export default function Home() {
     </div>
   )
 }
+
