@@ -79,6 +79,23 @@ export default function RootLayout({ children }) {
         <meta name="geo.region" content="ET" />
         <meta name="geo.placename" content="Ethiopia" />
         <meta name="language" content="English, Amharic" />
+        <script dangerouslySetInnerHTML={{__html: `
+          document.addEventListener('contextmenu', e => e.preventDefault());
+          document.addEventListener('copy', e => e.preventDefault());
+          document.addEventListener('cut', e => e.preventDefault());
+          document.addEventListener('keydown', e => {
+            if (e.key === 'F12') { e.preventDefault(); return false; }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
+            if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'a' || e.key === 'A' || e.key === 'c' || e.key === 'C')) { e.preventDefault(); return false; }
+            if (e.metaKey && (e.key === 'u' || e.key === 'U' || e.key === 'a' || e.key === 'A' || e.key === 'c' || e.key === 'C')) { e.preventDefault(); return false; }
+          });
+          setInterval(() => {
+            const threshold = 160;
+            if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+              document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;font-size:24px;color:#ea580c;font-weight:700;">🔒 Access Restricted</div>';
+            }
+          }, 1000);
+        `}} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -103,3 +120,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
