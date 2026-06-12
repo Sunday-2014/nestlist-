@@ -50,6 +50,8 @@ export default function ListingDetail({ params }) {
           renterEmail: 'anonymous@visitor.com',
           renterName: 'A visitor',
           listingTitle: listing.title,
+          listingCategory: listing.listing_category || 'Property',
+          listingType: listing.listing_type || 'Rent',
           message: ''
         })
       })
@@ -408,3 +410,4 @@ export default function ListingDetail({ params }) {
     </div>
   )
 }
+
