@@ -20,6 +20,7 @@ export default function ListProperty() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
+  const [currentUser, setCurrentUser] = useState(null)
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function ListProperty() {
   const loadUser = async () => {
     const user = await getCurrentUser()
     if (!user) { window.location.href = '/login'; return }
+    setCurrentUser(user)
     setForm(prev => ({
       ...prev,
       contact_email: user.email,
@@ -78,7 +80,7 @@ export default function ListProperty() {
     if (!form.contact_phone) { setError('Please add a contact phone number'); return }
     setLoading(true)
     try {
-      const user = await getCurrentUser()
+      const user = currentUser
       if (!user) { window.location.href = '/login'; return }
       setUploadProgress('Saving listing...')
       const listing = await createListing({
@@ -673,3 +675,4 @@ export default function ListProperty() {
     </div>
   )
 }
+
