@@ -344,7 +344,23 @@ export default function Home() {
               </a>
             </div>
           ) : (
-            <h2 style={{fontSize:'clamp(22px, 6vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>{t.heroTitle}</h2>
+            <>
+              <h2 style={{fontSize:'clamp(22px, 6vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>{t.heroTitle}</h2>
+              <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer"
+                style={{display:'block', width:'100%', maxWidth:'340px', margin:'0 auto 16px', borderRadius:'12px', overflow:'hidden', border:'3px solid #d97706', textDecoration:'none', position:'relative'}}>
+                <video
+                  src="/ads/Beryodes_Ad.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{width:'100%', height:'160px', objectFit:'cover', display:'block'}}
+                />
+                <div style={{position:'absolute', bottom:0, left:0, right:0, background:'rgba(0,0,0,0.5)', padding:'4px 8px', textAlign:'center'}}>
+                  <p style={{fontSize:'10px', color:'#ffffff', margin:'0', fontWeight:'700'}}>Ad</p>
+                </div>
+              </a>
+            </>
           )}
 
           <p style={{fontSize:'clamp(14px, 3vw, 16px)', color:'#4b5563', margin:'0 auto 24px', maxWidth:'480px', lineHeight:'1.6'}}>{t.heroSubtitle}</p>
@@ -682,6 +698,7 @@ export default function Home() {
     </div>
   )
 }
+
 
 
 
