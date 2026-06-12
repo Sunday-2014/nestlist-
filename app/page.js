@@ -98,6 +98,7 @@ export default function Home() {
   const [carSearch, setCarSearch] = useState('')
   const [carTypeFilter, setCarTypeFilter] = useState('')
   const [carConditionFilter, setCarConditionFilter] = useState('')
+  const [carListingType, setCarListingType] = useState('')
 
   const t = translations[lang]
 
@@ -157,6 +158,7 @@ export default function Home() {
     let results = listings.filter(l => l.listing_category === 'Vehicle')
     if (carTypeFilter) results = results.filter(l => l.property_type === carTypeFilter)
     if (carConditionFilter) results = results.filter(l => l.vehicle_condition === carConditionFilter)
+    if (carListingType) results = results.filter(l => l.listing_type === carListingType)
     if (carSearch) results = results.filter(l =>
       l.title?.toLowerCase().includes(carSearch.toLowerCase()) ||
       l.vehicle_make?.toLowerCase().includes(carSearch.toLowerCase()) ||
@@ -183,7 +185,13 @@ export default function Home() {
   const getCardBadge = (l) => {
     if (l.listing_category === 'Vehicle') {
       const icons = {Car:'🚗', Motorcycle:'🏍️', Bicycle:'🚲', Truck:'🚛', Van:'🚐'}
-      return <span style={{background:'#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{icons[l.property_type] || '🚗'} {l.property_type || 'Vehicle'}</span>
+      const isVehicleRent = l.listing_type === 'Rent'
+      return (
+        <div style={{display:'flex', gap:'4px', flexWrap:'wrap'}}>
+          <span style={{background:'#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{icons[l.property_type] || '🚗'} {l.property_type || 'Vehicle'}</span>
+          <span style={{background: isVehicleRent ? '#ea580c' : '#166534', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{isVehicleRent ? '🔄 For Rent' : '🔑 For Sale'}</span>
+        </div>
+      )
     }
     if (l.listing_category === 'Job') {
       return l.job_employment_type === 'Looking for Work'
@@ -220,7 +228,7 @@ export default function Home() {
         ) : (
           <div style={{padding:'12px 14px 0', display:'flex', gap:'4px', flexWrap:'wrap'}}>
             {getCardBadge(l)}
-            {l.listing_category !== 'Job' && <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>}
+            {l.listing_category !== 'Job' && l.listing_category !== 'Vehicle' && <span style={{background:'#f3f4f6', color:'#374151', fontSize:'10px', fontWeight:'700', padding:'3px 8px', borderRadius:'5px'}}>{l.property_type}</span>}
           </div>
         )}
         <div style={{padding:'14px'}}>
@@ -311,57 +319,102 @@ export default function Home() {
 
           {!isMobile ? (
             <div style={{display:'flex', alignItems:'center', gap:'16px', margin:'0 0 12px', justifyContent:'center'}}>
-              <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer"
-                style={{width:'160px', minHeight:'110px', flexShrink:0, borderRadius:'12px', overflow:'hidden', display:'block', cursor:'pointer', border:'3px solid #d97706', textDecoration:'none', position:'relative'}}>
-                <video
-                  src="/ads/Beryodes_Ad.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  style={{width:'100%', height:'110px', objectFit:'cover', display:'block'}}
-                  onError={e => e.currentTarget.style.display='none'}
-                />
-                <div style={{position:'absolute', bottom:0, left:0, right:0, background:'rgba(0,0,0,0.5)', padding:'4px 8px', textAlign:'center'}}>
-                  <p style={{fontSize:'10px', color:'#ffffff', margin:'0', fontWeight:'700'}}>Ad</p>
+
+              {/* LEFT AD — DESKTOP */}
+              <div style={{width:'160px', minHeight:'110px', flexShrink:0, borderRadius:'12px', overflow:'hidden', border:'3px solid #d97706', position:'relative'}}>
+                <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer" style={{display:'block', textDecoration:'none'}}>
+                  <video
+                    id="desktop-ad-video-1"
+                    ref={el => { if (el) { el.muted = true; el.play().catch(() => {}) } }}
+                    src="/ads/Beryodes_Ad.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    controls={false}
+                    style={{width:'100%', height:'110px', objectFit:'cover', display:'block'}}
+                    onError={e => e.currentTarget.style.display='none'}
+                  />
+                </a>
+                <div style={{position:'absolute', bottom:'6px', left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 6px'}}>
+                  <span style={{fontSize:'9px', color:'#ffffff', fontWeight:'700', background:'rgba(0,0,0,0.5)', padding:'1px 6px', borderRadius:'4px'}}>Ad</span>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      const vid = document.getElementById('desktop-ad-video-1')
+                      if (vid) { vid.muted = !vid.muted; if (!vid.muted) vid.play().catch(() => {}); e.currentTarget.textContent = vid.muted ? '🔇' : '🔊' }
+                    }}
+                    style={{background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%', width:'22px', height:'22px', cursor:'pointer', fontSize:'12px', color:'#ffffff', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                    🔇
+                  </button>
                 </div>
-              </a>
+              </div>
+
               <h2 style={{fontSize:'clamp(20px, 3vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0', lineHeight:'1.2', flex:1}}>{t.heroTitle}</h2>
-              <a href="https://YOUR-ADVERTISER-WEBSITE.com" target="_blank" rel="noopener noreferrer"
-                style={{width:'160px', minHeight:'110px', flexShrink:0, borderRadius:'12px', overflow:'hidden', display:'block', cursor:'pointer', border:'3px solid #d97706', textDecoration:'none', position:'relative'}}>
-                <video
-                  src="/ads/ad2.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  style={{width:'100%', height:'110px', objectFit:'cover', display:'block'}}
-                  onError={e => e.currentTarget.style.display='none'}
-                />
-                <div style={{position:'absolute', bottom:0, left:0, right:0, background:'rgba(0,0,0,0.5)', padding:'4px 8px', textAlign:'center'}}>
-                  <p style={{fontSize:'10px', color:'#ffffff', margin:'0', fontWeight:'700'}}>Ad</p>
+
+              {/* RIGHT AD — DESKTOP */}
+              <div style={{width:'160px', minHeight:'110px', flexShrink:0, borderRadius:'12px', overflow:'hidden', border:'3px solid #d97706', position:'relative'}}>
+                <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer" style={{display:'block', textDecoration:'none'}}>
+                  <video
+                    id="desktop-ad-video-2"
+                    ref={el => { if (el) { el.muted = true; el.play().catch(() => {}) } }}
+                    src="/ads/Beryodes_Ad.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    controls={false}
+                    style={{width:'100%', height:'110px', objectFit:'cover', display:'block'}}
+                    onError={e => e.currentTarget.style.display='none'}
+                  />
+                </a>
+                <div style={{position:'absolute', bottom:'6px', left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 6px'}}>
+                  <span style={{fontSize:'9px', color:'#ffffff', fontWeight:'700', background:'rgba(0,0,0,0.5)', padding:'1px 6px', borderRadius:'4px'}}>Ad</span>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      const vid = document.getElementById('desktop-ad-video-2')
+                      if (vid) { vid.muted = !vid.muted; if (!vid.muted) vid.play().catch(() => {}); e.currentTarget.textContent = vid.muted ? '🔇' : '🔊' }
+                    }}
+                    style={{background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%', width:'22px', height:'22px', cursor:'pointer', fontSize:'12px', color:'#ffffff', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                    🔇
+                  </button>
                 </div>
-              </a>
+              </div>
+
             </div>
           ) : (
             <>
               <h2 style={{fontSize:'clamp(22px, 6vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>{t.heroTitle}</h2>
-              <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer"
-                style={{display:'block', width:'100%', maxWidth:'340px', margin:'0 auto 16px', borderRadius:'12px', overflow:'hidden', border:'3px solid #d97706', textDecoration:'none', position:'relative'}}>
-                <video
-                  ref={el => { if (el) { el.muted = true; el.play().catch(() => {}) } }}
-                  src="/ads/Beryodes_Ad.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  controls={false}
-                  style={{width:'100%', height:'160px', objectFit:'cover', display:'block'}}
-                />
-                <div style={{position:'absolute', bottom:0, left:0, right:0, background:'rgba(0,0,0,0.5)', padding:'4px 8px', textAlign:'center'}}>
-                  <p style={{fontSize:'10px', color:'#ffffff', margin:'0', fontWeight:'700'}}>Ad</p>
+
+              {/* MOBILE AD */}
+              <div style={{width:'100%', maxWidth:'340px', margin:'0 auto 16px', borderRadius:'12px', overflow:'hidden', border:'3px solid #d97706', position:'relative'}}>
+                <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer" style={{display:'block', textDecoration:'none'}}>
+                  <video
+                    id="mobile-ad-video"
+                    ref={el => { if (el) { el.muted = true; el.play().catch(() => {}) } }}
+                    src="/ads/Beryodes_Ad.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    controls={false}
+                    style={{width:'100%', height:'160px', objectFit:'cover', display:'block'}}
+                  />
+                </a>
+                <div style={{position:'absolute', bottom:'8px', left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 10px'}}>
+                  <span style={{fontSize:'10px', color:'#ffffff', fontWeight:'700', background:'rgba(0,0,0,0.5)', padding:'2px 8px', borderRadius:'4px'}}>Ad</span>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      const vid = document.getElementById('mobile-ad-video')
+                      if (vid) { vid.muted = !vid.muted; if (!vid.muted) vid.play().catch(() => {}); e.currentTarget.textContent = vid.muted ? '🔇' : '🔊' }
+                    }}
+                    style={{background:'rgba(0,0,0,0.6)', border:'none', borderRadius:'50%', width:'28px', height:'28px', cursor:'pointer', fontSize:'14px', color:'#ffffff', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                    🔇
+                  </button>
                 </div>
-              </a>
+              </div>
             </>
           )}
 
@@ -427,19 +480,19 @@ export default function Home() {
 
       {/* MAIN TABS */}
       <div style={{maxWidth:'1100px', margin:'0 auto', padding:'24px 16px 0', boxSizing:'border-box'}}>
-        <div style={{display:'flex', gap:'4px', background:'#ffffff', padding:'4px', borderRadius:'12px', border:'1px solid #e5e7eb', width:'fit-content', marginBottom:'24px', flexWrap:'wrap'}}>
+        <div style={{display:'flex', gap:'8px', marginBottom:'24px', flexWrap:'wrap'}}>
           <button onClick={() => setActiveTab('listings')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', border:'none', cursor:'pointer', transition:'all 0.2s',
+            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', cursor:'pointer', transition:'all 0.2s',
               background: activeTab === 'listings' ? 'linear-gradient(135deg, #ea580c, #f97316)' : '#ffffff',
               color: activeTab === 'listings' ? '#ffffff' : '#6b7280',
               boxShadow: activeTab === 'listings' ? '0 4px 15px rgba(234,88,12,0.4)' : '0 1px 4px rgba(0,0,0,0.08)',
               border: activeTab === 'listings' ? 'none' : '2px solid #e5e7eb',
               transform: activeTab === 'listings' ? 'translateY(-1px)' : 'none'
             }}>
-            🏠 Apartment/Condo/House/Rooms
+            🏠 Listings
           </button>
           <button onClick={() => setActiveTab('cars')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', border:'none', cursor:'pointer', transition:'all 0.2s', display:'flex', alignItems:'center', gap:'6px',
+            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', cursor:'pointer', transition:'all 0.2s', display:'flex', alignItems:'center', gap:'6px',
               background: activeTab === 'cars' ? 'linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)' : 'linear-gradient(135deg, #f5f3ff, #ede9fe)',
               color: activeTab === 'cars' ? '#ffffff' : '#7c3aed',
               boxShadow: activeTab === 'cars' ? '0 4px 15px rgba(124,58,237,0.5)' : '0 2px 8px rgba(124,58,237,0.15)',
@@ -454,7 +507,7 @@ export default function Home() {
             )}
           </button>
           <button onClick={() => setActiveTab('jobs')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', border:'none', cursor:'pointer', transition:'all 0.2s', display:'flex', alignItems:'center', gap:'6px',
+            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', cursor:'pointer', transition:'all 0.2s', display:'flex', alignItems:'center', gap:'6px',
               background: activeTab === 'jobs' ? 'linear-gradient(135deg, #1877F2, #2563eb, #3b82f6)' : 'linear-gradient(135deg, #eff6ff, #dbeafe)',
               color: activeTab === 'jobs' ? '#ffffff' : '#1877F2',
               boxShadow: activeTab === 'jobs' ? '0 4px 15px rgba(24,119,242,0.5)' : '0 2px 8px rgba(24,119,242,0.15)',
@@ -502,17 +555,14 @@ export default function Home() {
       {/* CARS TAB */}
       {activeTab === 'cars' && (
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'0 16px 64px', boxSizing:'border-box'}}>
-
-          {/* CARS HEADER */}
           <div style={{background:'linear-gradient(135deg, #f5f3ff, #ede9fe)', borderRadius:'16px', padding:'24px', marginBottom:'20px', border:'1px solid #ddd6fe'}}>
-            <h2 style={{fontSize:'22px', fontWeight:'800', color:'#4c1d95', margin:'0 0 8px'}}>🚗 Cars & Vehicles for Sale</h2>
+            <h2 style={{fontSize:'22px', fontWeight:'800', color:'#4c1d95', margin:'0 0 8px'}}>🚗 Cars & Vehicles</h2>
             <p style={{fontSize:'14px', color:'#6d28d9', margin:'0 0 16px'}}>Browse cars, motorcycles, bicycles and more — direct from owners</p>
             <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#7c3aed', textDecoration:'none', display:'inline-block'}}>
               🚗 List Your Vehicle — Free
             </Link>
           </div>
 
-          {/* CAR FILTERS */}
           <div style={{background:'#ffffff', borderRadius:'16px', padding:'16px', marginBottom:'20px', border:'1px solid #e5e7eb', boxShadow:'0 1px 4px rgba(0,0,0,0.05)'}}>
             <div style={{display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'center'}}>
               <input
@@ -521,24 +571,24 @@ export default function Home() {
                 value={carSearch}
                 onChange={e => setCarSearch(e.target.value)}
               />
-              <select
-                style={{flex:'1', minWidth:'140px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
-                value={carTypeFilter}
-                onChange={e => setCarTypeFilter(e.target.value)}
-              >
-                <option value="">🚗 All Vehicles</option>
+              <select style={{flex:'1', minWidth:'130px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={carListingType} onChange={e => setCarListingType(e.target.value)}>
+                <option value="">🚗 Sale & Rent</option>
+                <option value="Sale">🔑 For Sale</option>
+                <option value="Rent">🔄 For Rent</option>
+              </select>
+              <select style={{flex:'1', minWidth:'130px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={carTypeFilter} onChange={e => setCarTypeFilter(e.target.value)}>
+                <option value="">All Vehicles</option>
                 <option value="Car">🚗 Car</option>
                 <option value="Motorcycle">🏍️ Motorcycle</option>
                 <option value="Bicycle">🚲 Bicycle</option>
                 <option value="Truck">🚛 Truck</option>
                 <option value="Van">🚐 Van</option>
               </select>
-              <select
-                style={{flex:'1', minWidth:'140px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
-                value={carConditionFilter}
-                onChange={e => setCarConditionFilter(e.target.value)}
-              >
-                <option value="">⭐ Any Condition</option>
+              <select style={{flex:'1', minWidth:'130px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={carConditionFilter} onChange={e => setCarConditionFilter(e.target.value)}>
+                <option value="">Any Condition</option>
                 <option value="Excellent">Excellent</option>
                 <option value="Very Good">Very Good</option>
                 <option value="Good">Good</option>
@@ -559,7 +609,7 @@ export default function Home() {
             <div style={{textAlign:'center', padding:'60px 24px', background:'#ffffff', borderRadius:'16px', border:'2px dashed #ddd6fe'}}>
               <div style={{fontSize:'48px', marginBottom:'12px'}}>🚗</div>
               <p style={{fontSize:'18px', fontWeight:'700', color:'#111827', margin:'0 0 8px'}}>No vehicles found</p>
-              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>Be the first to list a car, motorcycle or bicycle for sale!</p>
+              <p style={{fontSize:'14px', color:'#6b7280', margin:'0 0 20px'}}>Be the first to list a car, motorcycle or bicycle!</p>
               <Link href="/list" style={{fontSize:'14px', fontWeight:'700', color:'#ffffff', padding:'12px 28px', borderRadius:'10px', background:'#7c3aed', textDecoration:'none', display:'inline-block'}}>
                 List Your Vehicle — Free
               </Link>
@@ -575,7 +625,6 @@ export default function Home() {
       {/* JOBS TAB */}
       {activeTab === 'jobs' && (
         <div style={{maxWidth:'1100px', margin:'0 auto', padding:'0 16px 64px', boxSizing:'border-box'}}>
-
           <div style={{background:'linear-gradient(135deg, #eff6ff, #dbeafe)', borderRadius:'16px', padding:'24px', marginBottom:'20px', border:'1px solid #bfdbfe'}}>
             <h2 style={{fontSize:'22px', fontWeight:'800', color:'#1e3a8a', margin:'0 0 8px'}}>💼 Jobs Board / የስራ ቦርድ</h2>
             <p style={{fontSize:'14px', color:'#1d4ed8', margin:'0 0 16px'}}>Find jobs or post your opening — free for everyone · ለሁሉም ነፃ ነው</p>
@@ -584,7 +633,7 @@ export default function Home() {
                 👤 I Need a Job / ስራ እፈልጋለሁ
               </Link>
               <Link href="/list" style={{fontSize:'13px', fontWeight:'700', color:'#ffffff', padding:'10px 18px', borderRadius:'10px', background:'#166534', textDecoration:'none', display:'inline-block'}}>
-                🏢 Post a Job / ሰራተኛ ያስፈልጋሉ
+                🏢 Post a Job / የስራ ቅጥር ማስታዎቂያ
               </Link>
             </div>
           </div>
@@ -597,28 +646,22 @@ export default function Home() {
                 value={jobSearch}
                 onChange={e => setJobSearch(e.target.value)}
               />
-              <select
-                style={{flex:'1', minWidth:'160px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
-                value={jobFilter}
-                onChange={e => setJobFilter(e.target.value)}
-              >
+              <select style={{flex:'1', minWidth:'160px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={jobFilter} onChange={e => setJobFilter(e.target.value)}>
                 <option value="">👥 All Jobs</option>
                 <option value="Looking for Work">👤 Looking for Work — ስራ እፈልጋለሁ</option>
-                <option value="Hiring">🏢 Hiring — ሰራተኛ ያስፈልጋል</option>
+                <option value="Hiring">🏢 Hiring — ሰራተኛ መቅጠር እንፈልጋለን</option>
               </select>
-              <select
-                style={{flex:'1', minWidth:'160px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
-                value={jobTypeFilter}
-                onChange={e => setJobTypeFilter(e.target.value)}
-              >
+              <select style={{flex:'1', minWidth:'160px', padding:'10px', borderRadius:'10px', border:'2px solid #e5e7eb', fontSize:'13px', color:'#111827', background:'#f9fafb', outline:'none'}}
+                value={jobTypeFilter} onChange={e => setJobTypeFilter(e.target.value)}>
                 <option value="">🗂️ All Types</option>
                 <option value="Full Time">Full Time / ሙሉ ጊዜ</option>
                 <option value="Part Time">Part Time / ግማሽ ጊዜ</option>
                 <option value="Contract">Contract / ኮንትራት</option>
                 <option value="Day Job">Day Job / የቀን ስራ</option>
                 <option value="Household Assistant">Household Assistant / የቤት ሰራተኛ</option>
-                <option value="Home Care">Home Care / የቤት እንክብካቤ</option>
-                <option value="Nanny">Nanny / አያሪ</option>
+                <option value="Home Care">Home Care / የቤት ጽዳት</option>
+                <option value="Nanny">Nanny / ልጅ ተንከባካቢ</option>
                 <option value="Driver">Driver / ሹፌር</option>
                 <option value="Security">Security / ጠባቂ</option>
               </select>
@@ -700,7 +743,4 @@ export default function Home() {
     </div>
   )
 }
-
-
-
 
