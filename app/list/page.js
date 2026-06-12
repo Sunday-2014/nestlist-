@@ -69,15 +69,19 @@ export default function ListProperty() {
 
   const handleSubmit = async () => {
     setError('')
-    if (!form.title) { setError('Please add a title'); return }
-    if (!form.city) { setError('Please add a city'); return }
+    if (!form.title) { setError('Title is required — please add a title for your listing'); return }
+    if (!form.city) { setError('City is required — please add a city'); return }
     if (form.listing_category === 'Property') {
-      if (form.listing_type === 'Rent' && !form.price && form.currency !== 'Contact') { setError('Please add a rental price'); return }
-      if (form.listing_type === 'Sale' && !form.sale_price && form.currency !== 'Contact') { setError('Please add a sale price'); return }
+      if (form.listing_type === 'Rent' && !form.price && form.currency !== 'Contact') { setError('Rental price is required — please add a price or select Contact for price'); return }
+      if (form.listing_type === 'Sale' && !form.sale_price && form.currency !== 'Contact') { setError('Sale price is required — please add a price or select Contact for price'); return }
     } else if (form.listing_category === 'Vehicle') {
-      if (!form.sale_price && form.currency !== 'Contact') { setError('Please add a price'); return }
+      if (!form.sale_price && !form.price && form.currency !== 'Contact') { setError('Price is required — please add a vehicle price or select Contact for price'); return }
+    } else if (form.listing_category === 'Job') {
+      if (!form.description) { setError('Job description is required — please describe the job'); return }
+      if (!form.job_employment_type || form.job_employment_type === 'Full Time') { }
     }
-    if (!form.contact_phone) { setError('Please add a contact phone number'); return }
+    if (!form.contact_name) { setError('Your name is required — please add your name in the Contact section'); return }
+    if (!form.contact_phone) { setError('Phone number is required — please add a contact phone number'); return }
     setLoading(true)
     try {
       const user = currentUser
@@ -85,6 +89,7 @@ export default function ListProperty() {
       setUploadProgress('Saving listing...')
       const listing = await createListing({
         ...form,
+        available_from: form.available_from && form.available_from.trim() !== '' ? form.available_from : null,
         price: form.listing_category === 'Vehicle' && form.listing_type === 'Rent'
           ? parseInt(form.sale_price?.toString().replace(/,/g, '') || '0')
           : form.price ? parseInt(form.price.toString().replace(/,/g, '')) : 0,
@@ -188,8 +193,12 @@ export default function ListProperty() {
         </div>
 
         {error && (
-          <div style={{background:'#fef2f2', border:'2px solid #fca5a5', borderRadius:'12px', padding:'14px 18px', marginBottom:'20px', color:'#dc2626', fontSize:'14px', fontWeight:'600'}}>
-            ⚠️ {error}
+          <div style={{background:'#fef2f2', border:'2px solid #fca5a5', borderRadius:'12px', padding:'14px 18px', marginBottom:'20px', color:'#dc2626', fontSize:'14px', fontWeight:'600', display:'flex', alignItems:'flex-start', gap:'10px'}}>
+            <span style={{fontSize:'20px', flexShrink:0}}>⚠️</span>
+            <div>
+              <p style={{margin:'0 0 4px', fontWeight:'800'}}>Please fix the following:</p>
+              <p style={{margin:'0', fontWeight:'500'}}>{error}</p>
+            </div>
           </div>
         )}
 
@@ -675,4 +684,5 @@ export default function ListProperty() {
     </div>
   )
 }
+
 
