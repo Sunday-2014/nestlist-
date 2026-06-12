@@ -10,7 +10,7 @@
 
     // Hero
     badge: '🌎Current Time And Date🌎',
-    heroTitle: 'Find or List Rentals & Properties for Sale AnyWhere in the World',
+    heroTitle: 'Homes · Jobs · Cars — List or Find Anything, Anywhere',
     heroSubtitle: 'Browse rentals, list your property or post it for sale — connect directly with owners, no agents, no fees.',
     searchPlaceholder: 'Search city, neighborhood or title...',
     allTypes: 'All types',
@@ -56,7 +56,7 @@
 
     // Hero
     badge: '🌍የአሁኑ ሰዓት እና ቀን🌍',
-    heroTitle: 'በመላው አለም ለኪራይ ወይም ለሽያጭ የሚሆኑ ቤቶችን ይፈልጉ ወይም ሊስት ያስገቡ',
+    heroTitle: 'ቤት · ስራ · መኪና — ሁሉንም ያግኙ ወይም ያስተዋውቁ',
     heroSubtitle: 'የሚከራይ ቤት የፈልጉ ፣ ቤትዎን ያከራዩ — ቀጥታ ከባለቤቶች ጋር ይገናኙ።',
     searchPlaceholder: 'ከተማ፣ ሰፈር ወይም ቀበሌ ይፈልጉ...',
     allTypes: 'ሁሉም ዓይነቶች',
