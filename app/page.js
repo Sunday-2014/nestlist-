@@ -349,11 +349,13 @@ export default function Home() {
               <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer"
                 style={{display:'block', width:'100%', maxWidth:'340px', margin:'0 auto 16px', borderRadius:'12px', overflow:'hidden', border:'3px solid #d97706', textDecoration:'none', position:'relative'}}>
                 <video
+                  ref={el => { if (el) { el.muted = true; el.play().catch(() => {}) } }}
                   src="/ads/Beryodes_Ad.mp4"
                   autoPlay
                   loop
                   muted
                   playsInline
+                  controls={false}
                   style={{width:'100%', height:'160px', objectFit:'cover', display:'block'}}
                 />
                 <div style={{position:'absolute', bottom:0, left:0, right:0, background:'rgba(0,0,0,0.5)', padding:'4px 8px', textAlign:'center'}}>
