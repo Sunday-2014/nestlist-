@@ -389,16 +389,44 @@ export default function Home() {
       <div style={{maxWidth:'1100px', margin:'0 auto', padding:'24px 16px 0', boxSizing:'border-box'}}>
         <div style={{display:'flex', gap:'4px', background:'#ffffff', padding:'4px', borderRadius:'12px', border:'1px solid #e5e7eb', width:'fit-content', marginBottom:'24px', flexWrap:'wrap'}}>
           <button onClick={() => setActiveTab('listings')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'10px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'listings' ? '#ea580c' : 'transparent', color: activeTab === 'listings' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
+            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', border:'none', cursor:'pointer', transition:'all 0.2s',
+              background: activeTab === 'listings' ? 'linear-gradient(135deg, #ea580c, #f97316)' : '#ffffff',
+              color: activeTab === 'listings' ? '#ffffff' : '#6b7280',
+              boxShadow: activeTab === 'listings' ? '0 4px 15px rgba(234,88,12,0.4)' : '0 1px 4px rgba(0,0,0,0.08)',
+              border: activeTab === 'listings' ? 'none' : '2px solid #e5e7eb',
+              transform: activeTab === 'listings' ? 'translateY(-1px)' : 'none'
+            }}>
             🏠 Apartment/Condo/House/Rooms
           </button>
           <button onClick={() => setActiveTab('cars')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'10px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'cars' ? '#7c3aed' : 'transparent', color: activeTab === 'cars' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
-            🚗 Cars {listings.filter(l => l.listing_category === 'Vehicle').length > 0 && <span style={{background: activeTab === 'cars' ? 'rgba(255,255,255,0.3)' : '#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'1px 6px', borderRadius:'99px', marginLeft:'6px'}}>{listings.filter(l => l.listing_category === 'Vehicle').length}</span>}
+            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', border:'none', cursor:'pointer', transition:'all 0.2s', display:'flex', alignItems:'center', gap:'6px',
+              background: activeTab === 'cars' ? 'linear-gradient(135deg, #7c3aed, #9333ea, #a855f7)' : 'linear-gradient(135deg, #f5f3ff, #ede9fe)',
+              color: activeTab === 'cars' ? '#ffffff' : '#7c3aed',
+              boxShadow: activeTab === 'cars' ? '0 4px 15px rgba(124,58,237,0.5)' : '0 2px 8px rgba(124,58,237,0.15)',
+              border: activeTab === 'cars' ? 'none' : '2px solid #ddd6fe',
+              transform: activeTab === 'cars' ? 'translateY(-1px)' : 'none'
+            }}>
+            🚗 Cars
+            {listings.filter(l => l.listing_category === 'Vehicle').length > 0 && (
+              <span style={{background: activeTab === 'cars' ? 'rgba(255,255,255,0.3)' : '#7c3aed', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'2px 7px', borderRadius:'99px'}}>
+                {listings.filter(l => l.listing_category === 'Vehicle').length}
+              </span>
+            )}
           </button>
           <button onClick={() => setActiveTab('jobs')}
-            style={{fontSize:'14px', fontWeight:'700', padding:'10px 20px', borderRadius:'8px', border:'none', cursor:'pointer', background: activeTab === 'jobs' ? '#1877F2' : 'transparent', color: activeTab === 'jobs' ? '#ffffff' : '#6b7280', transition:'all 0.15s'}}>
-            💼 Jobs {listings.filter(l => l.listing_category === 'Job').length > 0 && <span style={{background: activeTab === 'jobs' ? 'rgba(255,255,255,0.3)' : '#1877F2', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'1px 6px', borderRadius:'99px', marginLeft:'6px'}}>{listings.filter(l => l.listing_category === 'Job').length}</span>}
+            style={{fontSize:'14px', fontWeight:'700', padding:'12px 24px', borderRadius:'12px', border:'none', cursor:'pointer', transition:'all 0.2s', display:'flex', alignItems:'center', gap:'6px',
+              background: activeTab === 'jobs' ? 'linear-gradient(135deg, #1877F2, #2563eb, #3b82f6)' : 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+              color: activeTab === 'jobs' ? '#ffffff' : '#1877F2',
+              boxShadow: activeTab === 'jobs' ? '0 4px 15px rgba(24,119,242,0.5)' : '0 2px 8px rgba(24,119,242,0.15)',
+              border: activeTab === 'jobs' ? 'none' : '2px solid #bfdbfe',
+              transform: activeTab === 'jobs' ? 'translateY(-1px)' : 'none'
+            }}>
+            💼 Jobs
+            {listings.filter(l => l.listing_category === 'Job').length > 0 && (
+              <span style={{background: activeTab === 'jobs' ? 'rgba(255,255,255,0.3)' : '#1877F2', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'2px 7px', borderRadius:'99px'}}>
+                {listings.filter(l => l.listing_category === 'Job').length}
+              </span>
+            )}
           </button>
         </div>
       </div>
