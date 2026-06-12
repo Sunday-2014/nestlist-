@@ -311,15 +311,37 @@ export default function Home() {
 
           {!isMobile ? (
             <div style={{display:'flex', alignItems:'center', gap:'16px', margin:'0 0 12px', justifyContent:'center'}}>
-              <div style={{width:'160px', minHeight:'110px', flexShrink:0, border:'3px solid #d97706', borderRadius:'12px', background:'linear-gradient(135deg, #fef3c7, #fde68a)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px', textAlign:'center', cursor:'pointer'}}>
-                <p style={{fontSize:'12px', fontWeight:'800', color:'#92400e', margin:'0 0 4px', lineHeight:'1.4'}}>This place is open for Ad</p>
-                <p style={{fontSize:'10px', color:'#b45309', margin:'0', lineHeight:'1.4'}}>Contact us to advertise</p>
-              </div>
+              <a href="https://www.Enjerapress.com" target="_blank" rel="noopener noreferrer"
+                style={{width:'160px', minHeight:'110px', flexShrink:0, borderRadius:'12px', overflow:'hidden', display:'block', cursor:'pointer', border:'3px solid #d97706', textDecoration:'none', position:'relative'}}>
+                <video
+                  src="/ads/Beryodes_Ad.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{width:'100%', height:'110px', objectFit:'cover', display:'block'}}
+                  onError={e => e.currentTarget.style.display='none'}
+                />
+                <div style={{position:'absolute', bottom:0, left:0, right:0, background:'rgba(0,0,0,0.5)', padding:'4px 8px', textAlign:'center'}}>
+                  <p style={{fontSize:'10px', color:'#ffffff', margin:'0', fontWeight:'700'}}>Ad</p>
+                </div>
+              </a>
               <h2 style={{fontSize:'clamp(20px, 3vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0', lineHeight:'1.2', flex:1}}>{t.heroTitle}</h2>
-              <div style={{width:'160px', minHeight:'110px', flexShrink:0, border:'3px solid #d97706', borderRadius:'12px', background:'linear-gradient(135deg, #fef3c7, #fde68a)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px', textAlign:'center', cursor:'pointer'}}>
-                <p style={{fontSize:'12px', fontWeight:'800', color:'#92400e', margin:'0 0 4px', lineHeight:'1.4'}}>This place is open for Ad</p>
-                <p style={{fontSize:'10px', color:'#b45309', margin:'0', lineHeight:'1.4'}}>Contact us to advertise</p>
-              </div>
+              <a href="https://YOUR-ADVERTISER-WEBSITE.com" target="_blank" rel="noopener noreferrer"
+                style={{width:'160px', minHeight:'110px', flexShrink:0, borderRadius:'12px', overflow:'hidden', display:'block', cursor:'pointer', border:'3px solid #d97706', textDecoration:'none', position:'relative'}}>
+                <video
+                  src="/ads/ad2.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{width:'100%', height:'110px', objectFit:'cover', display:'block'}}
+                  onError={e => e.currentTarget.style.display='none'}
+                />
+                <div style={{position:'absolute', bottom:0, left:0, right:0, background:'rgba(0,0,0,0.5)', padding:'4px 8px', textAlign:'center'}}>
+                  <p style={{fontSize:'10px', color:'#ffffff', margin:'0', fontWeight:'700'}}>Ad</p>
+                </div>
+              </a>
             </div>
           ) : (
             <h2 style={{fontSize:'clamp(22px, 6vw, 40px)', fontWeight:'800', color:'#1f2937', margin:'0 0 12px', lineHeight:'1.2'}}>{t.heroTitle}</h2>
@@ -660,4 +682,6 @@ export default function Home() {
     </div>
   )
 }
+
+
 
