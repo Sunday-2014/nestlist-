@@ -90,6 +90,8 @@ export default function RootLayout({ children }) {
             if (e.metaKey && (e.key === 'u' || e.key === 'U' || e.key === 'a' || e.key === 'A' || e.key === 'c' || e.key === 'C')) { e.preventDefault(); return false; }
           });
           setInterval(() => {
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) return;
             const threshold = 160;
             if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
               document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;font-size:24px;color:#ea580c;font-weight:700;">🔒 Access Restricted</div>';
